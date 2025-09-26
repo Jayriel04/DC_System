@@ -61,7 +61,7 @@ include('includes/dbconnection.php');
           <h3>Student Management System</h3>      
            <p>Registered Students can Login Here</p>             
           <div class="readmore">
-          <a href="user/login.php">Get started<i class="glyphicon glyphicon-menu-right"> </i></a>
+          <a href="user/create_account.php">Book appointment<i class="glyphicon glyphicon-menu-right"> </i></a>
           </div>
          </li>
 
