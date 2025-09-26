@@ -46,7 +46,7 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" href="view-notice.php">
-                <span class="menu-title">View Notice</span>
+                <span class="menu-title">Records</span>
                 <i class="icon-doc menu-icon"></i>
             </a>
         </li>
