@@ -1,0 +1,114 @@
+<?php
+session_start();
+error_reporting(0);
+include('includes/dbconnection.php');
+if (strlen($_SESSION['sturecmsaid']) == 0) {
+    header('location:logout.php');
+    exit();
+}
+
+if (!isset($_GET['editid'])) {
+    echo "<script>alert('No appointment selected');window.location.href='manage-appointment.php';</script>";
+    exit();
+}
+
+$number = intval($_GET['editid']);
+
+// Fetch appointment data
+$sql = "SELECT * FROM tblappointment WHERE number = :number";
+$query = $dbh->prepare($sql);
+$query->bindParam(':number', $number, PDO::PARAM_INT);
+$query->execute();
+$appointment = $query->fetch(PDO::FETCH_OBJ);
+
+if (!$appointment) {
+    echo "<script>alert('Appointment not found');window.location.href='manage-appointment.php';</script>";
+    exit();
+}
+
+// Handle form submission
+if (isset($_POST['submit'])) {
+    $firstname = trim($_POST['firstname']);
+    $surname = trim($_POST['surname']);
+    $date = $_POST['date'];
+    $time = $_POST['time'];
+    $status = $_POST['status'];
+
+    $updateSql = "UPDATE tblappointment SET firstname=:firstname, surname=:surname, date=:date, time=:time, status=:status WHERE number=:number";
+    $updateQuery = $dbh->prepare($updateSql);
+    $updateQuery->bindParam(':firstname', $firstname, PDO::PARAM_STR);
+    $updateQuery->bindParam(':surname', $surname, PDO::PARAM_STR);
+    $updateQuery->bindParam(':date', $date, PDO::PARAM_STR);
+    $updateQuery->bindParam(':time', $time, PDO::PARAM_STR);
+    $updateQuery->bindParam(':status', $status, PDO::PARAM_STR);
+    $updateQuery->bindParam(':number', $number, PDO::PARAM_INT);
+
+    if ($updateQuery->execute()) {
+        echo "<script>alert('Appointment updated successfully');window.location.href='manage-appointment.php';</script>";
+        exit();
+    } else {
+        echo "<script>alert('Update failed. Please try again.');</script>";
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Edit Appointment</title>
+    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container-scroller">
+    <?php include_once('includes/header.php'); ?>
+    <div class="container-fluid page-body-wrapper">
+        <?php include_once('includes/sidebar.php'); ?>
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <h3 class="page-title">Edit Appointment</h3>
+                </div>
+                <div class="row">
+                    <div class="col-md-8 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <form method="POST">
+                                    <div class="form-group">
+                                        <label for="firstname">First Name</label>
+                                        <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo htmlentities($appointment->firstname); ?>" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="surname">Surname</label>
+                                        <input type="text" class="form-control" id="surname" name="surname" value="<?php echo htmlentities($appointment->surname); ?>" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="date">Date</label>
+                                        <input type="date" class="form-control" id="date" name="date" value="<?php echo htmlentities($appointment->date); ?>" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="time">Time</label>
+                                        <input type="time" class="form-control" id="time" name="time" value="<?php echo htmlentities($appointment->time); ?>" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="status">Status</label>
+                                        <select class="form-control" id="status" name="status" required>
+                                            <option value="Pending" <?php if($appointment->status=="Pending") echo "selected"; ?>>Pending</option>
+                                            <option value="Approved" <?php if($appointment->status=="Approved") echo "selected"; ?>>Approved</option>
+                                            <option value="Declined" <?php if($appointment->status=="Declined") echo "selected"; ?>>Declined</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" name="submit" class="btn btn-primary">Update Appointment</button>
+                                    <a href="manage-appointment.php" class="btn btn-secondary">Cancel</a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php include_once('includes/footer.php'); ?>
+        </div>
+    </div>
+</div>
+<script src="vendors/js/vendor.bundle.base.js"></script>
+</body>
+</html>
