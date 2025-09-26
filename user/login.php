@@ -45,7 +45,7 @@ if (isset($_POST['login'])) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Student Management System || Student Login Page</title>
+    <title>Login Page</title>
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
@@ -59,7 +59,7 @@ if (isset($_POST['login'])) {
                     <div class="col-lg-4 mx-auto">
                         <div class="auth-form-light text-left p-5">
                             <div class="brand-logo" align="center" style="font-weight:bold">
-                                Student Management System
+                                <h2>Login</h2>
                             </div>
                             <h6 class="font-weight-light">Sign in to continue.</h6>
                             <form class="pt-3" id="login" method="post" name="login">
