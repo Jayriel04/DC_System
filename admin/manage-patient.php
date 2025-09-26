@@ -74,7 +74,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                     <th class="font-weight-bold">Address</th>
                                                     <th class="font-weight-bold">Occupation</th>
                                                     <th class="font-weight-bold">Patient History</th>
-                                                    <th class="font-weight-bold">Medical Record</th>
+                                                    <th class="font-weight-bold">Examination Record</th>
                                                     <th class="font-weight-bold">Action</th>
                                                 </tr>
                                             </thead>
@@ -134,7 +134,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                                     <a href="patient-history.php?number=<?php echo htmlentities($row->number); ?>" class="btn btn-success btn-sm">View</a>
                                                                 </div>
                                                             </td>
-                                                            <td><?php echo htmlentities($row->medical_record);?>
+                                                            <td><?php echo htmlentities($row->examination_record);?>
                                                         <div>
                                                             <a href="medical-record.php?number=<?php echo htmlentities($row->number); ?>" class="btn btn-success btn-sm">View</a>
                                                         </div></td>

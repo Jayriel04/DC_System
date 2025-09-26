@@ -2764,7 +2764,7 @@ select[multiple].form-group-lg .form-control {
   height: auto;
 }
 .form-group-lg .form-control-static {
-  height: 46px;
+  height: 45px;
   min-height: 38px;
   padding: 10px 16px;
   font-size: 18px;
@@ -4074,7 +4074,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 }
 @media (min-width: 768px) {
   .navbar {
-    border-radius: 4px;
+    border-radius: 1px;
   }
 }
 @media (min-width: 768px) {
@@ -4083,7 +4083,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   }
 }
 .navbar-collapse {
-  padding-right: 15px;
+  padding-right: 10px;
   padding-left: 15px;
   overflow-x: visible;
   -webkit-overflow-scrolling: touch;
@@ -4131,8 +4131,8 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .container-fluid > .navbar-header,
 .container > .navbar-collapse,
 .container-fluid > .navbar-collapse {
-  margin-right: -15px;
-  margin-left: -15px;
+  margin-right: -10px;
+  margin-left: -10px;
 }
 @media (min-width: 768px) {
   .container > .navbar-header,
@@ -4396,7 +4396,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   }
 }
 .navbar-default {
-  background-color: #f8f8f8;
+  background-color: #f7f4f4;
   border-color: #e7e7e7;
 }
 .navbar-default .navbar-brand {

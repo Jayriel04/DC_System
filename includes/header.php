@@ -10,7 +10,11 @@
           <span class="icon-bar"> </span>
           <span class="icon-bar"> </span>
         </button>
-        <h1><a class="navbar-brand" href="index.php">JF DENTAL CARE</a></h1>
+        <!-- Logo inserted here -->
+        <a class="navbar-brand" href="index.php" style="display: flex; align-items: center;">
+          <img src="images/Jf logo.png" alt="JF Dental Care Logo" style="height:40px; margin-right:10px;">
+          <span>JF DENTAL CARE</span>
+        </a>
       </div>
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -20,10 +24,10 @@
           <li><a href="service.php"><span data-hover="Service">Services</span></a></li>
           <li><a href="contact.php"><span data-hover="Contact">Contact Us</span></a></li>
           <li>
-            <a href="user/login.php" class="btn btn-primary navbar-btn">Login</a>
+            <a href="user/login.php" class="btn btn-primary navbar-btn">LOGIN</a>
           </li>
           <li>
-            <a href="user/register.php" class="btn btn-primary navbar-btn">Register</a>
+            <a href="user/register.php" class="btn btn-primary navbar-btn">SIGNUP</a>
           </li>
         </ul>
         <div class="clearfix"> </div>
