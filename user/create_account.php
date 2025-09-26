@@ -52,6 +52,16 @@ if (isset($_POST['register'])) {
                             <h6 class="font-weight-light">Create your account.</h6>
                             <form class="pt-3" method="post" name="register">
                                 <div class="form-group">
+                                    <input type="text" class="form-control form-control-lg" placeholder="Firstname" required="true" name="firstname">
+                                </div>
+                                    <div class="form-group">
+                                    <input type="text" class="form-control form-control-lg" placeholder="Surname" required="true" name="surname">
+                                </div>
+                                <div class="form-group">
+                                    <label for="date_of_birth">Date of Birth</label>
+                                    <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" required>
+                                </div>   
+                                <div class="form-group">
                                     <input type="text" class="form-control form-control-lg" placeholder="Username" required="true" name="username">
                                 </div>
                                 <div class="form-group">

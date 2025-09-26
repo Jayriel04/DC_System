@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 20, 2025 at 02:29 PM
+-- Generation Time: Sep 26, 2025 at 07:58 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -65,8 +65,7 @@ CREATE TABLE `tblappointment` (
 --
 
 INSERT INTO `tblappointment` (`number`, `firstname`, `surname`, `date`, `time`, `service`, `status`) VALUES
-(1, 'Jayriel', 'Senilla', '2025-09-19', '11:57:00', 'Follow-up', 'Pending'),
-(2, 'Jezrah Faith', 'Canonio', '2025-09-19', '17:55:00', 'Follow-up', 'Approved');
+(4, 'Jezrah', 'Canonio', '2025-12-31', '00:29:00', NULL, 'Declined');
 
 -- --------------------------------------------------------
 
@@ -88,7 +87,9 @@ CREATE TABLE `tblcalendar` (
 --
 
 INSERT INTO `tblcalendar` (`id`, `slots`, `date`, `start_time`, `duration`, `end_time`) VALUES
-(1, '45', '2025-09-19', '17:00:00', 56, '17:05:00');
+(1, '45', '2025-09-19', '17:00:00', 56, '17:05:00'),
+(2, '3', '2025-09-24', '20:49:00', 30, '17:49:00'),
+(3, '3', '2025-09-24', '20:49:00', 30, '17:49:00');
 
 -- --------------------------------------------------------
 
@@ -111,7 +112,9 @@ CREATE TABLE `tblinventory` (
 --
 
 INSERT INTO `tblinventory` (`number`, `name`, `brand`, `expiration_date`, `quantity`, `category`, `status`) VALUES
-(0, 'Etchant', 'FGM', '2025-09-19', 10, 'Medicine', 'idk');
+(1, 'Etchant', 'FGM', '2025-09-19', 1, 'Medicine', 'Available'),
+(2, 'fsd', 'dsd', '2026-01-24', 0, 'Supply', 'Available'),
+(3, 'Isoprophyl Alcohol', 'Doctor J', '2028-06-25', 3, 'Supply', 'Available');
 
 -- --------------------------------------------------------
 
@@ -144,30 +147,46 @@ INSERT INTO `tblpage` (`ID`, `PageType`, `PageTitle`, `PageDescription`, `Email`
 --
 
 CREATE TABLE `tblpatient` (
-  `number` int(11) NOT NULL AUTO_INCREMENT,
+  `number` int(11) NOT NULL,
   `firstname` varchar(50) DEFAULT NULL,
   `surname` varchar(50) DEFAULT NULL,
   `date_of_birth` date DEFAULT NULL,
+  `sex` varchar(10) DEFAULT NULL,
+  `status` varchar(20) DEFAULT NULL,
+  `occupation` varchar(50) DEFAULT NULL,
   `age` int(11) DEFAULT NULL,
-  `sex` varchar(10) DEFAULT NULL,               
-  `status` varchar(20) DEFAULT NULL,            
   `contact_number` varchar(15) DEFAULT NULL,
   `address` varchar(255) DEFAULT NULL,
-  `occupation` varchar(50) DEFAULT NULL,        
   `username` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
-  `Image` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`number`)
+  `Image` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Dumping data for table `tblpatient`
 --
 
-INSERT INTO `tblpatient` (`number`, `firstname`, `surname`, `date_of_birth`, `age`, `contact_number`, `address`, `username`, `password`, `Image`) VALUES
-(1, 'Jayriel', 'Senilla', '2004-04-09', 21, '09319106644', 'casili, consolacion', 'jay', 'jay123', NULL),
-(2, 'Jezrah Faith', 'Canonio', '2004-05-13', 21, '09876543211', 'IDK', NULL, NULL, NULL),
-(3, 'Jezrah Faith', 'Canonio', '2004-05-13', 21, '09876543211', 'IDK', NULL, NULL, NULL),
-(4, 'John Mar', 'Ypil', '2002-12-21', NULL, '09374939832', 'idk', 'jm', 'a2d1bd818ac8a8419ccfecc4bef27035', 'pfpjm.jfif');
+INSERT INTO `tblpatient` (`number`, `firstname`, `surname`, `date_of_birth`, `sex`, `status`, `occupation`, `age`, `contact_number`, `address`, `username`, `password`, `Image`) VALUES
+(1, 'Jayriel', 'Senilla', '2004-04-09', NULL, 'Single', '', 21, '09319106644', 'casili, consolacion', 'jay', 'jay123', NULL),
+(2, 'Jezrah Faith', 'Canonio', '2004-05-13', NULL, NULL, NULL, 21, '09876543211', 'IDK', NULL, NULL, NULL),
+(3, 'Jezrah Faith', 'Canonio', '2004-05-13', NULL, NULL, NULL, 21, '09876543211', 'IDK', NULL, NULL, NULL),
+(4, 'John Mar', 'Ypil', '2002-12-21', NULL, NULL, NULL, NULL, '09374939832', 'idk', 'jm', 'a2d1bd818ac8a8419ccfecc4bef27035', 'pfpjm.jfif'),
+(5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'jezrah@gmail.com', '3b02af71589ec5ea4138a1ece1866008', NULL),
+(6, 'Rodelyn', 'Estrera', '2004-06-30', NULL, NULL, NULL, 21, '09564780461', 'Bakilid, Mandaue City', NULL, NULL, NULL),
+(7, 'Justine Louise', 'Aguinaldo', '0003-06-28', 'Female', 'Single', 'student', 2022, '09476372827', 'Bakilid, Mandaue City', NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblpatient_history`
+--
+
+CREATE TABLE `tblpatient_history` (
+  `id` int(11) NOT NULL,
+  `patient_number` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `details` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -178,6 +197,7 @@ INSERT INTO `tblpatient` (`number`, `firstname`, `surname`, `date_of_birth`, `ag
 CREATE TABLE `tblservice` (
   `number` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `description` varchar(500) NOT NULL,
   `image` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -185,10 +205,8 @@ CREATE TABLE `tblservice` (
 -- Dumping data for table `tblservice`
 --
 
-INSERT INTO `tblservice` (`number`, `name`, `image`) VALUES
-(1, 'ambot unsa ni', '2d1150b69c99f9b78c350147b808cc331758270429.png'),
-(2, 'ambot unsa ni', '2d1150b69c99f9b78c350147b808cc331758270448.png'),
-(3, 'ambot unsa ni', '2d1150b69c99f9b78c350147b808cc331758270932.png');
+INSERT INTO `tblservice` (`number`, `name`, `description`, `image`) VALUES
+(4, 'Etchant', 'HAHAHAAHAHAHAHHHAHAHAHA', 'images/services/cat-1.png');
 
 -- --------------------------------------------------------
 
@@ -256,6 +274,13 @@ ALTER TABLE `tblpatient`
   ADD PRIMARY KEY (`number`);
 
 --
+-- Indexes for table `tblpatient_history`
+--
+ALTER TABLE `tblpatient_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `patient_number` (`patient_number`);
+
+--
 -- Indexes for table `tblservice`
 --
 ALTER TABLE `tblservice`
@@ -281,13 +306,19 @@ ALTER TABLE `tbladmin`
 -- AUTO_INCREMENT for table `tblappointment`
 --
 ALTER TABLE `tblappointment`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tblcalendar`
 --
 ALTER TABLE `tblcalendar`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `tblinventory`
+--
+ALTER TABLE `tblinventory`
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tblpage`
@@ -299,19 +330,35 @@ ALTER TABLE `tblpage`
 -- AUTO_INCREMENT for table `tblpatient`
 --
 ALTER TABLE `tblpatient`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `tblpatient_history`
+--
+ALTER TABLE `tblpatient_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tblservice`
 --
 ALTER TABLE `tblservice`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tbluploadedhomeworks`
 --
 ALTER TABLE `tbluploadedhomeworks`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `tblpatient_history`
+--
+ALTER TABLE `tblpatient_history`
+  ADD CONSTRAINT `tblpatient_history_ibfk_1` FOREIGN KEY (`patient_number`) REFERENCES `tblpatient` (`number`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
