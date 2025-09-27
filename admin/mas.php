@@ -119,9 +119,24 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                             <?php
                                             // Load calendar slots for dropdown (combine date + start_time + duration)
                                             // Note: removed date >= CURDATE() so existing rows (even past ones) are visible.
-                                            $calStmt = $dbh->prepare("SELECT id, date, start_time, duration FROM tblcalendar ORDER BY date, start_time");
+                                            // duration column was removed from tblcalendar; select end_time instead
+                                            $calStmt = $dbh->prepare("SELECT id, date, start_time, end_time FROM tblcalendar ORDER BY date, start_time");
                                             $calStmt->execute();
                                             $cals = $calStmt->fetchAll(PDO::FETCH_OBJ);
+
+                                            // Helper: convert 24-hour time string to 12-hour with am/pm
+                                            function time12($t) {
+                                                if (empty($t)) return '-';
+                                                // accept formats like HH:MM[:SS]
+                                                $parts = explode(':', $t);
+                                                if (count($parts) < 2) return $t;
+                                                $h = intval($parts[0]);
+                                                $m = str_pad($parts[1],2,'0',STR_PAD_LEFT);
+                                                $ampm = $h >= 12 ? 'pm' : 'am';
+                                                $h12 = $h % 12;
+                                                if ($h12 === 0) $h12 = 12;
+                                                return $h12 . ':' . $m . ' ' . $ampm;
+                                            }
                                             ?>
                                             <select class="form-control" name="calendar_filter" onchange="autoSubmit()">
                                                 <option value="">All Slots</option>
@@ -129,7 +144,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                     <option value="">No slots available</option>
                                                 <?php } else {
                                                     foreach ($cals as $cal) {
-                                                        $label = $cal->date . ' ' . substr($cal->start_time,0,5) . ' (' . intval($cal->duration) . ' mins)';
+                                                        // show start and optional end time in label
+                                                        if (!empty($cal->end_time) && strtotime($cal->end_time) !== false) {
+                                                            $label = $cal->date . ' ' . time12($cal->start_time) . ' - ' . time12($cal->end_time);
+                                                        } else {
+                                                            $label = $cal->date . ' ' . time12($cal->start_time);
+                                                        }
                                                 ?>
                                                     <option value="<?php echo htmlentities($cal->id); ?>" <?php if ($selected_calendar == $cal->id) echo 'selected'; ?>><?php echo htmlentities($label); ?></option>
                                                 <?php }
@@ -149,6 +169,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                     <th class="font-weight-bold">Time</th>
                                                     <th class="font-weight-bold">Duration (mins)</th>
                                                     <th class="font-weight-bold">Service</th>
+                                                    <th class="font-weight-bold">Cancel Reason</th>
                                                     <th class="font-weight-bold">Status</th>
                                                     <th class="font-weight-bold">Action</th>
                                                 </tr>
@@ -173,11 +194,22 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                 } catch (Exception $e) {
                                                     $hasServiceColumn = false;
                                                 }
+                                                // Determine if tblschedule has a cancel_reason column so we can display it
+                                                $hasCancelReason = false;
+                                                try {
+                                                    $cancelColChk = $dbh->prepare("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'tblschedule' AND COLUMN_NAME = 'cancel_reason'");
+                                                    $cancelColChk->execute();
+                                                    if ($cancelColChk->rowCount() > 0) $hasCancelReason = true;
+                                                } catch (Exception $e) {
+                                                    $hasCancelReason = false;
+                                                }
 
                                                 // Build the query based on search and status filter
                                                 // Left join tblschedule to get schedule date/time/duration if present
                                                 // If service column exists, left join tblservice to fetch service name
-                                                $selectExtra = $hasServiceColumn ? ", svc.name AS svc_name" : "";
+                                                $selectExtra = '';
+                                                if ($hasServiceColumn) $selectExtra .= ", svc.name AS svc_name";
+                                                if ($hasCancelReason) $selectExtra .= ", s.cancel_reason AS cancel_reason";
                                                 $joinService = $hasServiceColumn ? " LEFT JOIN tblservice svc ON svc.number = s.service_id" : "";
                                                 $sql = "SELECT tblappointment.*, s.id AS schedule_id, s.date AS sched_date, s.time AS sched_time, s.duration AS sched_duration, s.status AS sched_status" . $selectExtra . " FROM tblappointment LEFT JOIN tblschedule s ON s.appointment_id = tblappointment.id" . $joinService . " WHERE 1=1";
                                                 if ($search) {
@@ -261,8 +293,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                             <td><?php echo htmlentities($row->id); ?></td>
                                                             <td><?php echo htmlentities($row->firstname); ?></td>
                                                             <td><?php echo htmlentities($row->surname); ?></td>
-                                                            <td><?php echo htmlentities(!empty($row->sched_date) ? $row->sched_date : $row->date); ?></td>
-                                                            <td><?php echo htmlentities(!empty($row->sched_time) ? substr($row->sched_time,0,5) : substr($row->time,0,5)); ?></td>
+                                                                <td><?php
+                                                                    $d = !empty($row->sched_date) ? $row->sched_date : $row->date;
+                                                                    $t = !empty($row->sched_time) ? $row->sched_time : $row->time;
+                                                                    $timePart = $t ? time12($t) : '-';
+                                                                    echo htmlentities($d);
+                                                                ?></td>
+                                                                <td><?php echo htmlentities($timePart);
+                                                                ?></td>
                                                             <td><?php echo htmlentities(!empty($row->sched_duration) ? $row->sched_duration : '-'); ?></td>
                                                             <td><?php
                                                                 // Show service name from tblschedule if available
@@ -272,6 +310,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                                     echo '-';
                                                                 }
                                                             ?></td>
+                                                                <td>
+                                                                    <?php if (!empty($row->cancel_reason)) { ?>
+                                                                        <button type="button" class="btn btn-sm btn-outline-primary show-cancel-reason" data-reason="<?php echo htmlentities($row->cancel_reason); ?>">View</button>
+                                                                    <?php } else { echo '-'; } ?>
+                                                                </td>
                                                             <td>
                                                                 <?php
                                                                 // Prefer schedule-level status when present
@@ -334,6 +377,46 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <script src="js/off-canvas.js"></script>
     <script src="js/misc.js"></script>
     <script src="js/dashboard.js"></script>
+        <!-- Cancel Reason Modal -->
+        <div class="modal fade" id="cancelReasonModal" tabindex="-1" role="dialog" aria-labelledby="cancelReasonModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cancelReasonModalLabel">Cancel Reason</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="cancelReasonText"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            (function(){
+                // Use event delegation for buttons
+                document.addEventListener('click', function(e){
+                    var t = e.target;
+                    if(t && t.classList && t.classList.contains('show-cancel-reason')){
+                        var reason = t.getAttribute('data-reason') || '';
+                        var txt = document.getElementById('cancelReasonText');
+                        if(txt) txt.textContent = reason;
+                        // Try using jQuery/Bootstrap modal if available
+                        if (typeof jQuery !== 'undefined' && typeof jQuery('#cancelReasonModal').modal === 'function') {
+                            jQuery('#cancelReasonModal').modal('show');
+                        } else {
+                            // Fallback: make the modal visible (simple)
+                            var m = document.getElementById('cancelReasonModal');
+                            if(m) m.style.display = 'block';
+                        }
+                    }
+                }, false);
+            })();
+        </script>
 </body>
 </html>
 <?php } ?>

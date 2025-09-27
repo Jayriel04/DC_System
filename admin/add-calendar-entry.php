@@ -8,28 +8,23 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
 }
 
 if (isset($_POST['add_calendar'])) {
-    $slots = $_POST['slots'];
     $date = $_POST['date'];
     $start_time = $_POST['start_time'];
-    $duration = $_POST['duration'];
     $end_time = $_POST['end_time'];
-
-    $sql = "INSERT INTO tblcalendar (slots, date, start_time, duration, end_time) VALUES (:slots, :date, :start_time, :duration, :end_time)";
+    $sql = "INSERT INTO tblcalendar (date, start_time, end_time) VALUES (:date, :start_time, :end_time)";
     $query = $dbh->prepare($sql);
-    $query->bindParam(':slots', $slots, PDO::PARAM_STR);
     $query->bindParam(':date', $date, PDO::PARAM_STR);
     $query->bindParam(':start_time', $start_time, PDO::PARAM_STR);
-    $query->bindParam(':duration', $duration, PDO::PARAM_INT);
     $query->bindParam(':end_time', $end_time, PDO::PARAM_STR);
     $query->execute();
     echo "<script>alert('Calendar entry added');</script>";
-    echo "<script>window.location.href = 'manage-calendar.php';</script>";
+    echo "<script>window.location.href = 'calendar.php';</script>";
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Student Management System | Add Calendar Entry</title>
+    <title>Patient Management System | Add Calendar Entry</title>
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
@@ -54,20 +49,12 @@ if (isset($_POST['add_calendar'])) {
 
                 <form method="POST">
                     <div class="form-group">
-                        <label for="slots">Slots</label>
-                        <input type="text" class="form-control" name="slots" required>
-                    </div>
-                    <div class="form-group">
                         <label for="date">Date</label>
                         <input type="date" class="form-control" name="date" required>
                     </div>
                     <div class="form-group">
                         <label for="start_time">Start Time</label>
                         <input type="time" class="form-control" name="start_time" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="duration">Duration (minutes)</label>
-                        <input type="number" class="form-control" name="duration" required>
                     </div>
                     <div class="form-group">
                         <label for="end_time">End Time</label>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 26, 2025 at 01:47 PM
+-- Generation Time: Sep 27, 2025 at 01:40 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -66,7 +66,10 @@ CREATE TABLE `tblappointment` (
 --
 
 INSERT INTO `tblappointment` (`id`, `firstname`, `surname`, `date`, `time`, `patient_number`, `created_at`, `status`) VALUES
-(1, 'John Mar', 'Ypil', '2025-09-26', '17:47:00', 4, '2025-09-26 09:54:12', 'Approved');
+(1, 'John Mar', 'Ypil', '2025-09-26', '17:47:00', 4, '2025-09-26 09:54:12', 'Approved'),
+(2, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:36:00', 5, '2025-09-27 06:36:43', 'Approved'),
+(3, 'Rodelyn', 'Estrera', '2025-09-27', '16:42:00', 8, '2025-09-27 08:42:44', 'Pending'),
+(4, 'John Mar', 'Ypil', '2025-09-27', '18:14:00', 4, '2025-09-27 10:33:00', 'Pending');
 
 -- --------------------------------------------------------
 
@@ -76,10 +79,8 @@ INSERT INTO `tblappointment` (`id`, `firstname`, `surname`, `date`, `time`, `pat
 
 CREATE TABLE `tblcalendar` (
   `id` int(11) NOT NULL,
-  `slots` varchar(255) DEFAULT NULL,
   `date` date DEFAULT NULL,
   `start_time` time DEFAULT NULL,
-  `duration` int(11) DEFAULT NULL,
   `end_time` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -87,10 +88,13 @@ CREATE TABLE `tblcalendar` (
 -- Dumping data for table `tblcalendar`
 --
 
-INSERT INTO `tblcalendar` (`id`, `slots`, `date`, `start_time`, `duration`, `end_time`) VALUES
-(1, '45', '2025-09-19', '17:00:00', 56, '17:05:00'),
-(2, '3', '2025-09-24', '20:49:00', 30, '17:49:00'),
-(3, '3', '2025-09-24', '20:49:00', 30, '17:49:00');
+INSERT INTO `tblcalendar` (`id`, `date`, `start_time`, `end_time`) VALUES
+(1, '2025-09-19', '17:00:00', '17:05:00'),
+(2, '2025-09-24', '20:49:00', '17:49:00'),
+(3, '2025-09-24', '20:49:00', '17:49:00'),
+(4, '2025-09-26', '21:14:00', '21:45:00'),
+(5, '2025-09-27', '18:14:00', '19:00:00'),
+(6, '2025-09-27', '20:00:00', '21:00:00');
 
 -- --------------------------------------------------------
 
@@ -158,37 +162,54 @@ CREATE TABLE `tblpatient` (
   `age` int(11) DEFAULT NULL,
   `contact_number` varchar(15) DEFAULT NULL,
   `address` varchar(255) DEFAULT NULL,
-  `username` varchar(255) DEFAULT NULL,
-  `password` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
   `Image` varchar(255) DEFAULT NULL,
-  `health_conditions` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`health_conditions`))
+  `health_conditions` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `username` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblpatient`
 --
 
-INSERT INTO `tblpatient` (`number`, `firstname`, `surname`, `date_of_birth`, `sex`, `status`, `occupation`, `age`, `contact_number`, `address`, `username`, `password`, `Image`, `health_conditions`) VALUES
-(1, 'Jayriel', 'Senilla', '2004-04-09', NULL, 'Single', '', 21, '09319106644', 'casili, consolacion', 'jay', 'jay123', NULL, NULL),
-(2, 'Jezrah Faith', 'Canonio', '2004-05-13', NULL, NULL, NULL, 21, '09876543211', 'IDK', NULL, NULL, NULL, NULL),
-(3, 'Jezrah Faith', 'Canonio', '2004-05-13', NULL, NULL, NULL, 21, '09876543211', 'IDK', NULL, NULL, NULL, NULL),
-(4, 'John Mar', 'Ypil', '2002-12-21', NULL, NULL, NULL, NULL, '09374939832', 'idk', 'jm', 'a2d1bd818ac8a8419ccfecc4bef27035', 'pfpjm.jfif', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Delayed healing of wounds\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Headache\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}'),
-(5, 'Jezrah Faith', 'Canonio', '2004-05-13', 'Male', 'idk', 'Princess', 21, '09876543211', 'yati liloan', 'jezrah', '3b02af71589ec5ea4138a1ece1866008', 'pfpjez.jfif', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Family history of diabetes\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Numbness\\/Tingling\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}'),
-(6, 'Rodelyn', 'Estrera', '2004-06-30', NULL, NULL, NULL, 21, '09564780461', 'Bakilid, Mandaue City', NULL, NULL, NULL, NULL),
-(7, 'Justine Louise', 'Aguinaldo', '0003-06-28', 'Female', 'Single', 'student', 2022, '09476372827', 'Bakilid, Mandaue City', NULL, NULL, NULL, NULL);
+INSERT INTO `tblpatient` (`number`, `firstname`, `surname`, `date_of_birth`, `sex`, `status`, `occupation`, `age`, `contact_number`, `address`, `email`, `Image`, `health_conditions`, `created_at`, `username`, `password`) VALUES
+(4, 'John Mar', 'Ypil', '2002-12-21', 'Male', 'Married', 'Student', 22, '09374939832', 'idk', 'ypil.johnmar.mcc@gmail.com', 'pfpjm.jfif', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Delayed healing of wounds\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Headache\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}', '2025-09-27 11:02:35', 'jm', 'a2d1bd818ac8a8419ccfecc4bef27035'),
+(5, 'Jezrah Faith', 'Canonio', '2004-05-13', 'Female', 'Single', 'Princess', 21, '09876543211', 'yati liloan', 'canonio.jezrahfaith.mcc@gmail.com', 'pfpjez.jfif', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Family history of diabetes\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Numbness\\/Tingling\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}', '2025-09-27 11:03:26', 'jezrah', '3b02af71589ec5ea4138a1ece1866008'),
+(8, 'Rodelyn', 'Estrera', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'estrera.rodelyn.mcc@gmail.com', NULL, '{\"general\":[\"Marked weight change\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Delayed healing of wounds\"],\"thyroid\":[\"Perspire easily\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Headache\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Difficulty in breathing\"]}', '2025-09-27 11:04:04', 'rodelyn', 'bc65be184bd685684a786ac70c6d2ef7'),
+(9, 'Justine', 'Aguinaldo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'aguinaldo.justinelouise.mcc@gmail.com', NULL, NULL, '2025-09-27 11:04:46', 'justine', 'f6f3e757ac491a3511a5198a39c5ce29');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tblpatient_history`
+-- Table structure for table `tblschedule`
 --
 
-CREATE TABLE `tblpatient_history` (
+CREATE TABLE `tblschedule` (
   `id` int(11) NOT NULL,
-  `patient_number` int(11) NOT NULL,
-  `date` date NOT NULL,
-  `details` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `appointment_id` int(11) DEFAULT NULL,
+  `patient_number` int(11) DEFAULT NULL,
+  `firstname` varchar(255) DEFAULT NULL,
+  `surname` varchar(255) DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  `time` time DEFAULT NULL,
+  `service_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `duration` int(11) DEFAULT NULL,
+  `status` varchar(50) DEFAULT NULL,
+  `cancel_reason` text DEFAULT NULL,
+  `cancelled_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `tblschedule`
+--
+
+INSERT INTO `tblschedule` (`id`, `appointment_id`, `patient_number`, `firstname`, `surname`, `date`, `time`, `service_id`, `created_at`, `duration`, `status`, `cancel_reason`, `cancelled_at`) VALUES
+(1, 1, 4, 'John Mar', 'Ypil', '2025-09-26', '21:32:00', 4, '2025-09-26 13:32:21', 30, 'Ongoing', NULL, NULL),
+(2, 2, 5, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:39:00', 5, '2025-09-27 06:39:38', 45, 'Cancelled', 'Health issue', '2025-09-27 15:15:00'),
+(3, 3, 8, 'Rodelyn', 'Estrera', '2025-09-27', '18:44:00', 4, '2025-09-27 10:44:52', NULL, 'Ongoing', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -208,32 +229,8 @@ CREATE TABLE `tblservice` (
 --
 
 INSERT INTO `tblservice` (`number`, `name`, `description`, `image`) VALUES
-(4, 'Etchant', 'HAHAHAAHAHAHAHHHAHAHAHA', 'images/services/cat-1.png');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tbluploadedhomeworks`
---
-
-CREATE TABLE `tbluploadedhomeworks` (
-  `id` int(11) NOT NULL,
-  `homeworkId` int(11) DEFAULT NULL,
-  `studentId` int(11) DEFAULT NULL,
-  `homeworkDescription` longtext DEFAULT NULL,
-  `homeworkFile` varchar(255) DEFAULT NULL,
-  `postinDate` timestamp NULL DEFAULT current_timestamp(),
-  `adminRemark` mediumtext DEFAULT NULL,
-  `adminRemarkDate` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbluploadedhomeworks`
---
-
-INSERT INTO `tbluploadedhomeworks` (`id`, `homeworkId`, `studentId`, `homeworkDescription`, `homeworkFile`, `postinDate`, `adminRemark`, `adminRemarkDate`) VALUES
-(1, 2, 4, 'upload', '869d2b4df212b9b55402b8fca8e28870.pdf', '2025-01-01 05:47:45', 'ok', '2025-01-01 09:44:36'),
-(2, 4, 6, 'Done', 'a375fcfbcac4b897b4574fbd4003467d.pdf', '2025-01-04 04:13:46', NULL, NULL);
+(4, 'Etchant', 'HAHAHAAHAHAHAHHHAHAHAHA', 'images/services/cat-1.png'),
+(5, 'Ibot ngipon', 'Pa ibot ka ngipon gaw', 'images/services/sstudy laod.jpg');
 
 --
 -- Indexes for dumped tables
@@ -273,26 +270,23 @@ ALTER TABLE `tblpage`
 -- Indexes for table `tblpatient`
 --
 ALTER TABLE `tblpatient`
-  ADD PRIMARY KEY (`number`);
+  ADD PRIMARY KEY (`number`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
--- Indexes for table `tblpatient_history`
+-- Indexes for table `tblschedule`
 --
-ALTER TABLE `tblpatient_history`
+ALTER TABLE `tblschedule`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `patient_number` (`patient_number`);
+  ADD KEY `idx_appointment_id` (`appointment_id`),
+  ADD KEY `idx_service_id` (`service_id`),
+  ADD KEY `idx_date_time` (`date`,`time`);
 
 --
 -- Indexes for table `tblservice`
 --
 ALTER TABLE `tblservice`
   ADD PRIMARY KEY (`number`);
-
---
--- Indexes for table `tbluploadedhomeworks`
---
-ALTER TABLE `tbluploadedhomeworks`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -308,13 +302,13 @@ ALTER TABLE `tbladmin`
 -- AUTO_INCREMENT for table `tblappointment`
 --
 ALTER TABLE `tblappointment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tblcalendar`
 --
 ALTER TABLE `tblcalendar`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tblinventory`
@@ -332,35 +326,19 @@ ALTER TABLE `tblpage`
 -- AUTO_INCREMENT for table `tblpatient`
 --
 ALTER TABLE `tblpatient`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT for table `tblpatient_history`
+-- AUTO_INCREMENT for table `tblschedule`
 --
-ALTER TABLE `tblpatient_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `tblschedule`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tblservice`
 --
 ALTER TABLE `tblservice`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `tbluploadedhomeworks`
---
-ALTER TABLE `tbluploadedhomeworks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `tblpatient_history`
---
-ALTER TABLE `tblpatient_history`
-  ADD CONSTRAINT `tblpatient_history_ibfk_1` FOREIGN KEY (`patient_number`) REFERENCES `tblpatient` (`number`);
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

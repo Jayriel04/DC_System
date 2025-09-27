@@ -8,7 +8,7 @@ if(isset($_POST['submit']))
     $email=$_POST['email'];
 $mobile=$_POST['mobile'];
 $newpassword=md5($_POST['newpassword']);
-  $sql ="SELECT StudentEmail FROM tblstudent WHERE StudentEmail=:email and ContactNumber=:mobile";
+  $sql ="SELECT username AS StudentEmail FROM tblpatient WHERE username=:email and contact_number=:mobile";
 $query= $dbh -> prepare($sql);
 $query-> bindParam(':email', $email, PDO::PARAM_STR);
 $query-> bindParam(':mobile', $mobile, PDO::PARAM_STR);
@@ -16,7 +16,7 @@ $query-> execute();
 $results = $query -> fetchAll(PDO::FETCH_OBJ);
 if($query -> rowCount() > 0)
 {
-$con="update tblstudent set Password=:newpassword where StudentEmail=:email and ContactNumber=:mobile";
+$con="update tblpatient set password=:newpassword where username=:email and contact_number=:mobile";
 $chngpwd1 = $dbh->prepare($con);
 $chngpwd1-> bindParam(':email', $email, PDO::PARAM_STR);
 $chngpwd1-> bindParam(':mobile', $mobile, PDO::PARAM_STR);
@@ -34,7 +34,7 @@ echo "<script>alert('Email id or Mobile no is invalid');</script>";
 <html lang="en">
   <head>
   
-    <title>Forgot Password</title>
+  <title>Patient Forgot Password</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
@@ -65,9 +65,9 @@ return true;
         <div class="content-wrapper d-flex align-items-center auth">
           <div class="row flex-grow">
             <div class="col-lg-4 mx-auto">
-              <div class="auth-form-light text-left p-5">
+          <div class="auth-form-light text-left p-5">
                  <div class="brand-logo" align="center" style="font-weight:bold">
-      Change Password
+          Patient Password Reset
                 </div>
                 <h6 class="font-weight-light">Enter your email address to reset password!</h6>
                 <form class="pt-3" id="login" method="post" name="login">

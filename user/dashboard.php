@@ -114,12 +114,25 @@ try {
   // keep empty if no table or error
 }
 
+// Helper: convert 24-hour time string to 12-hour with am/pm for display
+function time12_dashboard($t) {
+  if (empty($t)) return '-';
+  $parts = explode(':', $t);
+  if (count($parts) < 2) return $t;
+  $h = intval($parts[0]);
+  $m = str_pad($parts[1],2,'0',STR_PAD_LEFT);
+  $ampm = $h >= 12 ? 'pm' : 'am';
+  $h12 = $h % 12;
+  if ($h12 === 0) $h12 = 12;
+  return $h12 . ':' . $m . ' ' . $ampm;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>Student Management System ||| Dashboard</title>
+  <title>Patient Management System ||| Dashboard</title>
   <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
   <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
   <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
@@ -166,7 +179,7 @@ try {
                 <div class="card-body">
                   <?php if (!empty($health_arr)) { ?>
                     <div class="table-responsive">
-                      <table class="table table-striped">
+                      <table class="table table-striped table-bordered">
                         <thead>
                           <tr>
                             <th>Category</th>
@@ -223,7 +236,7 @@ try {
                             <tr>
                               <td><?php echo $i++; ?></td>
                               <td><?php echo htmlspecialchars($a['date']); ?></td>
-                              <td><?php echo htmlspecialchars($a['time']); ?></td>
+                              <td><?php echo htmlspecialchars(time12_dashboard($a['time'])); ?></td>
                               <td><span class="<?php echo $badgeClass; ?>"><?php echo htmlspecialchars($status); ?></span></td>
                               
                             </tr>
@@ -265,7 +278,7 @@ try {
                               <td><?php echo $j++; ?></td>
                               <td><?php echo htmlspecialchars($s['appointment_id']); ?></td>
                               <td><?php echo htmlspecialchars($s['date']); ?></td>
-                              <td><?php echo htmlspecialchars(substr($s['time'],0,5)); ?></td>
+                              <td><?php echo htmlspecialchars(time12_dashboard($s['time'])); ?></td>
                               <td><?php echo htmlspecialchars(!empty($s['duration']) ? $s['duration'] : '-'); ?></td>
                               <td><?php echo htmlspecialchars(!empty($s['service_name']) ? $s['service_name'] : '-'); ?></td>
                               <td><?php

@@ -185,14 +185,9 @@ if (isset($_POST['save_schedule'])) {
                 }
                 $qIns->execute();
             }
-            // After saving schedule, mark appointment status as Service Avail
-            $svc = 'Service Avail';
-            $sqlStatus = "UPDATE tblappointment SET status = :s WHERE id = :id";
-            $qs = $dbh->prepare($sqlStatus);
-            $qs->bindParam(':s', $svc, PDO::PARAM_STR);
-            $qs->bindParam(':id', $appointmentId, PDO::PARAM_INT);
-            $qs->execute();
-
+            // After saving schedule: DO NOT change the appointment's consultation status here.
+            // Consultation statuses should only be edited in the appointment detail editor (edit-appointment-detail.php).
+            // Redirect back to MAS list after save.
             header('Location: mas.php');
             exit();
         } catch (Exception $e) {
@@ -229,10 +224,11 @@ if (isset($_POST['save_schedule'])) {
                                 $svcStmtForm->execute();
                                 $formServices = $svcStmtForm->fetchAll(PDO::FETCH_OBJ);
 
-                                // Prepare separated date and time prefills (prefer POSTed values)
+                                // Prepare separated date, time and duration prefills (prefer POSTed values)
                                 $sched_date_value = isset($_POST['sched_date']) ? $_POST['sched_date'] : (!empty($record->sched_date) ? $record->sched_date : '');
                                 $sched_time_value = isset($_POST['sched_time']) ? $_POST['sched_time'] : (!empty($record->sched_time) ? substr($record->sched_time,0,5) : '');
-
+                                // duration in minutes (if available)
+                                $duration_value = isset($_POST['duration']) ? intval($_POST['duration']) : ($current_duration !== null ? $current_duration : '');
                                 ?>
                                 <form method="POST">
                                     <div class="form-group">
@@ -257,8 +253,7 @@ if (isset($_POST['save_schedule'])) {
                                     </div>
                                     <div class="form-group">
                                         <label>Duration (minutes)</label>
-                                        <?php $duration_value = isset($_POST['duration']) ? intval($_POST['duration']) : $current_duration; ?>
-                                        <input type="number" name="duration" class="form-control" min="0" step="1" value="<?php echo htmlentities($duration_value); ?>" placeholder="e.g. 30">
+                                        <input type="number" name="duration" min="1" step="1" class="form-control" value="<?php echo htmlentities($duration_value); ?>" placeholder="Duration in minutes">
                                     </div>
                                     <div class="form-group">
                                         <label>Schedule Status</label>

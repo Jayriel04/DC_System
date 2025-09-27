@@ -63,8 +63,8 @@ include('includes/dbconnection.php');
         <div class="callbacks_container">
           <ul class="rslides" id="slider">
             <li>
-              <h3>Student Management System</h3>
-              <p>Registered Students can Login Here</p>
+              <h3>Patient Management System</h3>
+              <p>Registered Patients can Login Here</p>
               <div class="readmore">
                 <a href="user/create_account.php">Book appointment<i class="glyphicon glyphicon-menu-right"> </i></a>
               </div>

@@ -96,6 +96,21 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     </form>
 
                                     <div class="table-responsive border rounded p-1">
+                                        <?php
+                                        // small helper to format time to 12-hour with am/pm
+                                        function time12($t) {
+                                            if (empty($t)) return '-';
+                                            $parts = explode(':', $t);
+                                            if (count($parts) < 2) return $t;
+                                            $h = intval($parts[0]);
+                                            $m = str_pad($parts[1],2,'0',STR_PAD_LEFT);
+                                            $ampm = $h >= 12 ? 'pm' : 'am';
+                                            $h12 = $h % 12;
+                                            if ($h12 === 0) $h12 = 12;
+                                            return $h12 . ':' . $m . ' ' . $ampm;
+                                        }
+
+                                        ?>
                                         <table class="table">
                                             <thead>
                                                 <tr>
@@ -167,7 +182,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                             <td><?php echo htmlentities($row->firstname); ?></td>
                                                             <td><?php echo htmlentities($row->surname); ?></td>
                                                             <td><?php echo htmlentities($row->date); ?></td>
-                                                            <td><?php echo htmlentities($row->time); ?></td>
+                                                            <td><?php echo htmlentities(time12($row->time)); ?></td>
                                                             <td><?php echo htmlentities($row->status); ?></td>
                                                             <td>
                                                                 <div>
