@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 26, 2025 at 07:58 AM
+-- Generation Time: Sep 26, 2025 at 01:47 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -51,21 +51,22 @@ INSERT INTO `tbladmin` (`ID`, `AdminName`, `UserName`, `MobileNumber`, `Email`, 
 --
 
 CREATE TABLE `tblappointment` (
-  `number` int(11) NOT NULL,
-  `firstname` varchar(255) DEFAULT NULL,
-  `surname` varchar(255) DEFAULT NULL,
-  `date` date DEFAULT NULL,
-  `time` time DEFAULT NULL,
-  `service` varchar(255) DEFAULT NULL,
-  `status` varchar(255) DEFAULT NULL
+  `id` int(11) NOT NULL,
+  `firstname` varchar(100) NOT NULL,
+  `surname` varchar(100) NOT NULL,
+  `date` date NOT NULL,
+  `time` time NOT NULL,
+  `patient_number` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblappointment`
 --
 
-INSERT INTO `tblappointment` (`number`, `firstname`, `surname`, `date`, `time`, `service`, `status`) VALUES
-(4, 'Jezrah', 'Canonio', '2025-12-31', '00:29:00', NULL, 'Declined');
+INSERT INTO `tblappointment` (`id`, `firstname`, `surname`, `date`, `time`, `patient_number`, `created_at`, `status`) VALUES
+(1, 'John Mar', 'Ypil', '2025-09-26', '17:47:00', 4, '2025-09-26 09:54:12', 'Approved');
 
 -- --------------------------------------------------------
 
@@ -159,21 +160,22 @@ CREATE TABLE `tblpatient` (
   `address` varchar(255) DEFAULT NULL,
   `username` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
-  `Image` varchar(255) DEFAULT NULL
+  `Image` varchar(255) DEFAULT NULL,
+  `health_conditions` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`health_conditions`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblpatient`
 --
 
-INSERT INTO `tblpatient` (`number`, `firstname`, `surname`, `date_of_birth`, `sex`, `status`, `occupation`, `age`, `contact_number`, `address`, `username`, `password`, `Image`) VALUES
-(1, 'Jayriel', 'Senilla', '2004-04-09', NULL, 'Single', '', 21, '09319106644', 'casili, consolacion', 'jay', 'jay123', NULL),
-(2, 'Jezrah Faith', 'Canonio', '2004-05-13', NULL, NULL, NULL, 21, '09876543211', 'IDK', NULL, NULL, NULL),
-(3, 'Jezrah Faith', 'Canonio', '2004-05-13', NULL, NULL, NULL, 21, '09876543211', 'IDK', NULL, NULL, NULL),
-(4, 'John Mar', 'Ypil', '2002-12-21', NULL, NULL, NULL, NULL, '09374939832', 'idk', 'jm', 'a2d1bd818ac8a8419ccfecc4bef27035', 'pfpjm.jfif'),
-(5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'jezrah@gmail.com', '3b02af71589ec5ea4138a1ece1866008', NULL),
-(6, 'Rodelyn', 'Estrera', '2004-06-30', NULL, NULL, NULL, 21, '09564780461', 'Bakilid, Mandaue City', NULL, NULL, NULL),
-(7, 'Justine Louise', 'Aguinaldo', '0003-06-28', 'Female', 'Single', 'student', 2022, '09476372827', 'Bakilid, Mandaue City', NULL, NULL, NULL);
+INSERT INTO `tblpatient` (`number`, `firstname`, `surname`, `date_of_birth`, `sex`, `status`, `occupation`, `age`, `contact_number`, `address`, `username`, `password`, `Image`, `health_conditions`) VALUES
+(1, 'Jayriel', 'Senilla', '2004-04-09', NULL, 'Single', '', 21, '09319106644', 'casili, consolacion', 'jay', 'jay123', NULL, NULL),
+(2, 'Jezrah Faith', 'Canonio', '2004-05-13', NULL, NULL, NULL, 21, '09876543211', 'IDK', NULL, NULL, NULL, NULL),
+(3, 'Jezrah Faith', 'Canonio', '2004-05-13', NULL, NULL, NULL, 21, '09876543211', 'IDK', NULL, NULL, NULL, NULL),
+(4, 'John Mar', 'Ypil', '2002-12-21', NULL, NULL, NULL, NULL, '09374939832', 'idk', 'jm', 'a2d1bd818ac8a8419ccfecc4bef27035', 'pfpjm.jfif', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Delayed healing of wounds\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Headache\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}'),
+(5, 'Jezrah Faith', 'Canonio', '2004-05-13', 'Male', 'idk', 'Princess', 21, '09876543211', 'yati liloan', 'jezrah', '3b02af71589ec5ea4138a1ece1866008', 'pfpjez.jfif', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Family history of diabetes\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Numbness\\/Tingling\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}'),
+(6, 'Rodelyn', 'Estrera', '2004-06-30', NULL, NULL, NULL, 21, '09564780461', 'Bakilid, Mandaue City', NULL, NULL, NULL, NULL),
+(7, 'Justine Louise', 'Aguinaldo', '0003-06-28', 'Female', 'Single', 'student', 2022, '09476372827', 'Bakilid, Mandaue City', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -247,7 +249,7 @@ ALTER TABLE `tbladmin`
 -- Indexes for table `tblappointment`
 --
 ALTER TABLE `tblappointment`
-  ADD PRIMARY KEY (`number`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `tblcalendar`
@@ -306,7 +308,7 @@ ALTER TABLE `tbladmin`
 -- AUTO_INCREMENT for table `tblappointment`
 --
 ALTER TABLE `tblappointment`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblcalendar`

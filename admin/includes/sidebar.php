@@ -38,10 +38,17 @@
     </li>
 
     <li class="nav-item">
-      <a class="nav-link" href="manage-appointment.php">
-        <span class="menu-title">Appointment</span>
+      <a class="nav-link" data-toggle="collapse" href="#ui-basic-staff" aria-expanded="false"
+        aria-controls="ui-basic-staff">
+        <span class="menu-title">Apointment</span>
         <i class="icon-clock menu-icon"></i>
       </a>
+      <div class="collapse" id="ui-basic-staff">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item"><a class="nav-link" href="mac.php">Consulation</a></li>
+          <li class="nav-item"><a class="nav-link" href="mas.php">Service</a></li>
+        </ul>
+      </div>
     </li>
 
     <li class="nav-item">

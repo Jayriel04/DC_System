@@ -35,8 +35,10 @@ if (isset($_POST['login'])) {
                 }
             }
         }
-        $_SESSION['login'] = $_POST['username'];
-        echo "<script type='text/javascript'> document.location ='dashboard.php'; </script>";
+            $_SESSION['login'] = $_POST['username'];
+            // Redirect user to the dashboard so the health modal can show if needed
+            header('Location: dashboard.php');
+            exit();
     } else {
         echo "<script>alert('Invalid Details');</script>";
     }
