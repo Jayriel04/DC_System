@@ -9,7 +9,7 @@ if (strlen($_SESSION['sturecmsaid']==0)) {
 if(isset($_GET['delid']))
 {
 $rid=intval($_GET['delid']);
-$sql="delete from tblstudent where ID=:rid";
+$sql="delete from tblpatient where number=:rid";
 $query=$dbh->prepare($sql);
 $query->bindParam(':rid',$rid,PDO::PARAM_STR);
 $query->execute();
@@ -23,7 +23,7 @@ $query->execute();
 <html lang="en">
   <head>
    
-    <title>Student  Management System|||Search Students</title>
+  <title>Patient Management System ||| Search Patients</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
@@ -52,11 +52,11 @@ $query->execute();
         <div class="main-panel">
           <div class="content-wrapper">
              <div class="page-header">
-              <h3 class="page-title"> Search Student </h3>
+              <h3 class="page-title"> Search Patient </h3>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                  <li class="breadcrumb-item active" aria-current="page"> Search Student</li>
+                  <li class="breadcrumb-item active" aria-current="page"> Search Patient</li>
                 </ol>
               </nav>
             </div>
@@ -66,9 +66,9 @@ $query->execute();
                   <div class="card-body">
                     <form method="post">
                                 <div class="form-group">
-                                   <strong>Search Student:</strong>
+                                   <strong>Search Patient:</strong>
                                    
-                                    <input id="searchdata" type="text" name="searchdata" required="true" class="form-control" placeholder="Search by Student ID or Studnet name"></div>
+                                    <input id="searchdata" type="text" name="searchdata" required="true" class="form-control" placeholder="Search by Patient ID or Patient name"></div>
                                
                                 <button type="submit" class="btn btn-primary" name="search" id="submit">Search</button>
                             </form>
@@ -109,13 +109,13 @@ $sdata=$_POST['searchdata'];
         // Formula for pagination
         $no_of_records_per_page = 5;
         $offset = ($pageno-1) * $no_of_records_per_page;
-       $ret = "SELECT ID FROM tblstudent";
+  $ret = "SELECT number AS ID FROM tblpatient";
 $query1 = $dbh -> prepare($ret);
 $query1->execute();
 $results1=$query1->fetchAll(PDO::FETCH_OBJ);
 $total_rows=$query1->rowCount();
 $total_pages = ceil($total_rows / $no_of_records_per_page);
-$sql="SELECT tblstudent.StuID,tblstudent.ID as sid,tblstudent.StudentName,tblstudent.StudentEmail,tblstudent.DateofAdmission,tblclass.ClassName,tblclass.Section from tblstudent join tblclass on tblclass.ID=tblstudent.StudentClass where tblstudent.StuID like '$sdata%' || tblstudent.StudentName like '$sdata%' LIMIT $offset, $no_of_records_per_page";
+$sql="SELECT tblpatient.number as StuID, tblpatient.number as sid, CONCAT(tblpatient.firstname,' ',COALESCE(tblpatient.surname,'')) AS StudentName, tblpatient.username AS StudentEmail, tblpatient.date_of_birth AS DateofAdmission, tblclass.ClassName, tblclass.Section FROM tblpatient LEFT JOIN tblclass ON 1=1 WHERE tblpatient.number LIKE '$sdata%' OR CONCAT(tblpatient.firstname,' ',COALESCE(tblpatient.surname,'')) LIKE '$sdata%' LIMIT $offset, $no_of_records_per_page";
 $query = $dbh -> prepare($sql);
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);

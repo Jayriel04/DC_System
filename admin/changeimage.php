@@ -20,13 +20,13 @@ else
 {
 $image=md5($image).time().$extension;
  move_uploaded_file($_FILES["image"]["tmp_name"],"images/".$image);
-$sql="update tblstudent set Image=:image where ID=:eid";
+$sql="update tblpatient set Image=:image where number=:eid";
 $query=$dbh->prepare($sql);
 
 $query->bindParam(':image',$image,PDO::PARAM_STR);
 $query->bindParam(':eid',$eid,PDO::PARAM_STR);
  $query->execute();
-  echo '<script>alert("Student image has been updated")</script>';
+  echo '<script>alert("Patient image has been updated")</script>';
   echo "<script>window.location.href ='manage-students.php'</script>";
 }
 }
@@ -36,7 +36,7 @@ $query->bindParam(':eid',$eid,PDO::PARAM_STR);
 <html lang="en">
   <head>
    
-    <title>Student  Management System|| Update Students Image</title>
+    <title>Patient Management System || Update Patient Image</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
@@ -64,11 +64,11 @@ $query->bindParam(':eid',$eid,PDO::PARAM_STR);
         <div class="main-panel">
           <div class="content-wrapper">
             <div class="page-header">
-              <h3 class="page-title"> Update Students Image </h3>
+              <h3 class="page-title"> Update Patient Image </h3>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                  <li class="breadcrumb-item active" aria-current="page"> Update Students Image</li>
+                  <li class="breadcrumb-item active" aria-current="page"> Update Patient Image</li>
                 </ol>
               </nav>
             </div>
@@ -77,12 +77,12 @@ $query->bindParam(':eid',$eid,PDO::PARAM_STR);
               <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body">
-                    <h4 class="card-title" style="text-align: center;">Update Students Image</h4>
+                    <h4 class="card-title" style="text-align: center;">Update Patient Image</h4>
                    <hr/>
                     <form class="forms-sample" method="post" enctype="multipart/form-data">
                       <?php
 $eid=$_GET['editid'];
-$sql="SELECT tblstudent.StudentName,tblstudent.id as sid,tblstudent.StudentEmail,tblstudent.StudentClass,tblstudent.Gender,tblstudent.DOB,tblstudent.StuID,tblstudent.FatherName,tblstudent.MotherName,tblstudent.ContactNumber,tblstudent.AltenateNumber,tblstudent.Address,tblstudent.UserName,tblstudent.Password,tblstudent.Image,tblstudent.DateofAdmission,tblclass.ClassName,tblclass.Section from tblstudent join tblclass on tblclass.ID=tblstudent.StudentClass where tblstudent.ID=:eid";
+$sql="SELECT CONCAT(tblpatient.firstname, ' ', COALESCE(tblpatient.surname,'')) AS StudentName, tblpatient.number as sid, tblpatient.username AS StudentEmail, NULL AS StudentClass, tblpatient.sex AS Gender, tblpatient.date_of_birth AS DOB, tblpatient.number AS StuID, NULL AS FatherName, NULL AS MotherName, tblpatient.contact_number AS ContactNumber, NULL AS AltenateNumber, tblpatient.address AS Address, tblpatient.username AS UserName, tblpatient.password AS Password, tblpatient.Image AS Image, tblpatient.date_of_birth AS DateofAdmission, NULL AS ClassName, NULL AS Section FROM tblpatient WHERE tblpatient.number = :eid";
 $query = $dbh -> prepare($sql);
 $query->bindParam(':eid',$eid,PDO::PARAM_STR);
 $query->execute();
@@ -94,7 +94,7 @@ foreach($results as $row)
 {               ?>
    
  <div class="form-group">
-                        <label for="exampleInputName1">Student Name</label>
+                        <label for="exampleInputName1">Patient Name</label>
                         <input type="text" name="stuname" value="<?php  echo htmlentities($row->StudentName);?>" class="form-control" readonly='true'>
                       </div>
 

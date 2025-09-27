@@ -11,7 +11,7 @@ if(isset($_POST['submit']))
 $sid=$_SESSION['sturecmsstuid'];
 $cpassword=md5($_POST['currentpassword']);
 $newpassword=md5($_POST['newpassword']);
-$sql ="SELECT StuID FROM tblstudent WHERE StuID=:sid and Password=:cpassword";
+$sql ="SELECT number FROM tblpatient WHERE number=:sid and password=:cpassword";
 $query= $dbh -> prepare($sql);
 $query-> bindParam(':sid', $sid, PDO::PARAM_STR);
 $query-> bindParam(':cpassword', $cpassword, PDO::PARAM_STR);
@@ -20,7 +20,7 @@ $results = $query -> fetchAll(PDO::FETCH_OBJ);
 
 if($query -> rowCount() > 0)
 {
-$con="update tblstudent set Password=:newpassword where StuID=:sid";
+$con="update tblpatient set password=:newpassword where number=:sid";
 $chngpwd1 = $dbh->prepare($con);
 $chngpwd1-> bindParam(':sid', $sid, PDO::PARAM_STR);
 $chngpwd1-> bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
@@ -37,7 +37,7 @@ echo '<script>alert("Your current password is wrong")</script>';
 <html lang="en">
   <head>
    
-    <title>Student  Management System|| Student Change Password</title>
+  <title>Patient Management System || Patient Change Password</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">

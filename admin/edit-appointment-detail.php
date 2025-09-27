@@ -8,43 +8,36 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 }
 
 if (!isset($_GET['editid'])) {
-    echo "<script>alert('No appointment selected');window.location.href='manage-appointment.php';</script>";
+    echo "<script>alert('No appointment selected');window.location.href='mac.php';</script>";
     exit();
 }
 
-$number = intval($_GET['editid']);
+$id = intval($_GET['editid']);
 
-// Fetch appointment data
-$sql = "SELECT * FROM tblappointment WHERE number = :number";
+// Fetch appointment data by id
+$sql = "SELECT * FROM tblappointment WHERE id = :id";
 $query = $dbh->prepare($sql);
-$query->bindParam(':number', $number, PDO::PARAM_INT);
+$query->bindParam(':id', $id, PDO::PARAM_INT);
 $query->execute();
 $appointment = $query->fetch(PDO::FETCH_OBJ);
 
 if (!$appointment) {
-    echo "<script>alert('Appointment not found');window.location.href='manage-appointment.php';</script>";
+    echo "<script>alert('Appointment not found');window.location.href='mac.php';</script>";
     exit();
 }
 
 // Handle form submission
 if (isset($_POST['submit'])) {
-    $firstname = trim($_POST['firstname']);
-    $surname = trim($_POST['surname']);
-    $date = $_POST['date'];
-    $time = $_POST['time'];
+    // Only update the status from this form
     $status = $_POST['status'];
 
-    $updateSql = "UPDATE tblappointment SET firstname=:firstname, surname=:surname, date=:date, time=:time, status=:status WHERE number=:number";
+    $updateSql = "UPDATE tblappointment SET status=:status WHERE id=:id";
     $updateQuery = $dbh->prepare($updateSql);
-    $updateQuery->bindParam(':firstname', $firstname, PDO::PARAM_STR);
-    $updateQuery->bindParam(':surname', $surname, PDO::PARAM_STR);
-    $updateQuery->bindParam(':date', $date, PDO::PARAM_STR);
-    $updateQuery->bindParam(':time', $time, PDO::PARAM_STR);
     $updateQuery->bindParam(':status', $status, PDO::PARAM_STR);
-    $updateQuery->bindParam(':number', $number, PDO::PARAM_INT);
+    $updateQuery->bindParam(':id', $id, PDO::PARAM_INT);
 
     if ($updateQuery->execute()) {
-        echo "<script>alert('Appointment updated successfully');window.location.href='manage-appointment.php';</script>";
+        echo "<script>alert('Appointment updated successfully');window.location.href='mac.php';</script>";
         exit();
     } else {
         echo "<script>alert('Update failed. Please try again.');</script>";
@@ -87,7 +80,7 @@ if (isset($_POST['submit'])) {
                                     </div>
                                     <div class="form-group">
                                         <label for="time">Time</label>
-                                        <input type="time" class="form-control" id="time" name="time" value="<?php echo htmlentities($appointment->time); ?>" required>
+                                        <input type="time" class="form-control" id="time" name="time" value="<?php echo htmlentities($appointment->time); ?>" readonly>
                                     </div>
                                     <div class="form-group">
                                         <label for="status">Status</label>
@@ -97,8 +90,9 @@ if (isset($_POST['submit'])) {
                                             <option value="Declined" <?php if($appointment->status=="Declined") echo "selected"; ?>>Declined</option>
                                         </select>
                                     </div>
+                                    <input type="hidden" name="id" value="<?php echo $id; ?>">
                                     <button type="submit" name="submit" class="btn btn-primary">Update Appointment</button>
-                                    <a href="manage-appointment.php" class="btn btn-secondary">Cancel</a>
+                                    <a href="mac.php" class="btn btn-secondary">Cancel</a>
                                 </form>
                             </div>
                         </div>

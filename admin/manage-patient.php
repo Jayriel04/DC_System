@@ -131,7 +131,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                             <td><?php echo htmlentities($row->occupation);?></td>
                                                             <td><?php echo htmlentities($row->patient_history);?>
                                                                 <div>
-                                                                    <a href="patient-history.php?number=<?php echo htmlentities($row->number); ?>" class="btn btn-success btn-sm">View</a>
+                                                                    <a href="view-ph.php?number=<?php echo htmlentities($row->number); ?>" class="btn btn-success btn-sm">View</a>
                                                                 </div>
                                                             </td>
                                                             <td><?php echo htmlentities($row->examination_record);?>

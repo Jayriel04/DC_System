@@ -18,15 +18,31 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $status_filter = $_POST['status_filter'];
     }
 
+    // Handle status change from admin
+    if (isset($_POST['appt_id']) && isset($_POST['new_status'])) {
+        $apptId = intval($_POST['appt_id']);
+        $newStatus = trim($_POST['new_status']);
+        $allowed = ['Pending', 'Approved', 'Declined'];
+        if (in_array($newStatus, $allowed, true)) {
+            $sqlUp = "UPDATE tblappointment SET status = :st WHERE id = :id";
+            $qUp = $dbh->prepare($sqlUp);
+            $qUp->bindParam(':st', $newStatus, PDO::PARAM_STR);
+            $qUp->bindParam(':id', $apptId, PDO::PARAM_INT);
+            $qUp->execute();
+        }
+        header('Location: manage-appointment.php');
+        exit();
+    }
+
     // Code for deletion
     if (isset($_GET['delid'])) {
         $rid = intval($_GET['delid']);
-        $sql = "DELETE FROM tblappointment WHERE number = :rid";
+        $sql = "DELETE FROM tblappointment WHERE id = :rid";
         $query = $dbh->prepare($sql);
         $query->bindParam(':rid', $rid, PDO::PARAM_STR);
         $query->execute();
-        echo "<script>alert('Data deleted');</script>";
-        echo "<script>window.location.href = 'manage-appointments.php'</script>";
+    echo "<script>alert('Data deleted');</script>";
+    echo "<script>window.location.href = 'manage-appointment.php'</script>";
     }
     
 ?>
@@ -63,7 +79,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             <div class="card">
                                 <div class="card-body">
                                     <div class="d-sm-flex align-items-center mb-4">
-                                        <a href="add-appointment.php" class="btn btn-primary ml-auto mb-3 mb-sm-0">Add Appointment</a>
+                                        <!-- <a href="add-appointment.php" class="btn btn-primary ml-auto mb-3 mb-sm-0">Add Appointment</a> -->
                                     </div>
                                     <form method="POST" class="form-inline mb-4" id="filterForm">
                                         <div class="form-group mr-3">
@@ -80,6 +96,21 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     </form>
 
                                     <div class="table-responsive border rounded p-1">
+                                        <?php
+                                        // small helper to format time to 12-hour with am/pm
+                                        function time12($t) {
+                                            if (empty($t)) return '-';
+                                            $parts = explode(':', $t);
+                                            if (count($parts) < 2) return $t;
+                                            $h = intval($parts[0]);
+                                            $m = str_pad($parts[1],2,'0',STR_PAD_LEFT);
+                                            $ampm = $h >= 12 ? 'pm' : 'am';
+                                            $h12 = $h % 12;
+                                            if ($h12 === 0) $h12 = 12;
+                                            return $h12 . ':' . $m . ' ' . $ampm;
+                                        }
+
+                                        ?>
                                         <table class="table">
                                             <thead>
                                                 <tr>
@@ -125,7 +156,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                 $results = $query->fetchAll(PDO::FETCH_OBJ);
 
                                                 // Get total rows for pagination
-                                                $ret = "SELECT number FROM tblappointment WHERE 1=1";
+                                                $ret = "SELECT id FROM tblappointment WHERE 1=1";
                                                 if ($search) {
                                                     $ret .= " AND (firstname LIKE :search OR surname LIKE :search)";
                                                 }
@@ -147,16 +178,16 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                 if ($query->rowCount() > 0) {
                                                     foreach ($results as $row) { ?>
                                                         <tr>
-                                                            <td><?php echo htmlentities($row->number); ?></td>
+                                                            <td><?php echo htmlentities($row->id); ?></td>
                                                             <td><?php echo htmlentities($row->firstname); ?></td>
                                                             <td><?php echo htmlentities($row->surname); ?></td>
                                                             <td><?php echo htmlentities($row->date); ?></td>
-                                                            <td><?php echo htmlentities($row->time); ?></td>
+                                                            <td><?php echo htmlentities(time12($row->time)); ?></td>
                                                             <td><?php echo htmlentities($row->status); ?></td>
                                                             <td>
                                                                 <div>
-                                                                    <a href="edit-appointment-detail.php?editid=<?php echo htmlentities($row->number); ?>" class="btn btn-info btn-xs">Edit</a>
-                                                                    <a href="manage-appointment.php?delid=<?php echo ($row->number); ?>" onclick="return confirm('Do you really want to Delete ?');" class="btn btn-danger btn-xs">Delete</a>
+                                                                    <a href="edit-appointment-detail.php?editid=<?php echo htmlentities($row->id); ?>" class="btn btn-info btn-xs">Edit</a>
+                                                                    <a href="manage-appointment.php?delid=<?php echo ($row->id); ?>" onclick="return confirm('Do you really want to Delete ?');" class="btn btn-danger btn-xs">Delete</a>
                                                                 </div>
                                                             </td>
                                                         </tr>

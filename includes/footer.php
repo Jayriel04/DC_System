@@ -8,7 +8,7 @@
           <li><a href="about.php">About</a></li>
           <li><a href="contact.php">Contact</a></li>
           <li><a href="admin/login.php">Admin</a></li>
-          <li><a href="user/login.php">Student</a></li>
+          <li><a href="user/login.php">Patient</a></li>
         </ul>
        
       </div>
@@ -32,7 +32,7 @@ foreach($results as $row)
       <?php $cnt=$cnt+1;}} ?></div>
       <div class="col-md-3 footer-right">
         <h3>SMS</h3>
-        <p>Student Management System</p>
+  <p>Patient Management System</p>
       </div>
       <div class="clearfix"> </div> 
     </div>
@@ -43,9 +43,9 @@ foreach($results as $row)
 <div class="copyright">
     <!-- container -->
     <div class="container">
-      <div class="copyright-left">
-      <p>Student Management System </p>
-      </div>
+  <div class="copyright-left">
+  <p>Patient Management System </p>
+  </div>
 
       <div class="clearfix"> </div>
       

@@ -35,8 +35,10 @@ if (isset($_POST['login'])) {
                 }
             }
         }
-        $_SESSION['login'] = $_POST['username'];
-        echo "<script type='text/javascript'> document.location ='dashboard.php'; </script>";
+            $_SESSION['login'] = $_POST['username'];
+            // Redirect user to the dashboard so the health modal can show if needed
+            header('Location: dashboard.php');
+            exit();
     } else {
         echo "<script>alert('Invalid Details');</script>";
     }
@@ -64,7 +66,7 @@ if (isset($_POST['login'])) {
                             <h6 class="font-weight-light">Sign in to continue.</h6>
                             <form class="pt-3" id="login" method="post" name="login">
                                 <div class="form-group">
-                                    <input type="text" class="form-control form-control-lg" placeholder="Enter your username or student number" required="true" name="username" value="<?php if(isset($_COOKIE["user_login"])) { echo $_COOKIE["user_login"]; } ?>">
+                                    <input type="text" class="form-control form-control-lg" placeholder="Enter your username or patient number" required="true" name="username" value="<?php if(isset($_COOKIE["user_login"])) { echo $_COOKIE["user_login"]; } ?>">
                                 </div>
                                 <div class="form-group">
                                     <input type="password" class="form-control form-control-lg" placeholder="Enter your password" name="password" required="true" value="<?php if(isset($_COOKIE["userpassword"])) { echo $_COOKIE["userpassword"]; } ?>">
