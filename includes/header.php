@@ -1,5 +1,5 @@
 <!--header-->
-<div class="header" id="home">
+<div>
   <nav class="navbar navbar-default">
     <div class="container">
       <!-- Brand and toggle get grouped for better mobile display -->
@@ -13,7 +13,7 @@
         <!-- Logo inserted here -->
         <a class="navbar-brand" href="index.php" style="display: flex; align-items: center;">
           <img src="images/Jf logo.png" alt="JF Dental Care Logo" style="height:40px; margin-right:10px;">
-          <span>JF DENTAL CARE</span>
+          <h4>JF DENTAL CARE</h4>
         </a>
       </div>
       <!-- Collect the nav links, forms, and other content for toggling -->
@@ -34,6 +34,7 @@
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
   </nav>
+  <hr>
   <div class="clearfix"> </div>
 </div>
 <!--/header-->

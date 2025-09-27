@@ -34,13 +34,13 @@ include('includes/dbconnection.php');
 					event.preventDefault();
 					$('html,body').animate({scrollTop:$(this.hash).offset().top},900);
 				});
-			});
+			}); 
 </script>
 <!--/script-->
 </head>
 	<body>
 <?php include_once('includes/header.php');?>
-<div class="banner">
+
   <div class="container">
   <script src="js/responsiveslides.min.js"></script>
  <script>
@@ -58,8 +58,8 @@ include('includes/dbconnection.php');
        <div class="callbacks_container">
         <ul class="rslides" id="slider">
          <li>     
-          <h3>Student Management System</h3>      
-           <p>Registered Students can Login Here</p>             
+          <h3>WHERE YOUR SMILE GET BRIGHTNESS YOUR DAY!</h3> 
+          <p class="page1">A healthy smile is a reflection of a happy life. Let us help you shine your brightest. </p>                 
           <div class="readmore">
           <a href="user/create_account.php">Book appointment<i class="glyphicon glyphicon-menu-right"> </i></a>
           </div>
