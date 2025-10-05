@@ -6,15 +6,57 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid'] == 0)) {
   header('location:logout.php');
 } else {
-  // Code for deletion
+  // Code for deletion: prevent deleting a calendar entry that already has an appointment
   if (isset($_GET['delid'])) {
     $rid = intval($_GET['delid']);
+    // Fetch the calendar entry's date and start_time
+    $sqlFetch = "SELECT `date`, `start_time` FROM tblcalendar WHERE id = :rid";
+    $queryFetch = $dbh->prepare($sqlFetch);
+    $queryFetch->bindParam(':rid', $rid, PDO::PARAM_INT);
+    $queryFetch->execute();
+    $calEntry = $queryFetch->fetch(PDO::FETCH_OBJ);
+
+    if ($calEntry) {
+      // Check if there exists any appointment for this date/time that is not Declined
+      $sqlCheck = "SELECT COUNT(*) FROM tblappointment WHERE `date` = :dt AND `start_time` = :tm AND (status IS NULL OR status != 'Declined')";
+      $queryCheck = $dbh->prepare($sqlCheck);
+      $queryCheck->bindParam(':dt', $calEntry->date, PDO::PARAM_STR);
+      $queryCheck->bindParam(':tm', $calEntry->start_time, PDO::PARAM_STR);
+      $queryCheck->execute();
+      $count = $queryCheck->fetchColumn();
+
+      if ($count > 0) {
+        echo "<script>alert('Cannot delete: one or more appointments exist for this schedule.');</script>";
+        echo "<script>window.location.href = 'calendar.php'</script>";
+        exit();
+      }
+    }
+
+    // Safe to delete
     $sql = "DELETE FROM tblcalendar WHERE id=:rid";
     $query = $dbh->prepare($sql);
-    $query->bindParam(':rid', $rid, PDO::PARAM_STR);
+    $query->bindParam(':rid', $rid, PDO::PARAM_INT);
     $query->execute();
     echo "<script>alert('Event deleted');</script>";
     echo "<script>window.location.href = 'calendar.php'</script>";
+  }
+
+  // Handle admin declining an appointment: mark matching appointments as Declined
+  if (isset($_GET['decline_date']) && isset($_GET['decline_time'])) {
+    $dd = $_GET['decline_date'];
+    $tt = $_GET['decline_time'];
+    // Update appointment(s) that match the date and start_time
+    $sqld = "UPDATE tblappointment SET status = 'Declined' WHERE `date` = :dt AND `start_time` = :tm";
+    $queryd = $dbh->prepare($sqld);
+    $queryd->bindParam(':dt', $dd, PDO::PARAM_STR);
+    $queryd->bindParam(':tm', $tt, PDO::PARAM_STR);
+    if ($queryd->execute()) {
+      echo "<script>alert('Appointment(s) declined');</script>";
+    } else {
+      echo "<script>alert('Unable to decline appointment(s)');</script>";
+    }
+    echo "<script>window.location.href = 'calendar.php'</script>";
+    exit();
   }
 
   // Handle calendar edit/update from modal
@@ -24,6 +66,28 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     $ustart = isset($_POST['start_time']) ? $_POST['start_time'] : null;
     $uend = isset($_POST['end_time']) ? $_POST['end_time'] : null;
     if ($eid > 0) {
+      // Check if this calendar entry already has an appointment (booked)
+      $sqlFetch = "SELECT `date`, `start_time` FROM tblcalendar WHERE id = :eid";
+      $queryFetch = $dbh->prepare($sqlFetch);
+      $queryFetch->bindParam(':eid', $eid, PDO::PARAM_INT);
+      $queryFetch->execute();
+      $calEntry = $queryFetch->fetch(PDO::FETCH_OBJ);
+
+      if ($calEntry) {
+        $sqlCheck = "SELECT COUNT(*) FROM tblappointment WHERE `date` = :dt AND `start_time` = :tm AND (status IS NULL OR status != 'Declined')";
+        $queryCheck = $dbh->prepare($sqlCheck);
+        $queryCheck->bindParam(':dt', $calEntry->date, PDO::PARAM_STR);
+        $queryCheck->bindParam(':tm', $calEntry->start_time, PDO::PARAM_STR);
+        $queryCheck->execute();
+        $count = $queryCheck->fetchColumn();
+
+        if ($count > 0) {
+          echo "<script>alert('Cannot edit: one or more appointments exist for this schedule.');</script>";
+          echo "<script>window.location.href = 'calendar.php'</script>";
+          exit();
+        }
+      }
+
       $sqlu = "UPDATE tblcalendar SET date = :date, start_time = :start_time, end_time = :end_time WHERE id = :id";
       $queryu = $dbh->prepare($sqlu);
       $queryu->bindParam(':date', $udate, PDO::PARAM_STR);
@@ -53,17 +117,22 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
   $weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
   // Fetch events
-  $sql = "SELECT * FROM tblcalendar WHERE MONTH(date) = :month AND YEAR(date) = :year";
+  // Fetch calendar events and mark as booked when a matching appointment exists (join on date and time)
+  // Only consider appointments that are not Declined when calculating booked flag
+  $sql = "SELECT c.*, CASE WHEN a.id IS NULL THEN 0 ELSE 1 END AS booked_flag FROM tblcalendar c LEFT JOIN tblappointment a ON a.date = c.date AND a.start_time = c.start_time AND (a.status IS NULL OR a.status != 'Declined') WHERE MONTH(c.date) = :month AND YEAR(c.date) = :year";
   $query = $dbh->prepare($sql);
   $query->bindParam(':month', $currentMonth, PDO::PARAM_INT);
   $query->bindParam(':year', $currentYear, PDO::PARAM_INT);
   $query->execute();
   $events = $query->fetchAll(PDO::FETCH_OBJ);
 
-  // Create an array to hold events by date
+  // Create an array to hold events by date and flag booked events based strictly on tblappointment
   $eventDays = [];
   foreach ($events as $event) {
-    $eventDays[date('j', strtotime($event->date))][] = $event;
+    $dayIndex = date('j', strtotime($event->date));
+    // booked_flag comes from SQL join; coerce to boolean
+    $event->booked = !empty($event->booked_flag);
+    $eventDays[$dayIndex][] = $event;
   }
   ?>
   <!DOCTYPE html>
@@ -71,6 +140,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
 
   <head>
     <title>Calendar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
@@ -128,7 +198,8 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                   // Display events for the day
                   if (isset($eventDays[$day])) {
                     foreach ($eventDays[$day] as $event) {
-                      echo '<div class="event">';
+                      $bookedClass = !empty($event->booked) ? ' booked' : '';
+                      echo '<div class="event' . $bookedClass . '">';
                       // Format times to 12-hour AM/PM for display, fall back to raw value if parsing fails
                       $start_formatted = '';
                       $end_formatted = '';
@@ -144,10 +215,17 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                       }
                       echo 'Time: ' . $start_formatted . ' - ' . $end_formatted . '<br>';
                       echo '<div>';
-                      // Edit button opens modal and passes data attributes
-                      echo '<button class="btn btn-primary btn-sm edit-event-btn" data-id="' . htmlentities($event->id) . '" data-date="' . htmlentities($event->date) . '" data-start="' . htmlentities($event->start_time) . '" data-end="' . htmlentities($event->end_time) . '">Edit</button>';
-                      // Delete now points to calendar.php for deletion
-                      echo '<a href="calendar.php?delid=' . htmlentities($event->id) . '" onclick="return confirm(\'Do you really want to Delete ?\');" class="btn btn-danger btn-sm">Delete</a>';
+                      // If the event is booked (an appointment exists), disable edit/delete controls
+                      if (!empty($event->booked)) {
+                        echo '<button class="btn btn-secondary btn-sm" disabled title="This schedule has an appointment and cannot be edited">Edit</button>';
+                        echo ' ';
+                        echo '<button class="btn btn-secondary btn-sm" disabled title="This schedule has an appointment and cannot be deleted">Delete</button>';
+                      } else {
+                        // Edit button opens modal and passes data attributes
+                        echo '<button class="btn btn-primary btn-sm edit-event-btn" data-id="' . htmlentities($event->id) . '" data-date="' . htmlentities($event->date) . '" data-start="' . htmlentities($event->start_time) . '" data-end="' . htmlentities($event->end_time) . '">Edit</button>';
+                        // Delete now points to calendar.php for deletion
+                        echo '<a href="calendar.php?delid=' . htmlentities($event->id) . '" onclick="return confirm(\'Do you really want to Delete ?\');" class="btn btn-danger btn-sm">Delete</a>';
+                      }
                       echo '</div>';
                       echo '</div>';
                     }

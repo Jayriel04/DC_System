@@ -105,17 +105,28 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 
                                     <div class="table-responsive border rounded p-1">
                                         <?php
-                                        // small helper to format time to 12-hour with am/pm
-                                        function time12($t) {
-                                            if (empty($t)) return '-';
-                                            $parts = explode(':', $t);
-                                            if (count($parts) < 2) return $t;
-                                            $h = intval($parts[0]);
-                                            $m = str_pad($parts[1],2,'0',STR_PAD_LEFT);
-                                            $ampm = $h >= 12 ? 'pm' : 'am';
-                                            $h12 = $h % 12;
-                                            if ($h12 === 0) $h12 = 12;
-                                            return $h12 . ':' . $m . ' ' . $ampm;
+                                        // Helper to format a time string (HH:MM:SS or HH:MM) to 12-hour format
+                                        function time12_single($t) {
+                                            if (empty($t)) return '';
+                                            $ts = strtotime($t);
+                                            if ($ts === false) return $t;
+                                            return date('g:i A', $ts);
+                                        }
+
+                                        // Helper to format a start and optional end time into a range string
+                                        function time_range($start, $end) {
+                                            // prefer start_time; if not present, fall back to legacy `time` value
+                                            $s = isset($start) ? $start : '';
+                                            $e = isset($end) ? $end : '';
+                                            if (empty($s) && empty($e)) return '-';
+                                            $s_formatted = time12_single($s);
+                                            $e_formatted = time12_single($e);
+                                            if (!empty($s_formatted) && !empty($e_formatted)) {
+                                                return $s_formatted . ' - ' . $e_formatted;
+                                            }
+                                            if (!empty($s_formatted)) return $s_formatted;
+                                            if (!empty($e_formatted)) return $e_formatted;
+                                            return '-';
                                         }
 
                                         ?>
@@ -126,7 +137,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                     <th class="font-weight-bold">First Name</th>
                                                     <th class="font-weight-bold">Surname</th>
                                                     <th class="font-weight-bold">Date</th>
-                                                    <th class="font-weight-bold">Time</th>
+                                                    <th class="font-weight-bold">Start Time</th>
+                                                    <th class="font-weight-bold">End Time</th>
                                                     <th class="font-weight-bold">Status</th>
                                                     <th class="font-weight-bold">Action</th>
                                                 </tr>
@@ -190,7 +202,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                             <td><?php echo htmlentities($row->firstname); ?></td>
                                                             <td><?php echo htmlentities($row->surname); ?></td>
                                                             <td><?php echo htmlentities($row->date); ?></td>
-                                                            <td><?php echo htmlentities(time12($row->time)); ?></td>
+                                                            <td><?php echo htmlentities(time12_single(isset($row->start_time) ? $row->start_time : (isset($row->time) ? $row->time : ''))); ?></td>
+                                                            <td><?php echo htmlentities(time12_single(isset($row->end_time) ? $row->end_time : '')); ?></td>
                                                             <td>
                                                                 <?php
                                                                 $status = htmlentities($row->status);

@@ -25,6 +25,44 @@ if (!$record) {
     exit();
 }
 
+// Handle deletion of the existing schedule (from the edit page)
+if (isset($_GET['delsid'])) {
+    $delsid = intval($_GET['delsid']);
+    try {
+        // Only delete if the schedule belongs to this appointment
+        $delStmt = $dbh->prepare("DELETE FROM tblschedule WHERE id = :sid AND appointment_id = :aid");
+        $delStmt->bindParam(':sid', $delsid, PDO::PARAM_INT);
+        $delStmt->bindParam(':aid', $appointmentId, PDO::PARAM_INT);
+        $delStmt->execute();
+        if ($delStmt->rowCount() > 0) {
+            echo "<script>alert('Schedule deleted');</script>";
+        } else {
+            echo "<script>alert('No matching schedule found or already deleted');</script>";
+        }
+    } catch (Exception $e) {
+        echo "<script>alert('Failed to delete schedule');</script>";
+    }
+    echo "<script>window.location.href = 'mas.php'</script>";
+    exit();
+}
+
+// Ensure we correctly detect any existing schedule for this appointment.
+// Relying on the JOIN above can sometimes miss or return unexpected rows if data is inconsistent.
+$existingScheduleId = null;
+try {
+    $chkSch = $dbh->prepare("SELECT id FROM tblschedule WHERE appointment_id = :aid LIMIT 1");
+    $chkSch->bindParam(':aid', $appointmentId, PDO::PARAM_INT);
+    $chkSch->execute();
+    $sch = $chkSch->fetch(PDO::FETCH_OBJ);
+    if ($sch && isset($sch->id)) {
+        $existingScheduleId = (int)$sch->id;
+        // overwrite record->schedule_id so the rest of the code treats this appointment as scheduled
+        $record->schedule_id = $existingScheduleId;
+    }
+} catch (Exception $e) {
+    // ignore - we'll fall back to whatever the original join returned
+}
+
 // If this appointment already has a schedule, fetch its service_id, duration and status to preselect
 $current_service_id = null;
 $current_duration = null;
@@ -39,6 +77,10 @@ if (!empty($record->schedule_id)) {
             if (isset($svcRow->service_id)) $current_service_id = $svcRow->service_id;
             if (isset($svcRow->duration)) $current_duration = $svcRow->duration;
             if (isset($svcRow->status)) $current_schedule_status = $svcRow->status;
+            // If schedule status is null or empty, default to 'Ongoing' for display
+            if (empty($current_schedule_status)) {
+                $current_schedule_status = 'Ongoing';
+            }
         }
     } catch (Exception $e) {
         // ignore
@@ -120,6 +162,16 @@ if (isset($_POST['save_schedule'])) {
                 $hasDurationColumn = false;
             }
 
+            // determine final status to save: prefer posted value, then existing schedule status, otherwise default to 'Ongoing'
+            $statusToSave = null;
+            if (!empty($posted_schedule_status)) {
+                $statusToSave = $posted_schedule_status;
+            } elseif (!empty($current_schedule_status)) {
+                $statusToSave = $current_schedule_status;
+            } else {
+                $statusToSave = 'Ongoing';
+            }
+
             // now upsert into tblschedule (include service_id when available)
                 if (!empty($record->schedule_id)) {
                 // update existing schedule (also update name, patient_number and optional service)
@@ -149,12 +201,49 @@ if (isset($_POST['save_schedule'])) {
                     else $qUp->bindValue(':dur', null, PDO::PARAM_NULL);
                 }
                 if ($hasStatusColumn) {
-                    if (!empty($posted_schedule_status)) $qUp->bindParam(':status', $posted_schedule_status, PDO::PARAM_STR);
-                    else $qUp->bindValue(':status', null, PDO::PARAM_NULL);
+                    // always bind a status string (defaulting to 'Ongoing' if nothing provided)
+                    $qUp->bindParam(':status', $statusToSave, PDO::PARAM_STR);
                 }
                 $qUp->bindParam(':sid', $record->schedule_id, PDO::PARAM_INT);
                 $qUp->execute();
             } else {
+                // Before inserting, re-check for an existing schedule record for this appointment to avoid duplicate entries
+                try {
+                    $chk = $dbh->prepare("SELECT id FROM tblschedule WHERE appointment_id = :aid LIMIT 1");
+                    $chk->bindParam(':aid', $appointmentId, PDO::PARAM_INT);
+                    $chk->execute();
+                    $existing = $chk->fetch(PDO::FETCH_OBJ);
+                    if ($existing && isset($existing->id)) {
+                        // convert to update flow to prevent duplicate
+                        $record->schedule_id = (int)$existing->id;
+                        // rebuild the update query used above
+                        $sqlUp2 = "UPDATE tblschedule SET date = :d, time = :t, firstname = :fn, surname = :sn, patient_number = :pn";
+                        if ($hasServiceColumn) $sqlUp2 .= ", service_id = :svc";
+                        if ($hasDurationColumn) $sqlUp2 .= ", duration = :dur";
+                        if ($hasStatusColumn) $sqlUp2 .= ", status = :status";
+                        $sqlUp2 .= " WHERE id = :sid";
+                        $qUp2 = $dbh->prepare($sqlUp2);
+                        $qUp2->bindParam(':d', $sched_date, PDO::PARAM_STR);
+                        $qUp2->bindParam(':t', $sched_time, PDO::PARAM_STR);
+                        $qUp2->bindParam(':fn', $sched_firstname, PDO::PARAM_STR);
+                        $qUp2->bindParam(':sn', $sched_surname, PDO::PARAM_STR);
+                        $qUp2->bindParam(':pn', $sched_patient_number, PDO::PARAM_INT);
+                        if ($hasServiceColumn) $qUp2->bindParam(':svc', $selected_service, PDO::PARAM_INT);
+                        if ($hasDurationColumn) {
+                            if ($sched_duration !== null) $qUp2->bindParam(':dur', $sched_duration, PDO::PARAM_INT);
+                            else $qUp2->bindValue(':dur', null, PDO::PARAM_NULL);
+                        }
+                        if ($hasStatusColumn) $qUp2->bindParam(':status', $statusToSave, PDO::PARAM_STR);
+                        $qUp2->bindParam(':sid', $record->schedule_id, PDO::PARAM_INT);
+                        $qUp2->execute();
+                        // redirect after update
+                        header('Location: mas.php');
+                        exit();
+                    }
+                } catch (Exception $e) {
+                    // proceed with insert if check fails
+                }
+
                 // insert new schedule including patient info and optional service
                 $sqlIns = "INSERT INTO tblschedule (appointment_id, patient_number, firstname, surname, date, time, created_at";
                 if ($hasServiceColumn) $sqlIns .= ", service_id";
@@ -180,8 +269,8 @@ if (isset($_POST['save_schedule'])) {
                     else $qIns->bindValue(':dur', null, PDO::PARAM_NULL);
                 }
                 if ($hasStatusColumn) {
-                    if (!empty($posted_schedule_status)) $qIns->bindParam(':status', $posted_schedule_status, PDO::PARAM_STR);
-                    else $qIns->bindValue(':status', null, PDO::PARAM_NULL);
+                    // always bind a status string (defaulting to 'Ongoing' if nothing provided)
+                    $qIns->bindParam(':status', $statusToSave, PDO::PARAM_STR);
                 }
                 $qIns->execute();
             }
