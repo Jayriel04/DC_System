@@ -1,40 +1,27 @@
-<!--header-->
-<div>
-  <nav class="navbar navbar-default">
-    <div class="container">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"> </span>
-          <span class="icon-bar"> </span>
-          <span class="icon-bar"> </span>
-        </button>
-        <!-- Logo inserted here -->
-        <a class="navbar-brand" href="index.php" style="display: flex; align-items: center;">
-          <img src="images/Jf logo.png" alt="JF Dental Care Logo" style="height:40px; margin-right:10px;">
-          <h4>JF DENTAL CARE</h4>
-        </a>
+<link rel="stylesheet" href="css/header.css">
+<header class="header">
+  <div class="header-container">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo-container">
+         
+          <img src="images/Jf logo.png" alt="JF Dental Care Logo" class="logo-img" style="height:40px; margin-right:10px;">
+          <span class="logo-text">JF DENTAL CARE</span>
+        </div>
       </div>
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav navbar-right margin-top cl-effect-2">
-          <li><a href="index.php"><span data-hover="Home">Home</span></a></li>
-          <li><a href="about.php"><span data-hover="About">About</span></a></li>
-          <li><a href="service.php"><span data-hover="Service">Services</span></a></li>
-          <li><a href="contact.php"><span data-hover="Contact">Contact Us</span></a></li>
-          <li>
-            <a href="user/login.php" class="btn btn-primary navbar-btn">LOGIN</a>
-          </li>
-          <li>
-            <a href="user/register.php" class="btn btn-primary navbar-btn">SIGNUP</a>
-          </li>
-        </ul>
-        <div class="clearfix"> </div>
-      </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
-  </nav>
-  <hr>
-  <div class="clearfix"> </div>
-</div>
-<!--/header-->
+      <?php
+        $current = basename($_SERVER['PHP_SELF']);
+      ?>
+      <nav class="desktop-nav">
+        <a href="index.php" class="nav-link<?php if($current == 'index.php') echo ' active'; ?>">Home</a>
+        <a href="about.php" class="nav-link<?php if($current == 'about.php') echo ' active'; ?>">About Us</a>
+        <a href="services.php" class="nav-link<?php if($current == 'services.php') echo ' active'; ?>">Services</a>
+        <a href="contact.php" class="nav-link<?php if($current == 'contact.php') echo ' active'; ?>">Contact Us</a>
+      </nav>
+      <div class="action-buttons">
+        <a href="user/login.php" class="login-btn">LOGIN</a>
+        <a href="user/create_account.php" class="signup-btn">SIGN UP</a>
+      </div>
+    </div>
+  </div>
+</header>

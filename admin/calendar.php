@@ -70,7 +70,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
   <html lang="en">
 
   <head>
-    <title>Student Management System | Manage Calendar</title>
+    <title>Calendar</title>
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
@@ -87,11 +87,15 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
         <?php include_once('includes/sidebar.php'); ?>
         <div class="main-panel">
           <div class="content-wrapper">
-            <!-- Add Event Button -->
-            <div style="text-align: center; margin: 10px;">
+                    <div class="page-header">
+                        <h3 class="page-title">Manage Calendar</h3>
+                    </div>
+            
+            <div style="text-align: right; margin: 10px;">
               <a href="add-calendar-entry.php" class="btn"
-                style="padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">Add
-                Schedule</a>
+                style="padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">
+                Add Schedule
+              </a>
             </div>
             <div class="calendar-wrapper">
               <div class="calendar-header">

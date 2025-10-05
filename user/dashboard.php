@@ -132,7 +132,7 @@ function time12_dashboard($t) {
 <html lang="en">
 
 <head>
-  <title>Patient Management System ||| Dashboard</title>
+  <title>Dashboard</title>
   <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
   <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
   <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
@@ -155,11 +155,7 @@ function time12_dashboard($t) {
           <div class="row purchace-popup">
             <div class="col-12 stretch-card grid-margin">
               <div class="card card-secondary">
-                <span class="card-body d-lg-flex align-items-center">
-                  <p class="mb-lg-0">Notices from the school kindly check!</p>
-                  <a href="view-notice.php" target="_blank"
-                    class="btn btn-warning purchase-button btn-sm my-1 my-sm-0 ml-auto">View Notice</a>
-                </span>
+                
               </div>
             </div>
           </div>

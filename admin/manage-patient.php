@@ -54,7 +54,15 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     </div>
                                     <form method="POST" class="form-inline mb-4">
                                         <div class="form-group mr-3">
-                                            <input type="text" class="form-control" name="search" placeholder="Search by First Name or Surname" value="<?php echo htmlentities($search); ?>">
+                                            <input type="text" class="form-control" name="search" id="searchInput" placeholder="Search by First Name or Surname " value="<?php echo htmlentities($search); ?>">
+                                            <script>
+                                            document.getElementById('searchInput').addEventListener('input', function(e) {
+                                                let val = e.target.value;
+                                                if (val.length > 0) {
+                                                    e.target.value = val.charAt(0).toUpperCase() + val.slice(1);
+                                                }
+                                            });
+                                            </script>
                                         </div>
                                         <button type="submit" class="btn btn-primary">Search</button>
                                     </form>
@@ -136,7 +144,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                             </td>
                                                             <td><?php echo htmlentities($row->examination_record);?>
                                                         <div>
-                                                            <a href="medical-record.php?number=<?php echo htmlentities($row->number); ?>" class="btn btn-success btn-sm">View</a>
+                                                            <a href="view-er.php?stid=<?php echo $row->number; ?>" class="btn btn-info btn-sm">View</a>
                                                         </div></td>
                                                             <td>
                                                                 <div>
@@ -155,18 +163,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div align="left" class="mt-4">
-                                        <ul class="pagination">
-                                            <li><a href="?pageno=1"><strong>First</strong></a></li>
-                                            <li class="<?php if ($pageno <= 1) { echo 'disabled'; } ?>">
-                                                <a href="<?php if ($pageno <= 1) { echo '#'; } else { echo "?pageno=" . ($pageno - 1); } ?>"><strong>Prev</strong></a>
-                                            </li>
-                                            <li class="<?php if ($pageno >= $total_pages) { echo 'disabled'; } ?>">
-                                                <a href="<?php if ($pageno >= $total_pages) { echo '#'; } else { echo "?pageno=" . ($pageno + 1); } ?>"><strong>Next</strong></a>
-                                            </li>
-                                            <li><a href="?pageno=<?php echo $total_pages; ?>"><strong>Last</strong></a></li>
-                                        </ul>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>

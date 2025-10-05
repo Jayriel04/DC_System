@@ -70,7 +70,7 @@ function time12_viewph($t) {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Patient Management System || View Patient</title>
+    <title>View Patient History</title>
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
@@ -86,10 +86,7 @@ function time12_viewph($t) {
             <div class="page-header">
               <h3 class="page-title"> View Patient </h3>
               <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                  <li class="breadcrumb-item active" aria-current="page"> View Patient</li>
-                </ol>
+                
               </nav>
             </div>
 

@@ -1,7 +1,7 @@
 <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
     <div class="navbar-brand-wrapper d-flex align-items-center">
         <a class="navbar-brand brand-logo" href="dashboard.php">
-            <strong style="color: white;">SMS</strong>
+            <strong style="color: white;">JF DENTAL CARE </strong>
         </a>
     </div>
     
@@ -31,7 +31,7 @@
                             </div>
                             <a class="dropdown-item" href="view-profile.php"><i class="dropdown-item-icon icon-user text-primary"></i> My Profile</a>
                             <a class="dropdown-item" href="change-password.php"><i class="dropdown-item-icon icon-energy text-primary"></i> Change Password</a>
-                            <a class="dropdown-item" href="logout.php"><i class="dropdown-item-icon icon-power text-primary"></i> Sign Out</a>
+                            <a class="dropdown-item" href="logout.php"><i class="dropdown-item-icon icon-power text-primary"></i> Log Out</a>
                         </div>
                     </li>
                 </ul>

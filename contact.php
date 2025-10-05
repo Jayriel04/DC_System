@@ -6,86 +6,84 @@ include('includes/dbconnection.php');
 <!doctype html>
 <html>
 <head>
-<title>Student  Management System || Contact Us Page</title>
-<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
-<!--bootstrap-->
-<link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all">
-<!--coustom css-->
-<link href="css/style.css" rel="stylesheet" type="text/css"/>
-<!--script-->
-<script src="js/jquery-1.11.0.min.js"></script>
-<!-- js -->
-<script src="js/bootstrap.js"></script>
-<!-- /js -->
-<!--fonts-->
-<link href='//fonts.googleapis.com/css?family=Open+Sans:300,300italic,400italic,400,600,600italic,700,700italic,800,800italic' rel='stylesheet' type='text/css'>
-<!--/fonts-->
-<script type="text/javascript" src="js/move-top.js"></script>
-<script type="text/javascript" src="js/easing.js"></script>
-<!--script-->
-<script type="text/javascript">
-			jQuery(document).ready(function($) {
-				$(".scroll").click(function(event){		
-					event.preventDefault();
-					$('html,body').animate({scrollTop:$(this.hash).offset().top},900);
-				});
-			});
-</script>
-<!--/script-->
+  <title>Contact Us</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
-	<body>
-<!--header-->
-		<?php include_once('includes/header.php');?>
-<!-- Top Navigation -->
-<div class="banner banner5">
-	<div class="container">
-	<h2>Contact</h2>
-	</div>
-</div>
-<!--header-->
-		<!-- contact -->
-		<div class="contact">
-			<!-- container -->
-			<div class="container">
-				<div class="contact-info">
-					<h3 class="c-text">Feel Free to contact with us!!!</h3>
-				</div>
-				
-				<div class="contact-grids">
-					<?php
-$sql="SELECT * from tblpage where PageType='contactus'";
-$query = $dbh -> prepare($sql);
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-
-$cnt=1;
-if($query->rowCount() > 0)
-{
-foreach($results as $row)
-{               ?>
-					<div class="col-md-4 contact-grid-left">
-						<h3>Address :</h3>
-						<p><?php  echo htmlentities($row->PageDescription);?>
-						</p>
-					</div>
-					<div class="col-md-4 contact-grid-middle">
-						<h3>Phones :</h3>
-						<p><?php  echo htmlentities($row->MobileNumber);?>
-						</p>
-					</div>
-					<div class="col-md-4 contact-grid-right">
-						<h3>E-mail :</h3>
-						<p><?php  echo htmlentities($row->Email);?>
-						</p>
-					</div>
-					<div class="clearfix"> </div>
-					<?php $cnt=$cnt+1;}} ?>
-				</div>
-			</div>
-			<!-- //container -->
-		</div>
-		<!-- //contact -->
-<?php include_once('includes/footer.php');?>
-<!--/copy-rights-->
-	</body>
+<body>
+  <?php include_once('includes/header.php'); ?>
+  <div class="contact-title">Contact Us</div>
+  <div class="contact-desc">
+     Get in touch with us today and take the first step towards better oral health.
+  </div>
+  <div class="contact-main">
+    <!-- Left: Contact Info -->
+    <div class="contact-info">
+      <h3>Get in Touch</h3>
+      <ul class="contact-list">  
+        <li>
+          <i class="ri-map-pin-line"></i>
+          <div>
+            <span class="label">Address</span><br>
+            383 L.Jayme St., Bakilid 2, Hi-way Mandaue City<br>
+            6014 Cebu, Philippines
+          </div>
+        </li>
+        <li>
+          <i class="ri-phone-line"></i>
+          <div>
+            <span class="label">Phone</span><br>
+            0925-519-1328
+          </div>
+        </li>
+        <li>
+          <i class="ri-mail-line"></i>
+          <div>
+            <span class="label">Email</span><br>
+            <a href="mailto:info@jfdentalcare.com">info@jfdentalcare.com</a>
+          </div>
+        </li>
+        <li>
+          <i class="ri-time-line"></i>
+          <div>
+            <span class="label">Office Hours</span><br>
+            Monday & Thursday : 2:00 PM - 7:00 PM<br>
+            Tuesday & Saturday : 9:00 AM - 6:00 PM<br>
+            Wednesday & Friday : 4:30 PM - 7:00 PM<br>
+			Sunday: Closed
+          </div>
+        </li>
+        <li>
+          <i class="ri-facebook-circle-fill"></i>
+          <div>
+            <span class="label">Facebook</span><br>
+            <a href="https://facebook.com/jfdentalcare" target="_blank">facebook.com/jfdentalcare</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <!-- Right: Feedback Star Rating -->
+    <div class="contact-form-section">
+      <h3>Feedback</h3>
+      <form class="contact-form" method="post" action="#">
+        <label for="star-rating">Your Rating</label>
+        <div class="star-rating">
+          <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 stars">&#9733;</label>
+          <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 stars">&#9733;</label>
+          <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 stars">&#9733;</label>
+          <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 stars">&#9733;</label>
+          <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 star">&#9733;</label>
+        </div>
+        <button type="submit">Submit Feedback</button>
+      </form>
+    </div>
+  </div>
+  <!-- Google Map -->
+  <div class="map-container" style="max-width: 1200px; margin: 40px auto;">
+    <iframe
+      src="https://www.google.com/maps?q=383+L.Jayme+St.,+Bakilid+2,+Hi-way+Mandaue+City,+6014+Cebu,+Philippines&output=embed"
+      width="100%" height="320" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+  </div>
+  <?php include_once('includes/footer.php'); ?>
+</body>
 </html>

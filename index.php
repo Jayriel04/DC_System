@@ -41,6 +41,7 @@ include('includes/dbconnection.php');
     });
   </script>
   <!--/script-->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 
 <body>
@@ -63,74 +64,28 @@ include('includes/dbconnection.php');
         <div class="callbacks_container">
           <ul class="rslides" id="slider">
             <li>
-              <h3>Patient Management System</h3>
-              <p>Registered Patients can Login Here</p>
+              <h2>Where beautiful</h2>
+              <h2> smiles come to life</h2>
+              <p class="hero-description">
+                Experience comprehensive dental care with our advanced patient management system.
+                We provide personalized treatment plans and state-of-the-art dental services
+                for your optimal oral health.
+              </p>
               <div class="readmore">
-                <a href="user/create_account.php">Book appointment<i class="glyphicon glyphicon-menu-right"> </i></a>
+                <a href="user/create_account.php">
+                  Book appointment <i class="ri-arrow-right-line"></i>
+                </a>
               </div>
             </li>
-
-
           </ul>
         </div>
       </div>
     </div>
   </div>
-  <div class="welcome">
-    <div class="container">
-      <?php
-      $sql = "SELECT * from tblpage where PageType='aboutus'";
-      $query = $dbh->prepare($sql);
-      $query->execute();
-      $results = $query->fetchAll(PDO::FETCH_OBJ);
-
-      $cnt = 1;
-      if ($query->rowCount() > 0) {
-        foreach ($results as $row) { ?>
-          <h2><?php echo htmlentities($row->PageTitle); ?></h2>
-          <p><?php echo ($row->PageDescription); ?></p><?php $cnt = $cnt + 1;
-        }
-      } ?>
-    </div>
-  </div>
-  <!--/welcome-->
-
-
-  <!--testmonials-->
-  <div class="testimonials">
-    <div class="container">
-      <div class="testimonial-nfo">
-        <h3>Public Notices</h3>
-        <marquee style="height:350px;" direction="up" onmouseover="this.stop();" onmouseout="this.start();">
-          <?php
-          $sql = "SELECT * from tblpublicnotice";
-          $query = $dbh->prepare($sql);
-          $query->execute();
-          $results = $query->fetchAll(PDO::FETCH_OBJ);
-
-          $cnt = 1;
-          if ($query->rowCount() > 0) {
-            foreach ($results as $row) { ?>
-
-
-              <a href="view-public-notice.php?viewid=<?php echo htmlentities($row->ID); ?>" target="_blank"
-                style="color:#fff;">
-                <?php echo htmlentities($row->NoticeTitle); ?>(<?php echo htmlentities($row->CreationDate); ?>)</a>
-              <hr /><br />
-
-              <?php $cnt = $cnt + 1;
-            }
-          } ?>
-        </marquee>
-      </div>
-    </div>
-  </div>
-  <!--\testmonials-->
-  <!--specfication-->
-
-  <!--/specfication-->
+  <?php include_once('about.php'); ?>
+  <?php include_once('services.php'); ?>
+  <?php include_once('contact.php'); ?>
   <?php include_once('includes/footer.php'); ?>
-  <!--/copy-rights-->
 </body> 
 
 </html>

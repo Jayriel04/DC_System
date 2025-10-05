@@ -6,15 +6,11 @@ include('includes/dbconnection.php');
 <!doctype html>
 <html>
 <head>
-<title>About Us Page</title>
+<title>About Us </title>
 <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
-<!--bootstrap-->
 <link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all">
-<!--coustom css-->
 <link href="css/style.css" rel="stylesheet" type="text/css"/>
-<!--script-->
 <script src="js/jquery-1.11.0.min.js"></script>
-<!-- js -->
 <script src="js/bootstrap.js"></script>
 <!-- /js -->
 <!--fonts-->
@@ -32,45 +28,87 @@ include('includes/dbconnection.php');
 			});
 </script>
 <!--/script-->
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 	<body>
 <!--header-->
 <?php include_once('includes/header.php');?>
 <!-- Top Navigation -->
-<div class="banner banner5">
-	<div class="container">
-	<h2>About</h2>
+	
 	</div>
 </div>
 <!--header-->
 <!-- About -->
-<div class="about">
-	 <div class="container">
-		 <div class="about-info-grids">
-			 <div class="col-md-5 abt-pic">
-				 <img src="images/abt.jpg" class="img-responsive" alt=""/>
-			 </div>
-			 <div class="col-md-7 abt-info-pic">
-			 	<?php
-$sql="SELECT * from tblpage where PageType='aboutus'";
-$query = $dbh -> prepare($sql);
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-
-$cnt=1;
-if($query->rowCount() > 0)
-{
-foreach($results as $row)
-{               ?>
-				 
-				 <p><?php  echo ($row->PageDescription);?></p><?php $cnt=$cnt+1;}} ?>
-				
-			 </div>
-			 <div class="clearfix"> </div>
-		 </div>
-		
-	 </div>
+<section id="about" class="about-section">
+  <div class="about-container">
+    <div class="about-grid">
+      <div class="about-content">
+        <h2 class="about-title">About JF Dental Care</h2>
+        <p class="about-paragraph">
+          At JF Dental Care, we are committed to providing exceptional dental services
+          in a comfortable and modern environment. Our experienced team uses the latest
+          technology and techniques to ensure you receive the best possible care for
+          your oral health needs.
+        </p>
+        <p class="about-paragraph">
+          We believe in building long-term relationships with our patients through
+          personalized care, education, and a gentle approach to dentistry. Your
+          comfort and satisfaction are our top priorities.
+        </p>
+        <div class="features-grid">
+  <div class="feature-item">
+    <div class="feature-icon-container">
+      <i class="ri-award-line feature-icon"></i>
+    </div>
+    <div class="feature-content">
+      <h3 class="feature-title">Expert Team</h3>
+      <p class="feature-description">Experienced dental professionals with advanced training and certifications.</p>
+    </div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon-container">
+      <i class="ri-user-heart-line feature-icon"></i>
+    </div>
+    <div class="feature-content">
+      <h3 class="feature-title">Patient Centered</h3>
+      <p class="feature-description">We focus on your comfort and satisfaction at every visit.</p>
+    </div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon-container">
+      <i class="ri-macbook-line feature-icon"></i>
+    </div>
+    <div class="feature-content">
+      <h3 class="feature-title">Modern Technology</h3>
+      <p class="feature-description">State-of-the-art equipment for precise and gentle care.</p>
+    </div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon-container">
+      <i class="ri-calendar-check-line feature-icon"></i>
+    </div>
+    <div class="feature-content">
+      <h3 class="feature-title">Flexible Scheduling</h3>
+      <p class="feature-description">Convenient appointment times to fit your busy life.</p>
+    </div>
+  </div>
 </div>
+      </div>
+          <div class="about-image-container">
+  <img
+    src="images/doctor.png"
+    alt="JF Dental Care Team"
+    class="about-image"
+  />
+  <div class="experience-badge">
+    <div class="experience-number">5+</div>
+    <div class="experience-text">Years of Experience</div>
+  </div>
+</div>
+    </div>
+  </div>
+</section>
+			 	
 <!-- /About -->
 <?php include_once('includes/footer.php');?>
 <!--/copy-rights-->

@@ -66,7 +66,7 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
 <html lang="en">
   <head>
    
-    <title>Dental Clinic || Service Appointments</title>
+    <title>Service Appointments</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
@@ -95,18 +95,16 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
           <div class="content-wrapper">
             <div class="page-header">
               <h3 class="page-title"> Service Appointments </h3>
-              <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                  <li class="breadcrumb-item active" aria-current="page"> Service Appointments</li>
-                </ol>
-              </nav>
+              
+
             </div>
             <div class="row">
               <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body">
                     <h5 class="card-title">Your Service Appointments</h5>
+                    <p>&nbsp;</p>
+
                     <?php
                     // determine patient number from session (primary key used across app is 'sturecmsnumber')
                     $patient_number = null;

@@ -83,7 +83,15 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     </div>
                                     <form method="POST" class="form-inline mb-4" id="filterForm">
                                         <div class="form-group mr-3">
-                                            <input type="text" class="form-control" name="search" placeholder="Search by First Name or Surname" value="<?php echo htmlentities($search); ?>">
+                                            <input type="text" class="form-control" name="search" id="searchInput" placeholder="Search by First Name or Surname" value="<?php echo htmlentities($search); ?>">
+                                            <script>
+                                            document.getElementById('searchInput').addEventListener('input', function(e) {
+                                                let val = e.target.value;
+                                                if (val.length > 0) {
+                                                    e.target.value = val.charAt(0).toUpperCase() + val.slice(1);
+                                                }
+                                            });
+                                            </script>
                                         </div>
                                         <div class="form-group mr-3">
                                             <select class="form-control" name="status_filter" onchange="autoSubmit()">
@@ -183,7 +191,19 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                             <td><?php echo htmlentities($row->surname); ?></td>
                                                             <td><?php echo htmlentities($row->date); ?></td>
                                                             <td><?php echo htmlentities(time12($row->time)); ?></td>
-                                                            <td><?php echo htmlentities($row->status); ?></td>
+                                                            <td>
+                                                                <?php
+                                                                $status = htmlentities($row->status);
+                                                                if ($status == "Approved") {
+                                                                    $badge = "badge-success";
+                                                                } elseif ($status == "Declined") {
+                                                                    $badge = "badge-danger";
+                                                                } else {
+                                                                    $badge = "badge-secondary";
+                                                                }
+                                                                ?>
+                                                                <span class="badge <?php echo $badge; ?>"><?php echo $status; ?></span>
+                                                            </td>
                                                             <td>
                                                                 <div>
                                                                     <a href="edit-appointment-detail.php?editid=<?php echo htmlentities($row->id); ?>" class="btn btn-info btn-xs">Edit</a>
@@ -197,18 +217,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div align="left" class="mt-4">
-                                        <ul class="pagination">
-                                            <li><a href="?page_no=1"><strong>First</strong></a></li>
-                                            <li class="<?php if ($page_no <= 1) echo 'disabled'; ?>">
-                                                <a href="<?php if ($page_no <= 1) echo '#'; else echo "?page_no=" . ($page_no - 1); ?>"><strong>Prev</strong></a>
-                                            </li>
-                                            <li class="<?php if ($page_no >= $total_pages) echo 'disabled'; ?>">
-                                                <a href="<?php if ($page_no >= $total_pages) echo '#'; else echo "?page_no=" . ($page_no + 1); ?>"><strong>Next</strong></a>
-                                            </li>
-                                            <li><a href="?page_no=<?php echo $total_pages; ?>"><strong>Last</strong></a></li>
-                                        </ul>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>

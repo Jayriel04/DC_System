@@ -38,8 +38,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         <h3 class="page-title">Manage Services</h3>
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Manage Services</li>
+                     
                             </ol>
                         </nav>
                     </div>
@@ -48,7 +47,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             <div class="card">
                                 <div class="card-body">
                                     <div class="d-sm-flex align-items-center mb-4">
-                                        <h4 class="card-title mb-sm-0">Manage Services</h4>
+                                        
                                         <a href="add-service.php" class="btn btn-primary ml-auto">Add Service</a>
                                     </div>
                                     <div class="table-responsive border rounded p-1">

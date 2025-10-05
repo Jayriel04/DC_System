@@ -98,7 +98,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                     </div>
                                     <form method="POST" class="form-inline mb-4" id="filterForm" onsubmit="return false;">
                                         <div class="form-group mr-3">
-                                                <input type="text" class="form-control" name="search" placeholder="Search..." value="<?php echo htmlentities($search); ?>" onkeyup="if(event.key === 'Enter') autoSubmit()">
+                                                <input type="text" class="form-control" name="search" placeholder="Search..." value="<?php echo htmlentities($search); ?>" id="searchInput" onkeyup="if(event.key === 'Enter') autoSubmit()">
                                             </div>
                                             <div class="form-group mr-3">
                                             <select class="form-control" name="category_filter" onchange="autoSubmit()">
@@ -108,6 +108,14 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                             </select>
                                         </div>
                                     </form>
+                                    <script>
+                                    document.getElementById('searchInput').addEventListener('input', function(e) {
+                                        let val = e.target.value;
+                                        if (val.length > 0) {
+                                            e.target.value = val.charAt(0).toUpperCase() + val.slice(1);
+                                        }
+                                    });
+                                    </script>
 
                                     <div class="table-responsive border rounded p-1">
                                         <table class="table">
@@ -226,19 +234,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                                 } ?>
                                             </tbody>
                                         </table>
-                                    </div>
-                                    <div align="left" class="mt-4">
-                                        <ul class="pagination">
-                                            <li><a href="?pageno=1"><strong>First</strong></a></li>
-                                            <li class="<?php if ($pageno <= 1) { echo 'disabled'; } ?>">
-                                                <a href="<?php if ($pageno <= 1) { echo '#'; } else { echo "?pageno=" . ($pageno - 1); } ?>"><strong>Prev</strong></a>
-                                            </li>
-                                            <li class="<?php if ($pageno >= $total_pages) { echo 'disabled'; } ?>">
-                                                <a href="<?php if ($pageno >= $total_pages) { echo '#'; } else { echo "?pageno=" . ($pageno + 1); } ?>"><strong>Next</strong></a>
-                                            </li>
-                                            <li><a href="?pageno=<?php echo $total_pages; ?>"><strong>Last</strong></a></li>
-                                        </ul>
-                                    </div>
+                                    </div>                   
                                 </div>
                             </div>
                         </div>

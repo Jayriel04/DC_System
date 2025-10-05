@@ -109,8 +109,7 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
 
   <head>
 
-    <title>Student Management System || Consultation Appointments</title>
-    <title>Dental Clinic || Consultation Appointments</title>
+    <title>Consultation Appointments</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
@@ -140,12 +139,7 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
           <div class="content-wrapper">
             <div class="page-header">
               <h3 class="page-title"> Consultation Appointments </h3>
-              <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                  <li class="breadcrumb-item active" aria-current="page"> Consultation Appointments</li>
-                </ol>
-              </nav>
+             
               <!-- Book Consultation button -->
               <div class="mt-2">
                 <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#healthModal" data-bs-toggle="modal" data-bs-target="#healthModal">Book Consultation</button>
@@ -156,6 +150,8 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
                 <div class="card">
                   <div class="card-body">
                     <h5 class="card-title">Your Consultation Appointments</h5>
+                    <p>&nbsp;</p>
+
                     <?php
                     // determine patient number from session (try multiple keys used across app)
                     $patient_number = null;

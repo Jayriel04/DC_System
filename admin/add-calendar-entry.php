@@ -17,8 +17,12 @@ if (isset($_POST['add_calendar'])) {
     $query->bindParam(':start_time', $start_time, PDO::PARAM_STR);
     $query->bindParam(':end_time', $end_time, PDO::PARAM_STR);
     $query->execute();
-    echo "<script>alert('Calendar entry added');</script>";
-    echo "<script>window.location.href = 'calendar.php';</script>";
+    if ($query->rowCount() > 0) {
+        echo "<script>alert('Calendar entry added');</script>";
+        echo "<script>window.location.href = 'calendar.php';</script>";
+    } else {
+        echo "<script>alert('Failed to add entry.');</script>";
+    }
 }
 ?>
 <!DOCTYPE html>
