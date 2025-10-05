@@ -3389,8 +3389,8 @@ hr {
     }
     .contact-form-section {
       background: #f8fafc;
-      border-radius: 10px;
-      padding: 24px 20px;
+      border-radius: 7px;
+      padding: 5px 4px;
       box-shadow: 0 1px 6px rgba(0,0,0,0.04);
     }
     .contact-form-section h3 {

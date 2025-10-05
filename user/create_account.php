@@ -149,7 +149,6 @@ if (isset($_POST['register'])) {
                                     <label for="surname">Surname</label>
                                     <input type="text" id="surname" class="form-control form-control-lg" placeholder="Surname" required name="surname">
                                 </div>
-                                <!-- date_of_birth, sex, contact number, and address removed per request -->
                                 <div class="form-group">
                                     <label for="email">Email</label>
                                     <input type="email" id="email" class="form-control form-control-lg" placeholder="Email" required name="email">

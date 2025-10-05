@@ -42,8 +42,10 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 <html lang="en">
 <head>
     <title>Add Inventory Item</title>
+<link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
+    <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
 <div class="container-scroller">

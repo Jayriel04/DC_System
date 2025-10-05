@@ -6,17 +6,16 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid'] == 0)) {
     header('location:logout.php');
 } else {
-    // Handle form submission
     if (isset($_POST['submit'])) {
-        // Get form data
+        
         $firstname = $_POST['firstname'];
         $surname = $_POST['surname'];
         $date = $_POST['date'];
         $time = $_POST['time'];
-        $service = $_POST['service']; // Now from dropdown
-        $status = $_POST['status']; // Now from dropdown
+        $service = $_POST['service']; 
+        $status = $_POST['status']; 
 
-        // Insert query
+        
         $sql = "INSERT INTO tblappointment (firstname, surname, date, time, service, status) VALUES (:firstname, :surname, :date, :time, :service, :status)";
         $query = $dbh->prepare($sql);
         $query->bindParam(':firstname', $firstname, PDO::PARAM_STR);

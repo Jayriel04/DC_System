@@ -2,29 +2,42 @@
 session_start();
 error_reporting(0);
 include('includes/dbconnection.php');
-if (strlen($_SESSION['sturecmsaid']==0)) {
+
+if (strlen($_SESSION['sturecmsstuid']==0)) {
   header('location:logout.php');
   } else{
-   if(isset($_POST['submit']))
-  {
- $pagetitle=$_POST['pagetitle'];
-$pagedes=$_POST['pagedes'];
-$sql="update tblpage set PageTitle=:pagetitle,PageDescription=:pagedes where  PageType='aboutus'";
-$query=$dbh->prepare($sql);
-$query->bindParam(':pagetitle',$pagetitle,PDO::PARAM_STR);
-$query->bindParam(':pagedes',$pagedes,PDO::PARAM_STR);
+if(isset($_POST['submit']))
+{
+$sid=$_SESSION['sturecmsstuid'];
+$cpassword=md5($_POST['currentpassword']);
+$newpassword=md5($_POST['newpassword']);
+$sql ="SELECT number FROM tblpatient WHERE number=:sid and password=:cpassword";
+$query= $dbh -> prepare($sql);
+$query-> bindParam(':sid', $sid, PDO::PARAM_STR);
+$query-> bindParam(':cpassword', $cpassword, PDO::PARAM_STR);
+$query-> execute();
+$results = $query -> fetchAll(PDO::FETCH_OBJ);
 
-$query->execute();
-echo '<script>alert("About us has been updated")</script>';
+if($query -> rowCount() > 0)
+{
+$con="update tblpatient set password=:newpassword where number=:sid";
+$chngpwd1 = $dbh->prepare($con);
+$chngpwd1-> bindParam(':sid', $sid, PDO::PARAM_STR);
+$chngpwd1-> bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
+$chngpwd1->execute();
 
+echo '<script>alert("Your password successully changed")</script>';
+} else {
+echo '<script>alert("Your current password is wrong")</script>';
 
-  }
+}
+}
   ?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
    
-    <title>Student  Management System|| Update About Us</title>
+  <title>Patient Management System || Patient Change Password</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
@@ -38,8 +51,19 @@ echo '<script>alert("About us has been updated")</script>';
     <!-- endinject -->
     <!-- Layout styles -->
     <link rel="stylesheet" href="css/style.css" />
-    <script src="http://js.nicedit.com/nicEdit-latest.js" type="text/javascript"></script>
-<script type="text/javascript">bkLib.onDomLoaded(nicEditors.allTextAreas);</script>
+    <script type="text/javascript">
+function checkpass()
+{
+if(document.changepassword.newpassword.value!=document.changepassword.confirmpassword.value)
+{
+alert('New Password and Confirm Password field does not match');
+document.changepassword.confirmpassword.focus();
+return false;
+}
+return true;
+}   
+
+</script>
   </head>
   <body>
     <div class="container-scroller">
@@ -53,11 +77,11 @@ echo '<script>alert("About us has been updated")</script>';
         <div class="main-panel">
           <div class="content-wrapper">
             <div class="page-header">
-              <h3 class="page-title"> Update About Us </h3>
+              <h3 class="page-title"> Change Password </h3>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                  <li class="breadcrumb-item active" aria-current="page"> Update About Us</li>
+                  <li class="breadcrumb-item active" aria-current="page">Change Password</li>
                 </ol>
               </nav>
             </div>
@@ -66,30 +90,24 @@ echo '<script>alert("About us has been updated")</script>';
               <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body">
-                    <h4 class="card-title" style="text-align: center;">Update About Us</h4>
+                    <h4 class="card-title" style="text-align: center;">Change Password</h4>
                    
-                    <form class="forms-sample" method="post">
-                      <?php
-
-$sql="SELECT * from  tblpage where PageType='aboutus'";
-$query = $dbh -> prepare($sql);
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-$cnt=1;
-if($query->rowCount() > 0)
-{
-foreach($results as $row)
-{               ?>      
+                    <form class="forms-sample" name="changepassword" method="post" onsubmit="return checkpass();">
+                      
                       <div class="form-group">
-                        <label for="exampleInputName1">Page Title:</label>
-                        <input type="text" name="pagetitle" value="<?php  echo $row->PageTitle;?>" class="form-control" required='true'>
+                        <label for="exampleInputName1">Current Password</label>
+                        <input type="password" name="currentpassword" id="currentpassword" class="form-control" required="true">
                       </div>
                       <div class="form-group">
-                        <label for="exampleInputName1">Page Description:</label>
-                        <textarea type="text" name="pagedes" class="form-control" required='true'><?php  echo $row->PageDescription;?></textarea>
+                        <label for="exampleInputEmail3">New Password</label>
+                        <input type="password" name="newpassword"  class="form-control" required="true">
                       </div>
-                      <?php $cnt=$cnt+1;}} ?>
-                      <button type="submit" class="btn btn-primary mr-2" name="submit">Update</button>
+                      <div class="form-group">
+                        <label for="exampleInputPassword4">Confirm Password</label>
+                        <input type="password" name="confirmpassword" id="confirmpassword" value=""  class="form-control" required="true">
+                      </div>
+                      
+                      <button type="submit" class="btn btn-primary mr-2" name="submit">Change</button>
                      
                     </form>
                   </div>

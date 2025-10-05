@@ -48,9 +48,18 @@ if (!empty($row->health_conditions) && $row->health_conditions !== 'null' && $ro
 </head>
 <body>
  <div class="container-scroller">
-        <?php include_once('includes/header.php'); ?>
-        <div class="container-fluid page-body-wrapper">
-            <?php include_once('includes/sidebar.php'); ?>   
+      <?php include_once('includes/header.php');?>
+      <div class="container-fluid page-body-wrapper">
+        <?php include_once('includes/sidebar.php');?>
+        <div class="main-panel">
+          <div class="content-wrapper">
+            <div class="page-header">
+              <h3 class="page-title"> View Patient </h3>
+              <nav aria-label="breadcrumb">
+                
+              </nav>
+            </div>
+ 
 <div class="container mt-4">
     <?php if (isset($_SESSION['modal_success'])) { ?>
         <div class="container px-3 mt-3">
