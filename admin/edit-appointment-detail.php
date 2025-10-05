@@ -46,65 +46,82 @@ if (isset($_POST['submit'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Edit Appointment</title>
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+<<<<<<< HEAD
     <link rel="stylesheet" href="./css/style.css">
+=======
+    <link rel="stylesheet" href="vendors/daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" href="vendors/chartist/chartist.min.css">
+    <link rel="stylesheet" href="css/style.css">
+>>>>>>> b184c05d51a01ff284077be27cc61dc877d139d1
 </head>
+
 <body>
-<div class="container-scroller">
-    <?php include_once('includes/header.php'); ?>
-    <div class="container-fluid page-body-wrapper">
-        <?php include_once('includes/sidebar.php'); ?>
-        <div class="main-panel">
-            <div class="content-wrapper">
-                <div class="page-header">
-                    <h3 class="page-title">Edit Appointment</h3>
-                </div>
-                <div class="row">
-                    <div class="col-md-8 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <form method="POST">
-                                    <div class="form-group">
-                                        <label for="firstname">First Name</label>
-                                        <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo htmlentities($appointment->firstname); ?>" readonly>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="surname">Surname</label>
-                                        <input type="text" class="form-control" id="surname" name="surname" value="<?php echo htmlentities($appointment->surname); ?>" readonly>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="date">Date</label>
-                                        <input type="date" class="form-control" id="date" name="date" value="<?php echo htmlentities($appointment->date); ?>" readonly>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="time">Time</label>
-                                        <input type="time" class="form-control" id="time" name="time" value="<?php echo htmlentities($appointment->time); ?>" readonly>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="status">Status</label>
-                                        <select class="form-control" id="status" name="status" required>
-                                            <option value="Pending" <?php if($appointment->status=="Pending") echo "selected"; ?>>Pending</option>
-                                            <option value="Approved" <?php if($appointment->status=="Approved") echo "selected"; ?>>Approved</option>
-                                            <option value="Declined" <?php if($appointment->status=="Declined") echo "selected"; ?>>Declined</option>
-                                        </select>
-                                    </div>
-                                    <input type="hidden" name="id" value="<?php echo $id; ?>">
-                                    <button type="submit" name="submit" class="btn btn-primary">Update Appointment</button>
-                                    <a href="mac.php" class="btn btn-secondary">Cancel</a>
-                                </form>
+    <div class="container-scroller">
+        <?php include_once('includes/header.php'); ?>
+        <div class="container-fluid page-body-wrapper">
+            <?php include_once('includes/sidebar.php'); ?>
+            <div class="main-panel">
+                <div class="content-wrapper">
+                    <div class="page-header">
+                        <h3 class="page-title">Edit Appointment</h3>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <form method="POST">
+                                        <div class="form-group">
+                                            <label for="firstname">First Name</label>
+                                            <input type="text" class="form-control" id="firstname" name="firstname"
+                                                value="<?php echo htmlentities($appointment->firstname); ?>" readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="surname">Surname</label>
+                                            <input type="text" class="form-control" id="surname" name="surname"
+                                                value="<?php echo htmlentities($appointment->surname); ?>" readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="date">Date</label>
+                                            <input type="date" class="form-control" id="date" name="date"
+                                                value="<?php echo htmlentities($appointment->date); ?>" readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="time">Time</label>
+                                            <input type="time" class="form-control" id="time" name="time"
+                                                value="<?php echo htmlentities($appointment->time); ?>" readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="status">Status</label>
+                                            <select class="form-control" id="status" name="status" required>
+                                                <option value="Pending" <?php if ($appointment->status == "Pending")
+                                                    echo "selected"; ?>>Pending</option>
+                                                <option value="Approved" <?php if ($appointment->status == "Approved")
+                                                    echo "selected"; ?>>Approved</option>
+                                                <option value="Declined" <?php if ($appointment->status == "Declined")
+                                                    echo "selected"; ?>>Declined</option>
+                                            </select>
+                                        </div>
+                                        <input type="hidden" name="id" value="<?php echo $id; ?>">
+                                        <button type="submit" name="submit" class="btn btn-primary">Update
+                                            Appointment</button>
+                                        <a href="mac.php" class="btn btn-secondary">Cancel</a>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <?php include_once('includes/footer.php'); ?>
             </div>
-            <?php include_once('includes/footer.php'); ?>
         </div>
     </div>
-</div>
-<script src="vendors/js/vendor.bundle.base.js"></script>
+    <script src="vendors/js/vendor.bundle.base.js"></script>
 </body>
+
 </html>

@@ -54,6 +54,17 @@ body {
     border-radius: 4px;
 }
 
+.event.booked {
+    background-color: #e0e0e0; /* light gray */
+    border-color: #bdbdbd;
+    color: #6b6b6b;
+}
+
+.event.booked .btn {
+    background-color: #9e9e9e;
+    cursor: not-allowed;
+}
+
 .btn {
     display: inline-block;
     margin-top: 10px;

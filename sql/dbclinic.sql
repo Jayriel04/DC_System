@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 27, 2025 at 01:40 PM
+-- Generation Time: Oct 05, 2025 at 09:06 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -55,7 +55,8 @@ CREATE TABLE `tblappointment` (
   `firstname` varchar(100) NOT NULL,
   `surname` varchar(100) NOT NULL,
   `date` date NOT NULL,
-  `time` time NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time DEFAULT NULL,
   `patient_number` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `status` varchar(20) DEFAULT NULL
@@ -65,11 +66,13 @@ CREATE TABLE `tblappointment` (
 -- Dumping data for table `tblappointment`
 --
 
-INSERT INTO `tblappointment` (`id`, `firstname`, `surname`, `date`, `time`, `patient_number`, `created_at`, `status`) VALUES
-(1, 'John Mar', 'Ypil', '2025-09-26', '17:47:00', 4, '2025-09-26 09:54:12', 'Approved'),
-(2, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:36:00', 5, '2025-09-27 06:36:43', 'Approved'),
-(3, 'Rodelyn', 'Estrera', '2025-09-27', '16:42:00', 8, '2025-09-27 08:42:44', 'Pending'),
-(4, 'John Mar', 'Ypil', '2025-09-27', '18:14:00', 4, '2025-09-27 10:33:00', 'Pending');
+INSERT INTO `tblappointment` (`id`, `firstname`, `surname`, `date`, `start_time`, `end_time`, `patient_number`, `created_at`, `status`) VALUES
+(1, 'John Mar', 'Ypil', '2025-09-26', '17:47:00', NULL, 4, '2025-09-26 09:54:12', 'Approved'),
+(2, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:36:00', NULL, 5, '2025-09-27 06:36:43', 'Approved'),
+(3, 'Rodelyn', 'Estrera', '2025-09-27', '16:42:00', NULL, 8, '2025-09-27 08:42:44', 'Approved'),
+(4, 'John Mar', 'Ypil', '2025-09-27', '18:14:00', '19:00:00', 4, '2025-09-27 10:33:00', 'Approved'),
+(5, 'John Mar', 'Ypil', '2025-10-05', '13:47:00', '14:48:00', 4, '2025-10-05 05:49:13', 'Approved'),
+(6, 'John Mar', 'Ypil', '2025-10-05', '15:14:00', '16:14:00', 4, '2025-10-05 06:15:00', 'Approved');
 
 -- --------------------------------------------------------
 
@@ -94,7 +97,10 @@ INSERT INTO `tblcalendar` (`id`, `date`, `start_time`, `end_time`) VALUES
 (3, '2025-09-24', '20:49:00', '17:49:00'),
 (4, '2025-09-26', '21:14:00', '21:45:00'),
 (5, '2025-09-27', '18:14:00', '19:00:00'),
-(6, '2025-09-27', '20:00:00', '21:00:00');
+(6, '2025-09-27', '20:00:00', '21:00:00'),
+(7, '2025-10-05', '13:47:00', '14:48:00'),
+(8, '2025-10-05', '15:14:00', '16:14:00'),
+(9, '2025-10-05', '17:29:00', '18:30:00');
 
 -- --------------------------------------------------------
 
@@ -207,9 +213,9 @@ CREATE TABLE `tblschedule` (
 --
 
 INSERT INTO `tblschedule` (`id`, `appointment_id`, `patient_number`, `firstname`, `surname`, `date`, `time`, `service_id`, `created_at`, `duration`, `status`, `cancel_reason`, `cancelled_at`) VALUES
-(1, 1, 4, 'John Mar', 'Ypil', '2025-09-26', '21:32:00', 4, '2025-09-26 13:32:21', 30, 'Ongoing', NULL, NULL),
-(2, 2, 5, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:39:00', 5, '2025-09-27 06:39:38', 45, 'Cancelled', 'Health issue', '2025-09-27 15:15:00'),
-(3, 3, 8, 'Rodelyn', 'Estrera', '2025-09-27', '18:44:00', 4, '2025-09-27 10:44:52', NULL, 'Ongoing', NULL, NULL);
+(1, 1, 4, 'John Mar', 'Ypil', '2025-09-26', '21:32:00', 4, '2025-09-26 05:32:21', 30, 'Ongoing', NULL, NULL),
+(2, 2, 5, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:39:00', 5, '2025-09-26 22:39:38', 45, 'Cancelled', 'Health issue', '2025-09-27 15:15:00'),
+(3, 3, 8, 'Rodelyn', 'Estrera', '2025-09-27', '18:44:00', 4, '2025-09-27 02:44:52', NULL, 'Ongoing', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -274,15 +280,6 @@ ALTER TABLE `tblpatient`
   ADD UNIQUE KEY `email` (`email`);
 
 --
--- Indexes for table `tblschedule`
---
-ALTER TABLE `tblschedule`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_appointment_id` (`appointment_id`),
-  ADD KEY `idx_service_id` (`service_id`),
-  ADD KEY `idx_date_time` (`date`,`time`);
-
---
 -- Indexes for table `tblservice`
 --
 ALTER TABLE `tblservice`
@@ -302,13 +299,13 @@ ALTER TABLE `tbladmin`
 -- AUTO_INCREMENT for table `tblappointment`
 --
 ALTER TABLE `tblappointment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tblcalendar`
 --
 ALTER TABLE `tblcalendar`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `tblinventory`
@@ -327,12 +324,6 @@ ALTER TABLE `tblpage`
 --
 ALTER TABLE `tblpatient`
   MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
---
--- AUTO_INCREMENT for table `tblschedule`
---
-ALTER TABLE `tblschedule`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tblservice`
