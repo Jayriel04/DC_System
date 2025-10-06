@@ -16,7 +16,7 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
       // Only return calendar slots for the date that are not already booked
       $stmt = $dbh->prepare("SELECT c.id, c.start_time, c.end_time
         FROM tblcalendar c
-        LEFT JOIN tblappointment a ON a.date = c.date AND a.time = c.start_time
+        LEFT JOIN tblappointment a ON a.date = c.date AND a.start_time = c.start_time
         WHERE c.date = :date AND a.id IS NULL
         ORDER BY c.start_time");
       $stmt->bindParam(':date', $reqDate, PDO::PARAM_STR);
@@ -54,7 +54,7 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
     } else {
       // check duplicate appointment for same patient/date/time
       try {
-        $sqlChk = "SELECT COUNT(*) FROM tblappointment WHERE patient_number = :pn AND `date` = :dt AND `time` = :tm";
+  $sqlChk = "SELECT COUNT(*) FROM tblappointment WHERE patient_number = :pn AND `date` = :dt AND `start_time` = :tm";
         $qryChk = $dbh->prepare($sqlChk);
         $qryChk->bindParam(':pn', $patient_number, PDO::PARAM_INT);
         $qryChk->bindParam(':dt', $appointment_date, PDO::PARAM_STR);
@@ -68,7 +68,7 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
           $firstname = isset($_SESSION['sturecmsfirstname']) ? $_SESSION['sturecmsfirstname'] : '';
           $surname = isset($_SESSION['sturecmssurname']) ? $_SESSION['sturecmssurname'] : '';
           $status_default = 'Pending';
-          $sqlIns = "INSERT INTO tblappointment (`firstname`, `surname`, `date`, `time`, `patient_number`, `status`) VALUES (:fn, :sn, :dt, :tm, :pn, :st)";
+          $sqlIns = "INSERT INTO tblappointment (`firstname`, `surname`, `date`, `start_time`, `patient_number`, `status`) VALUES (:fn, :sn, :dt, :tm, :pn, :st)";
           $qryIns = $dbh->prepare($sqlIns);
           $qryIns->bindParam(':fn', $firstname, PDO::PARAM_STR);
           $qryIns->bindParam(':sn', $surname, PDO::PARAM_STR);
@@ -84,6 +84,39 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
         }
       } catch (Exception $e) {
         $modal_error = 'Database error: ' . $e->getMessage();
+        $show_health_modal = true;
+      }
+    }
+  }
+
+  // Handle cancellation from modal
+  if (isset($_POST['confirm_cancel'])) {
+    $cancelId = isset($_POST['cancel_appointment_id']) ? intval($_POST['cancel_appointment_id']) : 0;
+    $cancelReason = isset($_POST['cancel_reason']) ? trim($_POST['cancel_reason']) : '';
+    if ($cancelId > 0) {
+      try {
+        // Update appointment status
+        $upd = $dbh->prepare("UPDATE tblappointment SET status = 'Cancelled' WHERE id = :id");
+        $upd->bindParam(':id', $cancelId, PDO::PARAM_INT);
+        $upd->execute();
+
+        // If there is a service schedule attached, mark it cancelled and record reason
+        $chk = $dbh->prepare("SELECT id FROM tblschedule WHERE appointment_id = :aid LIMIT 1");
+        $chk->bindParam(':aid', $cancelId, PDO::PARAM_INT);
+        $chk->execute();
+        $sch = $chk->fetch(PDO::FETCH_ASSOC);
+        if ($sch && isset($sch['id'])) {
+          $updSch = $dbh->prepare("UPDATE tblschedule SET status = 'Cancelled', cancel_reason = :reason, cancelled_at = NOW() WHERE appointment_id = :aid");
+          $updSch->bindParam(':reason', $cancelReason, PDO::PARAM_STR);
+          $updSch->bindParam(':aid', $cancelId, PDO::PARAM_INT);
+          $updSch->execute();
+        }
+
+        $_SESSION['modal_success'] = 'Appointment cancelled.' . (!empty($cancelReason) ? ' Reason: ' . htmlspecialchars($cancelReason) : '');
+        header('Location: vac.php');
+        exit();
+      } catch (Exception $e) {
+        $modal_error = 'Unable to cancel appointment: ' . $e->getMessage();
         $show_health_modal = true;
       }
     }
@@ -166,7 +199,7 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
                     $appointments = [];
                     if ($patient_number !== null) {
                       try {
-                        $sqlA = "SELECT id, `date`, `time`, status FROM tblappointment WHERE patient_number = :pn ORDER BY `date` DESC, `time` DESC";
+                        $sqlA = "SELECT id, `date`, start_time AS `time`, status FROM tblappointment WHERE patient_number = :pn ORDER BY `date` DESC, `time` DESC";
                         $qA = $dbh->prepare($sqlA);
                         $qA->bindParam(':pn', $patient_number, PDO::PARAM_INT);
                         $qA->execute();
@@ -186,6 +219,7 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
                               <th>Date</th>
                               <th>Time</th>
                               <th>Status</th>
+                              <th>Action</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -216,6 +250,11 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
                                 <td><?php echo htmlspecialchars($ap['date']); ?></td>
                                 <td><?php echo htmlspecialchars(time12_vac($ap['time'])); ?></td>
                                 <td><span class="<?php echo $badgeClass; ?>"><?php echo htmlspecialchars($status); ?></span>
+                                </td>
+                                <td>
+                                  <?php if ($status !== 'Cancelled' && $status !== 'Declined') { ?>
+                                    <button class="btn btn-danger btn-sm btn-cancel" data-id="<?php echo intval($ap['id']); ?>" data-date="<?php echo htmlspecialchars($ap['date']); ?>" data-time="<?php echo htmlspecialchars($ap['time']); ?>">Cancel</button>
+                                  <?php } else { echo '-'; } ?>
                                 </td>
                               </tr>
                             <?php } ?>
@@ -374,6 +413,58 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
             });
           }
         }
+      })();
+    </script>
+    <!-- Cancel Appointment Modal -->
+    <div class="modal fade" id="cancelAppointmentModal" tabindex="-1" role="dialog" aria-labelledby="cancelAppointmentLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form method="post">
+            <div class="modal-header">
+              <h5 class="modal-title" id="cancelAppointmentLabel">Cancel Appointment</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-bs-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+              <input type="hidden" name="cancel_appointment_id" id="cancel_appointment_id" value="">
+              <div class="form-group">
+                <label for="cancel_reason">Reason for cancellation (optional)</label>
+                <textarea name="cancel_reason" id="cancel_reason" class="form-control" rows="3"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" data-bs-dismiss="modal">Close</button>
+              <button type="submit" name="confirm_cancel" class="btn btn-danger">Confirm Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        function openCancelModal(id) {
+          var hid = document.getElementById('cancel_appointment_id');
+          if (hid) hid.value = id;
+          var m = document.getElementById('cancelAppointmentModal');
+          if (!m) return;
+          if (typeof $ !== 'undefined' && typeof $.fn.modal === 'function') {
+            $('#cancelAppointmentModal').modal('show');
+          } else if (typeof bootstrap !== 'undefined') {
+            var bs = new bootstrap.Modal(m);
+            bs.show();
+          }
+        }
+
+        // attach click handlers
+        document.addEventListener('DOMContentLoaded', function () {
+          var els = document.querySelectorAll('.btn-cancel');
+          els.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              var id = this.getAttribute('data-id');
+              openCancelModal(id);
+            });
+          });
+        });
       })();
     </script>
   </body>

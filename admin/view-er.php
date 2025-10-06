@@ -85,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
 </head>
 
 <body>
-<<<<<<< HEAD
  <div class="container-scroller">
       <?php include_once('includes/header.php');?>
       <div class="container-fluid page-body-wrapper">
@@ -107,20 +106,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
         <?php unset($_SESSION['modal_success']);
     } ?> 
     
-=======
-    <div class="container-scroller">
-        <?php include_once('includes/header.php'); ?>
-        <div class="container-fluid page-body-wrapper">
-            <?php include_once('includes/sidebar.php'); ?>
-            <div class="container mt-4">
-                <?php if (isset($_SESSION['modal_success'])) { ?>
-                    <div class="container px-3 mt-3">
-                        <div class="alert alert-success" role="alert">
-                            <?php echo htmlspecialchars($_SESSION['modal_success']); ?></div>
-                    </div>
-                    <?php unset($_SESSION['modal_success']);
-                } ?>
->>>>>>> b184c05d51a01ff284077be27cc61dc877d139d1
 
 
                 <!-- Health Conditions Table -->

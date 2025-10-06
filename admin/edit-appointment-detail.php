@@ -52,13 +52,7 @@ if (isset($_POST['submit'])) {
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-<<<<<<< HEAD
     <link rel="stylesheet" href="./css/style.css">
-=======
-    <link rel="stylesheet" href="vendors/daterangepicker/daterangepicker.css">
-    <link rel="stylesheet" href="vendors/chartist/chartist.min.css">
-    <link rel="stylesheet" href="css/style.css">
->>>>>>> b184c05d51a01ff284077be27cc61dc877d139d1
 </head>
 
 <body>

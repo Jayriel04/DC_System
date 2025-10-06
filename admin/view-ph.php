@@ -31,7 +31,7 @@ $results = $query->fetchAll(PDO::FETCH_OBJ);
 // Fetch consultation appointments for this patient
 $appointments = [];
 try {
-    $sqlApp = "SELECT id, firstname, surname, `date`, `time`, created_at, status FROM tblappointment WHERE patient_number = :pnum ORDER BY `date` DESC, `time` DESC";
+  $sqlApp = "SELECT id, firstname, surname, `date`, start_time AS `time`, created_at, status FROM tblappointment WHERE patient_number = :pnum ORDER BY `date` DESC, `time` DESC";
     $qryApp = $dbh->prepare($sqlApp);
     $qryApp->bindParam(':pnum', $stdid, PDO::PARAM_INT);
     $qryApp->execute();

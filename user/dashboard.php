@@ -1,4 +1,3 @@
-</div>
 <?php
 session_start();
 //error_reporting(0);
@@ -12,6 +11,39 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
 // Patient number from session
 $patient_number = $_SESSION['sturecmsnumber'];
+
+// AJAX endpoint: return calendar times for a given date (used to populate time dropdown)
+if (isset($_GET['get_calendar_times']) && !empty($_GET['date'])) {
+  $reqDate = $_GET['date'];
+  try {
+    // Only return calendar slots for the date that are not already booked
+  $stmt = $dbh->prepare("SELECT c.id, c.start_time, c.end_time
+    FROM tblcalendar c
+    LEFT JOIN tblappointment a ON a.date = c.date AND a.start_time = c.start_time
+    WHERE c.date = :date AND a.id IS NULL
+    ORDER BY c.start_time");
+    $stmt->bindParam(':date', $reqDate, PDO::PARAM_STR);
+    $stmt->execute();
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $out = [];
+    foreach ($rows as $r) {
+      $start = $r['start_time'];
+      $end = $r['end_time'];
+      $label = $start;
+      if (strtotime($start) !== false) $label = date('g:i A', strtotime($start));
+      if (!empty($end)) {
+        $label .= ' - ' . (strtotime($end) !== false ? date('g:i A', strtotime($end)) : $end);
+      }
+      $out[] = ['id' => $r['id'], 'start' => $start, 'end' => $end, 'label' => $label];
+    }
+    header('Content-Type: application/json');
+    echo json_encode($out);
+  } catch (Exception $e) {
+    header('Content-Type: application/json', true, 500);
+    echo json_encode(['error' => $e->getMessage()]);
+  }
+  exit();
+}
 
 // Handle modal submission: single action 'Book Appointment' which also saves health conditions
 if (isset($_POST['book_appointment'])) {
@@ -31,7 +63,7 @@ if (isset($_POST['book_appointment'])) {
     $qryUpd->bindParam(':num', $patient_number, PDO::PARAM_INT);
     if ($qryUpd->execute()) {
       // Duplicate check: same patient, same date and time
-      $sqlChk = "SELECT COUNT(*) FROM tblappointment WHERE patient_number = :pn AND `date` = :dt AND `time` = :tm";
+  $sqlChk = "SELECT COUNT(*) FROM tblappointment WHERE patient_number = :pn AND `date` = :dt AND `start_time` = :tm";
       $qryChk = $dbh->prepare($sqlChk);
       $qryChk->bindParam(':pn', $patient_number, PDO::PARAM_INT);
       $qryChk->bindParam(':dt', $appointment_date, PDO::PARAM_STR);
@@ -46,7 +78,7 @@ if (isset($_POST['book_appointment'])) {
 
         // set default status for new appointments
         $status_default = 'Pending';
-        $sqlIns = "INSERT INTO tblappointment (`firstname`, `surname`, `date`, `time`, `patient_number`, `status`) VALUES (:fn, :sn, :dt, :tm, :pn, :st)";
+  $sqlIns = "INSERT INTO tblappointment (`firstname`, `surname`, `date`, `start_time`, `patient_number`, `status`) VALUES (:fn, :sn, :dt, :tm, :pn, :st)";
         $qryIns = $dbh->prepare($sqlIns);
         $qryIns->bindParam(':fn', $firstname, PDO::PARAM_STR);
         $qryIns->bindParam(':sn', $surname, PDO::PARAM_STR);
@@ -92,8 +124,8 @@ if (!empty($existing_health) && $existing_health !== 'null' && $existing_health 
 
 // Fetch this patient's appointments for dashboard display
 $appointments = [];
-try {
-  $sqlApp = "SELECT id, firstname, surname, `date`, `time`, created_at, status FROM tblappointment WHERE patient_number = :pn ORDER BY `date` DESC, `time` DESC";
+  try {
+  $sqlApp = "SELECT id, firstname, surname, `date`, start_time AS `time`, created_at, status FROM tblappointment WHERE patient_number = :pn ORDER BY `date` DESC, `time` DESC";
   $qryApp = $dbh->prepare($sqlApp);
   $qryApp->bindParam(':pn', $patient_number, PDO::PARAM_INT);
   $qryApp->execute();
@@ -348,7 +380,9 @@ function time12_dashboard($t) {
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="appointment_time">Preferred Appointment Time</label>
-                    <input type="time" class="form-control" name="appointment_time" id="appointment_time">
+                    <select class="form-control" name="appointment_time" id="appointment_time">
+                      <option value="">-- Select a time --</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -479,6 +513,66 @@ function time12_dashboard($t) {
           var myModal = new bootstrap.Modal(document.getElementById('healthModal'), { backdrop: 'static', keyboard: false });
           myModal.show();
         });
+      }
+    })();
+  </script>
+
+  <script>
+    // Populate times dropdown from tblcalendar via AJAX endpoint
+    (function () {
+      function populateTimes(date) {
+        var sel = document.getElementById('appointment_time');
+        if (!sel) return;
+        sel.innerHTML = '<option value="">-- Select a time --</option>';
+        if (!date) return;
+        var url = 'dashboard.php?get_calendar_times=1&date=' + encodeURIComponent(date);
+        if (typeof $ !== 'undefined' && typeof $.get === 'function') {
+          $.get(url).done(function (data) {
+            try {
+              data.forEach(function (item) {
+                var opt = document.createElement('option');
+                opt.value = item.start; // post start time
+                opt.textContent = item.label;
+                sel.appendChild(opt);
+              });
+            } catch (e) {}
+          });
+        } else {
+          fetch(url).then(function (r) { return r.json(); }).then(function (data) {
+            data.forEach(function (item) {
+              var opt = document.createElement('option');
+              opt.value = item.start;
+              opt.textContent = item.label;
+              sel.appendChild(opt);
+            });
+          }).catch(function (err) {
+            // ignore
+          });
+        }
+      }
+
+      // Populate when date changes
+      var dateInput = document.getElementById('appointment_date');
+      if (dateInput) {
+        dateInput.addEventListener('change', function () {
+          populateTimes(this.value);
+        });
+      }
+
+      // When modal opens, populate times for current date value
+      var healthModal = document.getElementById('healthModal');
+      if (healthModal) {
+        healthModal.addEventListener('shown.bs.modal', function () {
+          var d = dateInput ? dateInput.value : '';
+          populateTimes(d);
+        });
+        // also for bootstrap 4 jQuery event
+        if (typeof $ !== 'undefined') {
+          $(healthModal).on('shown.bs.modal', function () {
+            var d = dateInput ? dateInput.value : '';
+            populateTimes(d);
+          });
+        }
       }
     })();
   </script>

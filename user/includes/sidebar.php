@@ -58,11 +58,11 @@
                 </ul>
             </div>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
             <a class="nav-link" href="calendar.php">
                 <span class="menu-title">Calendar</span>
                 <i class="icon-calendar menu-icon"></i>
             </a>
-        </li>
+        </li> -->
     </ul>
 </nav>
