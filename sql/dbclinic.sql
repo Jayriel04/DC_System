@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 05, 2025 at 09:06 AM
+-- Generation Time: Oct 06, 2025 at 08:49 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -67,12 +67,13 @@ CREATE TABLE `tblappointment` (
 --
 
 INSERT INTO `tblappointment` (`id`, `firstname`, `surname`, `date`, `start_time`, `end_time`, `patient_number`, `created_at`, `status`) VALUES
-(1, 'John Mar', 'Ypil', '2025-09-26', '17:47:00', NULL, 4, '2025-09-26 09:54:12', 'Approved'),
+(1, 'John Mar', 'Ypil', '2025-09-26', '17:47:00', NULL, 4, '2025-09-26 09:54:12', 'Declined'),
 (2, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:36:00', NULL, 5, '2025-09-27 06:36:43', 'Approved'),
 (3, 'Rodelyn', 'Estrera', '2025-09-27', '16:42:00', NULL, 8, '2025-09-27 08:42:44', 'Approved'),
 (4, 'John Mar', 'Ypil', '2025-09-27', '18:14:00', '19:00:00', 4, '2025-09-27 10:33:00', 'Approved'),
 (5, 'John Mar', 'Ypil', '2025-10-05', '13:47:00', '14:48:00', 4, '2025-10-05 05:49:13', 'Approved'),
-(6, 'John Mar', 'Ypil', '2025-10-05', '15:14:00', '16:14:00', 4, '2025-10-05 06:15:00', 'Approved');
+(6, 'John Mar', 'Ypil', '2025-10-05', '15:14:00', '16:14:00', 4, '2025-10-05 06:15:00', 'Approved'),
+(7, 'Nimfa', 'Conde', '2025-10-05', '17:39:00', '18:40:00', 10, '2025-10-05 09:40:49', 'walk-in');
 
 -- --------------------------------------------------------
 
@@ -100,7 +101,8 @@ INSERT INTO `tblcalendar` (`id`, `date`, `start_time`, `end_time`) VALUES
 (6, '2025-09-27', '20:00:00', '21:00:00'),
 (7, '2025-10-05', '13:47:00', '14:48:00'),
 (8, '2025-10-05', '15:14:00', '16:14:00'),
-(9, '2025-10-05', '17:29:00', '18:30:00');
+(9, '2025-10-05', '17:29:00', '18:30:00'),
+(10, '2025-10-05', '18:55:00', '19:55:00');
 
 -- --------------------------------------------------------
 
@@ -181,10 +183,12 @@ CREATE TABLE `tblpatient` (
 --
 
 INSERT INTO `tblpatient` (`number`, `firstname`, `surname`, `date_of_birth`, `sex`, `status`, `occupation`, `age`, `contact_number`, `address`, `email`, `Image`, `health_conditions`, `created_at`, `username`, `password`) VALUES
-(4, 'John Mar', 'Ypil', '2002-12-21', 'Male', 'Married', 'Student', 22, '09374939832', 'idk', 'ypil.johnmar.mcc@gmail.com', 'pfpjm.jfif', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Delayed healing of wounds\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Headache\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}', '2025-09-27 11:02:35', 'jm', 'a2d1bd818ac8a8419ccfecc4bef27035'),
+(4, 'John Mar', 'Ypil', '2002-12-21', 'Male', 'Married', 'Student', 22, '09374939832', 'idk', 'ypil.johnmar.mcc@gmail.com', 'pfpjm.jfif', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Increase intake of food or water\"],\"thyroid\":[\"Apprehension\"],\"nervous\":[\"Headache\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}', '2025-09-27 11:02:35', 'jm', 'a2d1bd818ac8a8419ccfecc4bef27035'),
 (5, 'Jezrah Faith', 'Canonio', '2004-05-13', 'Female', 'Single', 'Princess', 21, '09876543211', 'yati liloan', 'canonio.jezrahfaith.mcc@gmail.com', 'pfpjez.jfif', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Family history of diabetes\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Numbness\\/Tingling\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}', '2025-09-27 11:03:26', 'jezrah', '3b02af71589ec5ea4138a1ece1866008'),
 (8, 'Rodelyn', 'Estrera', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'estrera.rodelyn.mcc@gmail.com', NULL, '{\"general\":[\"Marked weight change\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Delayed healing of wounds\"],\"thyroid\":[\"Perspire easily\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Headache\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Difficulty in breathing\"]}', '2025-09-27 11:04:04', 'rodelyn', 'bc65be184bd685684a786ac70c6d2ef7'),
-(9, 'Justine', 'Aguinaldo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'aguinaldo.justinelouise.mcc@gmail.com', NULL, NULL, '2025-09-27 11:04:46', 'justine', 'f6f3e757ac491a3511a5198a39c5ce29');
+(9, 'Justine', 'Aguinaldo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'aguinaldo.justinelouise.mcc@gmail.com', NULL, NULL, '2025-09-27 11:04:46', 'justine', 'f6f3e757ac491a3511a5198a39c5ce29'),
+(10, 'Nimfa', 'Conde', '1956-03-09', 'Female', 'Single', 'Mother', 69, '09876543211', 'idk', NULL, NULL, NULL, NULL, NULL, NULL),
+(11, 'Seg', 'Canonio', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'seg@gmail.com', NULL, NULL, NULL, 'seg', '54151f5b2b56a1345561afde6059ac63');
 
 -- --------------------------------------------------------
 
@@ -213,9 +217,12 @@ CREATE TABLE `tblschedule` (
 --
 
 INSERT INTO `tblschedule` (`id`, `appointment_id`, `patient_number`, `firstname`, `surname`, `date`, `time`, `service_id`, `created_at`, `duration`, `status`, `cancel_reason`, `cancelled_at`) VALUES
-(1, 1, 4, 'John Mar', 'Ypil', '2025-09-26', '21:32:00', 4, '2025-09-26 05:32:21', 30, 'Ongoing', NULL, NULL),
-(2, 2, 5, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:39:00', 5, '2025-09-26 22:39:38', 45, 'Cancelled', 'Health issue', '2025-09-27 15:15:00'),
-(3, 3, 8, 'Rodelyn', 'Estrera', '2025-09-27', '18:44:00', 4, '2025-09-27 02:44:52', NULL, 'Ongoing', NULL, NULL);
+(1, 1, 4, 'John Mar', 'Ypil', '2025-09-26', '21:32:00', 4, '2025-09-26 05:32:21', 30, 'Ongoing', 'idk', '2025-10-05 19:05:16'),
+(2, 2, 5, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:39:00', 4, '2025-09-26 22:39:38', 45, 'Ongoing', 'Health issue', '2025-09-27 15:15:00'),
+(3, 3, 8, 'Rodelyn', 'Estrera', '2025-09-27', '18:44:00', 4, '2025-09-27 02:44:52', 67, 'Ongoing', NULL, NULL),
+(16, 4, 4, 'John Mar', 'Ypil', '2025-10-05', '16:29:00', 4, '2025-10-05 08:29:34', 50, 'Ongoing', NULL, NULL),
+(17, 5, 4, 'John Mar', 'Ypil', '2025-10-05', '16:39:00', 4, '2025-10-05 08:39:17', 34, 'Done', NULL, NULL),
+(18, 6, 4, 'John Mar', 'Ypil', '2025-10-05', '16:39:00', 4, '2025-10-05 08:39:42', 56, 'Ongoing', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -236,7 +243,12 @@ CREATE TABLE `tblservice` (
 
 INSERT INTO `tblservice` (`number`, `name`, `description`, `image`) VALUES
 (4, 'Etchant', 'HAHAHAAHAHAHAHHHAHAHAHA', 'images/services/cat-1.png'),
-(5, 'Ibot ngipon', 'Pa ibot ka ngipon gaw', 'images/services/sstudy laod.jpg');
+(5, 'Ibot ngipon', 'Pa ibot ka ngipon gaw', 'images/services/sstudy laod.jpg'),
+(6, 'sample 3', 'idk aahahah', 'images/services/image.png'),
+(7, 'sample 4', 'sample for number 5', 'images/services/logo.png'),
+(8, 'sample 5', 'sample number 5', 'images/services/mcc_logo2.jpg'),
+(9, 'sample 6', 'sample for number 6', 'images/services/mcc.jpg'),
+(10, 'sample 7', 'This is for sample service', 'images/services/Mandaue City College Student Profiling.png');
 
 --
 -- Indexes for dumped tables
@@ -280,6 +292,12 @@ ALTER TABLE `tblpatient`
   ADD UNIQUE KEY `email` (`email`);
 
 --
+-- Indexes for table `tblschedule`
+--
+ALTER TABLE `tblschedule`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `tblservice`
 --
 ALTER TABLE `tblservice`
@@ -299,13 +317,13 @@ ALTER TABLE `tbladmin`
 -- AUTO_INCREMENT for table `tblappointment`
 --
 ALTER TABLE `tblappointment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `tblcalendar`
 --
 ALTER TABLE `tblcalendar`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `tblinventory`
@@ -323,13 +341,19 @@ ALTER TABLE `tblpage`
 -- AUTO_INCREMENT for table `tblpatient`
 --
 ALTER TABLE `tblpatient`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `tblschedule`
+--
+ALTER TABLE `tblschedule`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `tblservice`
 --
 ALTER TABLE `tblservice`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
