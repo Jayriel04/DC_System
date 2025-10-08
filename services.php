@@ -12,81 +12,9 @@ include('includes/dbconnection.php');
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <style>
 body {
-  background: #fafbfc;
+  background: #ffffffff;
 }
 
-/* Carousel: show three cards per slide on wide screens, stack on small screens */
-.services-carousel .carousel-inner {}
-.services-carousel .service-slide {
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  min-height: 340px;
-}
-.services-carousel .service-card {
-  flex: 0 0 320px;
-  max-width: 320px;
-  min-width: 320px;
-  margin: 0 16px;
-  box-sizing: border-box;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: box-shadow 0.2s;
-}
-.services-carousel .service-card-img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-.services-carousel .service-card-body {
-  padding: 18px 16px 16px 16px;
-  width: 100%;
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.services-carousel .service-card-title {
-  font-size: 1.2em;
-  font-weight: 600;
-  margin: 10px 0 6px 0;
-  text-align: center;
-}
-.services-carousel .service-card-desc {
-  font-size: 1em;
-  color: #555;
-  text-align: center;
-}
-.services-carousel .service-card-icon {
-  font-size: 2em;
-  color: #007bff;
-  margin-bottom: 6px;
-}
-@media (max-width: 991px) {
-  .services-carousel .service-card {
-    flex-basis: 260px;
-    max-width: 260px;
-    min-width: 260px;
-  }
-}
-@media (max-width: 767px) {
-  .services-carousel .service-slide {
-    flex-direction: column;
-    min-height: unset;
-  }
-  .services-carousel .service-card {
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-    margin: 10px 0;
-  }
-}
 </style>
 </head>
 <body>

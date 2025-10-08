@@ -84,7 +84,7 @@ function time12_viewph($t) {
         <div class="main-panel">
           <div class="content-wrapper">
             <div class="page-header">
-              <h3 class="page-title"> View Patient </h3>
+              <h3 class="page-title"> View Schedule </h3>
               <nav aria-label="breadcrumb">
                 
               </nav>

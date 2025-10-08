@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
         <div class="main-panel">
           <div class="content-wrapper">
             <div class="page-header">
-              <h3 class="page-title"> View Patient </h3>
+              <h3 class="page-title"> Examination Record</h3>
               <nav aria-label="breadcrumb">
                 
               </nav>
