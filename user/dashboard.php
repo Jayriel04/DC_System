@@ -174,14 +174,23 @@ function time12_dashboard($t) {
 </head>
 
 <body>
-  <div class="container-scroller">
+  <style>
+  .main-panel {
+    margin-left: auto;
+    margin-right: 0;
+    margin-top: 50px;
+    width: 81%; 
+  }
+</style>
+  
     <!-- partial:partials/_navbar.html -->
-    <?php include_once('includes/header.php'); ?>
+    <?php include_once('includes/sidebar.php'); ?>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_sidebar.html -->
-      <?php include_once('includes/sidebar.php'); ?>
-      <!-- partial -->
+      <?php include_once('includes/header.php'); ?>
+      <!-- partial --> 
+
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row purchace-popup">

@@ -136,11 +136,11 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
   }
   $show_health_modal = isset($show_health_modal) ? $show_health_modal : (empty($existing_health) || $existing_health === 'null' || $existing_health === '[]');
 
-  ?>
+  ?> 
   <!DOCTYPE html>
   <html lang="en">
-
-  <head>
+ 
+  <head>   
 
     <title>Consultation Appointments</title>
     <!-- plugins:css -->
@@ -160,6 +160,17 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
   </head>
 
   <body>
+    <style>
+  .main-panel {
+    margin-left: auto;
+    margin-right: 0;
+    margin-top: 71px;   
+    width: 81%; 
+  }
+
+  
+  
+</style>
     <div class="container-scroller">
       <!-- partial:partials/_navbar.html -->
       <?php include_once('includes/header.php'); ?>

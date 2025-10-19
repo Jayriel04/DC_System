@@ -3468,12 +3468,12 @@ hr {
   display: flex;
   justify-content: center;
   align-items: stretch;
-  min-height: 340px;
+	min-height: 440px;
 }
 .services-carousel .service-card {
-  flex: 0 0 320px;
-  max-width: 320px;
-  min-width: 320px;
+	flex: 0 0 400px;
+	max-width: 400px;
+	min-width: 400px;
   margin: 0 16px;
   box-sizing: border-box;
   background: #fff;
@@ -3486,7 +3486,7 @@ hr {
 }
 .services-carousel .service-card-img {
   width: 100%;
-  height: 180px;
+	height: 240px;
   object-fit: cover;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
@@ -3516,11 +3516,11 @@ hr {
   margin-bottom: 6px;
 }
 @media (max-width: 991px) {
-  .services-carousel .service-card {
-    flex-basis: 260px;
-    max-width: 260px;
-    min-width: 260px;
-  }
+	.services-carousel .service-card {
+		flex-basis: 320px;
+		max-width: 320px;
+		min-width: 320px;
+	}
 }
 @media (max-width: 767px) {
   .services-carousel .service-slide {

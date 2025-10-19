@@ -18,16 +18,43 @@ if (isset($_POST['login'])) {
     }
 
     if (!empty($_POST["remember"])) {
-      //COOKIES for username
-      setcookie("user_login", $_POST["username"], time() + (10 * 365 * 24 * 60 * 60));
-      //COOKIES for password
-      setcookie("userpassword", $_POST["password"], time() + (10 * 365 * 24 * 60 * 60));
+      // Set cookies with proper path and secure parameters
+      setcookie(
+        "user_login",
+        $_POST["username"],
+        [
+          'expires' => time() + (10 * 365 * 24 * 60 * 60),
+          'path' => '/',
+          'secure' => true,
+          'httponly' => true,
+          'samesite' => 'Strict'
+        ]
+      );
+      // Store hashed password in cookie
+      setcookie(
+        "userpassword",
+        $password, // Using the hashed password
+        [
+          'expires' => time() + (10 * 365 * 24 * 60 * 60),
+          'path' => '/',
+          'secure' => true,
+          'httponly' => true,
+          'samesite' => 'Strict'
+        ]
+      );
     } else {
+      // Clear cookies if remember is not checked
       if (isset($_COOKIE["user_login"])) {
-        setcookie("user_login", "");
-        if (isset($_COOKIE["userpassword"])) {
-          setcookie("userpassword", "");
-        }
+        setcookie("user_login", "", [
+          'expires' => time() - 3600,
+          'path' => '/',
+        ]);
+      }
+      if (isset($_COOKIE["userpassword"])) {
+        setcookie("userpassword", "", [
+          'expires' => time() - 3600,
+          'path' => '/',
+        ]);
       }
     }
     $_SESSION['login'] = $_POST['username'];
@@ -43,66 +70,84 @@ if (isset($_POST['login'])) {
 
 <head>
 
-  <title>Dental Clinic System|| Login Page</title>
+  <title>Login Admin</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
   <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
   <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-  <!-- endinject -->
-  <!-- Plugin css for this page -->
-  <!-- End plugin css for this page -->
-  <!-- inject:css -->
-  <!-- endinject -->
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <!-- Layout styles -->
   <link rel="stylesheet" href="css/style.css">
-
+    <style>
+        
+        .auth-form-light {
+            border-radius: 15px; 
+            padding: 20px;
+            background-color: #f9f9f9; 
+        }
+        .form-group label {
+            text-align: left;
+            font-weight: normal;
+            display: block;
+        }
+        .input-group {
+            position: relative;
+        }
+        .input-group .input-group-text {
+            position: absolute;
+            right: 10px; /* Adjust as necessary */
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            background: transparent; /* Make background transparent */
+            border: none; /* Remove border */
+        }
+    .form-control {
+        padding-right: 50px; 
+    }
+    </style>
 </head>
-
 <body>
-  <div class="container-scroller">
-    <div class="container-fluid page-body-wrapper full-page-wrapper">
-      <div class="content-wrapper d-flex align-items-center auth">
-        <div class="row flex-grow">
-          <div class="col-lg-4 mx-auto">
-            <div class="auth-form-light text-left p-5">
-              <div class="brand-logo" align="center" style="font-weight:bold">
-                Admin Login
-              </div>
-              <h6 class="font-weight-light">Sign in to continue.</h6>
-              <form class="pt-3" id="login" method="post" name="login">
-                <div class="form-group">
-                  <input type="text" class="form-control form-control-lg" placeholder="enter your username"
-                    required="true" name="username"
-                    value="<?php if (isset($_COOKIE["user_login"])) {
-                      echo $_COOKIE["user_login"];
-                    } ?>">
-                </div>
-                <div class="form-group">
-
-                  <input type="password" class="form-control form-control-lg" placeholder="enter your password"
-                    name="password" required="true"
-                    value="<?php if (isset($_COOKIE["userpassword"])) {
-                      echo $_COOKIE["userpassword"];
-                    } ?>">
+    <div class="container-scroller">
+        <div class="container-fluid page-body-wrapper full-page-wrapper">
+            <div class="content-wrapper d-flex align-items-center auth">
+                <div class="row flex-grow">
+                      <div class="col-lg-4 mx-auto"> 
+                          <div class="auth-form-light text-left p-5">
+                              <div class="brand-logo" align="center" style="font-weight:bold">
+                        <img src="../images/Jf logo.png" alt="JF Dental Care Logo" class="logo-img" style="width:35px; margin-right:10px;">
+                        <h2 style="margin-top: 10px; margin-bottom: 5px;">Welcome to <br> JF Dental Care Admin</h2>     
+                          <br>
+                            <form class="pt-3" id="login" method="post" name="login">
+                                  <div class="form-group">
+                                      <label for="username">Username</label>
+                                      <input type="text" class="form-control form-control-lg" id="username" placeholder="Username or email" required="true" name="username" value="<?php if(isset($_COOKIE['user_login'])) { echo $_COOKIE['user_login']; } ?>" style="border-radius: 10px;">
+                                  </div>
+                                  <div class="form-group">
+                                      <label for="password">Password</label>
+                                      <div class="input-group">
+                                          <input type="password" id="password" class="form-control form-control-lg" placeholder="Password" required name="password" style="border-radius: 10px;">
+                                          <span class="input-group-text" onclick="togglePassword('password')">
+                                              <i id="eye-password" class="fas fa-eye"></i>
+                                          </span>
+                                      </div>
                 </div>
                 <div class="mt-3">
-                  <button class="btn btn-success btn-block loginbtn" name="login" type="submit">Login</button>
+                  <button class="btn btn-success btn-block loginbtn" name="login" type="submit" style="border-radius: 10px;">Login</button>
                 </div>
                 <div class="my-2 d-flex justify-content-between align-items-center">
                   <div class="form-check">
                     <label class="form-check-label text-muted">
-                      <input type="checkbox" id="remember" class="form-check-input" name="remember" <?php if (isset($_COOKIE["user_login"])) { ?> checked <?php } ?> /> Keep me signed in </label>
+                      <input type="checkbox" id="remember" class="form-check-input" name="remember" value="1" <?php if (isset($_COOKIE["user_login"])) { echo 'checked'; } ?>/> Keep me signed in </label>
                   </div>
                   <a href="forgot-password.php" class="auth-link text-black">Forgot password?</a>
                 </div>
-                <div class="mb-2">
-                  <a href="../index.php" class="btn btn-block btn-facebook auth-form-btn">
-                    <i class="icon-social-home mr-2"></i>Back Home </a>
-                </div>
+                
 
               </form>
             </div>
-          </div>
+          </div>  
         </div>
       </div>
       <!-- content-wrapper ends -->
@@ -118,6 +163,22 @@ if (isset($_POST['login'])) {
   <!-- inject:js -->
   <script src="js/off-canvas.js"></script>
   <script src="js/misc.js"></script>
+  <script>
+function togglePassword(id) {
+    var input = document.getElementById(id);
+    var eyeIcon = document.getElementById('eye-' + id);
+    
+    if (input.type === "password") {
+        input.type = "text";
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+    } else {
+        input.type = "password";
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+    }
+}
+</script>
   <!-- endinject -->
 </body>
 

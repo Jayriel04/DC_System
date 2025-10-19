@@ -3,30 +3,32 @@ session_start();
 error_reporting(0);
 include('includes/dbconnection.php');
 
-if(isset($_POST['submit']))
-  {
-    $email=$_POST['email'];
-$mobile=$_POST['mobile'];
-$newpassword=md5($_POST['newpassword']);
-  $sql ="SELECT username AS StudentEmail FROM tblpatient WHERE username=:email and contact_number=:mobile";
-$query= $dbh -> prepare($sql);
-$query-> bindParam(':email', $email, PDO::PARAM_STR);
-$query-> bindParam(':mobile', $mobile, PDO::PARAM_STR);
-$query-> execute();
-$results = $query -> fetchAll(PDO::FETCH_OBJ);
-if($query -> rowCount() > 0)
-{
-$con="update tblpatient set password=:newpassword where username=:email and contact_number=:mobile";
-$chngpwd1 = $dbh->prepare($con);
-$chngpwd1-> bindParam(':email', $email, PDO::PARAM_STR);
-$chngpwd1-> bindParam(':mobile', $mobile, PDO::PARAM_STR);
-$chngpwd1-> bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
-$chngpwd1->execute();
-echo "<script>alert('Your Password succesfully changed');</script>";
-}
-else {
-echo "<script>alert('Email id or Mobile no is invalid');</script>"; 
-}
+// Message variable for feedback
+$message = '';
+if(isset($_POST['submit'])) {
+  $email = $_POST['email'];
+  // Check if email exists in database
+  $sql = "SELECT id, username FROM tblpatient WHERE username=:email";
+  $query = $dbh->prepare($sql);
+  $query->bindParam(':email', $email, PDO::PARAM_STR);
+  $query->execute();
+  if($query->rowCount() > 0) {
+    // Generate temporary password
+    $temp_password = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 10);
+    $hashed_password = md5($temp_password);
+    // Update password in database
+    $update_sql = "UPDATE tblpatient SET password=:password WHERE username=:email";
+    $update_query = $dbh->prepare($update_sql);
+    $update_query->bindParam(':password', $hashed_password, PDO::PARAM_STR);
+    $update_query->bindParam(':email', $email, PDO::PARAM_STR);
+    if($update_query->execute()) {
+      $message = '<div class="alert alert-success text-center">A temporary password has been generated: <strong>' . $temp_password . '</strong><br>Please login with this password and change it immediately.</div>';
+    } else {
+      $message = '<div class="alert alert-danger text-center">Something went wrong. Please try again.</div>';
+    }
+  } else {
+    $message = '<div class="alert alert-warning text-center">Email address not found in our records.</div>';
+  }
 }
 
 ?>
@@ -34,7 +36,7 @@ echo "<script>alert('Email id or Mobile no is invalid');</script>";
 <html lang="en">
   <head>
   
-  <title>Patient Forgot Password</title>
+  <title>Forgot Password</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
@@ -66,31 +68,24 @@ return true;
           <div class="row flex-grow">
             <div class="col-lg-4 mx-auto">
           <div class="auth-form-light text-left p-5">
-                 <div class="brand-logo" align="center" style="font-weight:bold">
-          Patient Password Reset
+          <?php if(!empty($message)) echo $message; ?>
+                <div class="text-center mb-4">
+                    <i class="icon-lock text-primary" style="font-size: 50px;"></i>
+                    <h4 class="mt-3">Reset Password</h4>
+                    <p class="text-muted">Enter your email address and we'll send you a link to reset your password.</p>
                 </div>
-                <h6 class="font-weight-light">Enter your email address to reset password!</h6>
-                <form class="pt-3" id="login" method="post" name="login">
-                  <div class="form-group">
-                    <input type="email" class="form-control form-control-lg" placeholder="Email Address" required="true" name="email">
-                  </div>
-                  <div class="form-group">
-                   
-                    <input class="form-control form-control-lg" type="password" name="newpassword" placeholder="New Password" required="true"/>
-                  </div>
-                  <div class="form-group">
-                    
-                   <input class="form-control form-control-lg" type="password" name="confirmpassword" placeholder="Confirm Password" required="true" />
-                  </div>
-                  <div class="mt-3">
-                    <button class="btn btn-success btn-block loginbtn" name="submit" type="submit">Reset</button>
-                  </div>
-                  <div class="mt-2">
-                    <a href="../index.php" class="btn btn-block btn-facebook auth-form-btn">
-                      <i class="icon-social-home mr-2"></i>Back Home </a>
-                  </div>
-                  
-                </form>
+          <form class="pt-3" name="chngpwd" method="post">
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" class="form-control form-control-lg" style="border-radius: 10px;" placeholder="Enter your email" required name="email">
+            </div>
+            <div class="mt-3">
+              <button type="submit" name="submit" class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" style="border-radius: 10px;">Send Reset Link</button>
+            </div>
+            <div class="text-center mt-4 font-weight-light">
+              Remember your password? <a href="login.php" class="text-primary">Back to Login</a>
+            </div>
+          </form>
               </div>
             </div>
           </div>

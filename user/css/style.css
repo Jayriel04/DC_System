@@ -1,3 +1,11 @@
+/* Custom override for navbar menu wrapper width */
+.navbar-menu-wrapper {
+  width: calc(100% - 1000px) !important;
+}
+/* Custom override for navbar brand wrapper width */
+.navbar .navbar-brand-wrapper {
+  width: 300px !important;
+}
 /*-------------------------------------------------------------------
   ===== Table of Contents =====
 

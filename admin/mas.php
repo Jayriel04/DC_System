@@ -80,16 +80,18 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
-                        <h3 class="page-title">Manage Appointments (MAS)</h3>
-                    </div>
+    <h4 class="page-title">Manage Appointments Service <br></h4> 
+</div>
+<p style="font-size: .9375rem;line-height: 1.5;">Schedule and track patient appointments for service</p>
                     <div class="row">
-                        <div class="col-md-12 grid-margin stretch-card">
-                            <div class="card">
+                        <div class="col-md-12 grid-margin">
+                            <!-- Search / Filters Card -->
+                            <div class="card mb-3">
                                 <div class="card-body">
                                     <div class="d-sm-flex align-items-center mb-4">
                                         <!-- <a href="add-appointment.php" class="btn btn-primary ml-auto mb-3 mb-sm-0">Add Appointment</a> -->
                                     </div>
-                                    <form method="POST" class="form-inline mb-4" id="filterForm">
+                                    <form method="POST" class="form-inline mb-0" id="filterForm">
                                         <div class="form-group mr-3">
                                             <input type="text" class="form-control" name="search" id="searchInput" placeholder="Search by First Name or Surname" value="<?php echo htmlentities($search); ?>">
                                             <script>
@@ -165,7 +167,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                             </select>
                                         </div>
                                     </form>
+                                </div>
+                            </div>
 
+                            <!-- Appointments Table Card -->
+                            <div class="card">
+                                <div class="card-body">
                                     <div class="table-responsive border rounded p-1">
                                         <table class="table">
                                             <thead>
@@ -346,7 +353,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                             <td>
                                                                 <div>
                                                                     <a href="edit-mas.php?editid=<?php echo htmlentities($row->id); ?>" class="btn btn-info btn-xs">Edit</a>
-                                                                    <a href="manage-appointment.php?delid=<?php echo ($row->id); ?>" onclick="return confirm('Do you really want to Delete ?');" class="btn btn-danger btn-xs">Delete</a>
+                                                                    <a href="mas.php?delid=<?php echo intval($row->id); ?>" onclick="return confirm('Do you really want to Delete ?');" class="btn btn-danger btn-xs">Delete</a>
                                                                 </div>
                                                             </td>
                                                         </tr>

@@ -34,7 +34,7 @@ echo "<script>alert('Email id or Mobile no is invalid');</script>";
 <html lang="en">
   <head>
   
-    <title>Student  Management System|| Forgot Password</title>
+    <title>Forgot Password</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
@@ -66,38 +66,22 @@ return true;
           <div class="row flex-grow">
             <div class="col-lg-4 mx-auto">
               <div class="auth-form-light text-left p-5">
-                   <div class="brand-logo" align="center" style="font-weight:bold">
-     Student  Management System
+                <div class="text-center mb-4">
+                    <i class="icon-lock text-primary" style="font-size: 50px;"></i>
+                    <h4 class="mt-3">Reset Password</h4>
+                    <p class="text-muted">Enter your email address and we'll send you a link to reset your password.</p>
                 </div>
-                <h4>RECOVER PASSWORD</h4>
-                <h6 class="font-weight-light">Enter your email address and mobile number to reset password!</h6>
-                <form class="pt-3" id="login" method="post" name="login">
-                  <div class="form-group">
-                    <input type="email" class="form-control form-control-lg" placeholder="Email Address" required="true" name="email">
-                  </div>
-                  <div class="form-group">
-                    
-                     <input type="text" class="form-control form-control-lg"  name="mobile" placeholder="Mobile Number" required="true" maxlength="10" pattern="[0-9]+">
-                  </div>
-                  <div class="form-group">
-                   
-                    <input class="form-control form-control-lg" type="password" name="newpassword" placeholder="New Password" required="true"/>
-                  </div>
-                  <div class="form-group">
-                    
-                   <input class="form-control form-control-lg" type="password" name="confirmpassword" placeholder="Confirm Password" required="true" />
-                  </div>
-                  <div class="mt-3">
-                    <button class="btn btn-success btn-block loginbtn" name="submit" type="submit">Reset</button>
-                  </div>
-                  <div class="my-2 d-flex justify-content-between align-items-center">
-                    
-                    <a href="login.php" class="auth-link text-black">signin</a>
-                  </div>
-                  <div class="mb-2">
-                    <a href="../index.php" class="btn btn-block btn-facebook auth-form-btn">
-                      <i class="icon-social-home mr-2"></i>Back Home </a>
-                  </div>
+                <form class="pt-3" name="chngpwd" method="post" onSubmit="return valid();">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" class="form-control form-control-lg"style="border-radius: 10px;" placeholder="Enter your email" required="true" name="email">
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" name="submit" class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn"style="border-radius: 10px;">Send Reset Link</button>
+                    </div>
+                    <div class="text-center mt-4 font-weight-light">
+                        Remember your password? <a href="login.php" class="text-primary">Back to Login</a>
+                    </div>
                   
                 </form>
               </div>

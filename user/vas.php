@@ -83,6 +83,17 @@ if (strlen(isset($_SESSION['sturecmsnumber']) ? $_SESSION['sturecmsnumber'] : ''
     
   </head>
   <body>
+    <style>
+  .main-panel {
+    margin-left: auto;
+    margin-right: 0;
+    margin-top: 71px;   
+    width: 81%; 
+  }
+
+  
+  
+</style>
     <div class="container-scroller">
       <!-- partial:partials/_navbar.html -->
      <?php include_once('includes/header.php');?>

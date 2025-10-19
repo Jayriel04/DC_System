@@ -89,7 +89,6 @@ body {
             echo '<img src="' . $svcImage . '" alt="' . $svcName . '" class="service-card-img">';
           }
           echo '<div class="service-card-body">';
-          echo '<span class="service-card-icon"><i class="ri-file-list-3-line"></i></span>';
           echo '<div class="service-card-title">' . $svcName . '</div>';
           echo '<div class="service-card-desc">' . $svcDesc . '</div>';
           echo '</div>';

@@ -1,0 +1,39 @@
+/* Shared CSS for Login and Create Account Modals */
+.auth-form-light {
+    border-radius: 15px;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+.input-group {
+    position: relative;
+}
+.input-group .input-group-text {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+}
+.form-control {
+    padding-right: 40px;
+    border-radius: 10px;
+}
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 35px;
+    color: black;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+.close-btn:hover {
+    color: whitesmoke;
+}
+.btn-block {
+    border-radius: 10px;
+}

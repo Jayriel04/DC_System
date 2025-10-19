@@ -149,9 +149,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                             <div class="col-md-12">
                                                 <div class="d-sm-flex align-items-baseline report-summary-header">
                                                     <h5 class="font-weight-semibold">Report Summary</h5>
-                                                    <span class="ml-auto">Updated Report</span>
-                                                    <button class="btn btn-icons border-0 p-2"><i
-                                                            class="icon-refresh"></i></button>
                                                 </div>
                                             </div>
                                         </div>
@@ -168,29 +165,30 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                         $totalpatients = $query5->rowCount();
                                         ?>
                                         <div class="d-flex justify-content-end mb-2">
-                                            <label class="mr-2">Period:</label>
-                                            <select id="chartPeriod" class="form-control" style="width:150px;display:inline-block;margin-right:8px;">
-                                                <option value="day">Day</option>
-                                                <option value="week" selected>Week</option>
-                                                <option value="month">Month</option>
+                                            <label class="mr-2" style="margin-top: 35px;">Period:</label>
+                                            <select id="chartPeriod" class="form-control" style="width:100px; height: auto; margin-top: 30px; border-radius: 5%;; margin-right:auto; margin-left: 0;">
+                                                <option value="day">Daily</option>
+                                                <option value="week" selected>Weekly</option>
+                                                <option value="month">Monthly</option>
+                                                <option value="year">Yearly</option>
                                             </select>
-                                            <label class="mr-2">Mode:</label>
-                                            <select id="chartMode" class="form-control" style="width:180px;display:inline-block;">
+                                            <label class="mr-2" style="margin-top: 35px; margin-left: -500px;">Mode:</label>
+                                            <select id="chartMode" class="form-control" style="width:180px; height: auto; margin-top: 30px; border-radius: 5%;; margin-right:auto; margin-left: 0;">
                                                 <option value="appointments">Appointments</option>
                                                 <option value="patients">Patients</option>
                                                 <option value="both">Both</option>
                                             </select>
                                         </div>
-                                            <div class="row report-inner-cards-wrapper">
+                                            <div class="row justify-content-center report-inner-cards-wrapper">
                                                 <div class="col-12">
                                                     <div class="report-inner-card p-3" style="min-height:420px;">
                                                         <div class="inner-card-text">
-                                                            <span class="report-title">Appointments & Patients</span>
-                                                            <div style="width:100%;margin:16px 0;">
+                                                            <span class="report-title" >Appointments & Patients</span>
+                                                            <div style="width:120%;margin:50px 0;">
                                                                 <canvas id="mainChart" height="420" style="width:100%"></canvas>
                                                             </div>
                                                             <div class="d-flex justify-content-between">
-                                                                <div><a href="manage-appointment.php"><span class="report-count"> View Appointments</span></a></div>
+                                                                <div><a href="mac.php"><span class="report-count"> View Appointments</span></a></div>
                                                                 <div><a href="manage-patient.php"><span class="report-count"> View Patients</span></a></div>
                                                             </div>
                                                         </div>
@@ -293,7 +291,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                             // initial load
                                             refreshMain();
                                         })();
-                                    </script>
+                                    </script> 
     </body>
 
     </html>

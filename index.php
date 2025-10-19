@@ -225,7 +225,6 @@ include('includes/dbconnection.php');
             echo '<img src="' . $svcImage . '" alt="' . $svcName . '" class="service-card-img">';
           }
           echo '<div class="service-card-body">';
-          echo '<span class="service-card-icon"><i class="ri-file-list-3-line"></i></span>';
           echo '<div class="service-card-title">' . $svcName . '</div>';
           echo '<div class="service-card-desc">' . $svcDesc . '</div>';
           echo '</div>';
@@ -271,7 +270,7 @@ include('includes/dbconnection.php');
 
 <!--Contact-->
 
-     <div class="contact-title">Contact Us</div>
+       <div class="contact-title">Contact Us</div>
   <div class="contact-desc">
      Get in touch with us today and take the first step towards better oral health.
   </div>
@@ -309,7 +308,7 @@ include('includes/dbconnection.php');
             Monday & Thursday : 2:00 PM - 7:00 PM<br>
             Tuesday & Saturday : 9:00 AM - 6:00 PM<br>
             Wednesday & Friday : 4:30 PM - 7:00 PM<br>
-			Sunday: Closed
+			      Sunday: Closed
           </div>
         </li>
         <li>
@@ -322,18 +321,23 @@ include('includes/dbconnection.php');
       </ul>
     </div>
     <!-- Right: Feedback Star Rating -->
-    <div class="contact-form-section">
-      <h3>Feedback</h3>
-      <form class="contact-form" method="post" action="#">
-        <label for="star-rating">Your Rating</label>
-        <div class="star-rating">
-          <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 stars">&#9733;</label>
-          <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 stars">&#9733;</label>
-          <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 stars">&#9733;</label>
-          <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 stars">&#9733;</label>
-          <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 star">&#9733;</label>
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 350px;">
+  <form method="post" action="" class="feedback-form" style="max-width: 500px; width: 100%; margin: auto;">
+        <div style="margin-top: 20px; background: #f5f8ff; border-radius: 16px; box-shadow: 0 2px 8px #e0e7ff; padding: 24px; text-align: center;">
+          <div style="font-size: 22px; font-weight: 600; color: #222; margin-bottom: 8px;">Rate your experience</div>
+          <div style="color: #6c7a89; font-size: 15px; margin-bottom: 18px;">We highly value your feedback! Kindly take a moment to rate your experience and provide us with your valuable feedback.</div>
+          <div class="star-rating" style="margin-bottom: 18px;">
+            <!-- ...existing star rating code... -->
+            <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 stars">&#9733;</label>
+            <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 stars">&#9733;</label>
+            <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 stars">&#9733;</label>
+            <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 stars">&#9733;</label>
+            <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 star">&#9733;</label>
+          </div>
+          <textarea name="feedback" rows="3" style="width: 90%; max-width: 400px; border-radius: 8px; border: 1px solid #dbeafe; padding: 12px; font-size: 15px; margin-bottom: 18px; resize: none;" placeholder="Tell us about your experience!"></textarea>
+          <br>
+          <button type="submit" style="background: #ffd966; color: #222; border: none; border-radius: 24px; padding: 10px 32px; font-size: 16px; font-weight: 500; box-shadow: 0 2px 8px #e0e7ff; cursor: pointer;">Send</button>
         </div>
-        <button type="submit">Submit Feedback</button>
       </form>
     </div>
   </div>
