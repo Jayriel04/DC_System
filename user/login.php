@@ -36,8 +36,8 @@ if (isset($_POST['login'])) {
             }
         }
             $_SESSION['login'] = $_POST['username'];
-            // Redirect user to the dashboard so the health modal can show if needed
-            header('Location: dashboard.php');
+            // Redirect user to the site index after successful login
+            header('Location: ../index.php');
             exit();
     } else {
         echo "<script>alert('Invalid Details');</script>";
@@ -47,7 +47,7 @@ if (isset($_POST['login'])) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Login U</title>
+    <title>Login User</title>
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">

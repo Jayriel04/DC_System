@@ -2,6 +2,57 @@
 session_start();
 error_reporting(0);
 include('includes/dbconnection.php');
+
+if(isset($_POST['book_appointment'])) {
+    $userid = $_SESSION['uid'] ?? $_SESSION['userid'] ?? $_SESSION['sturecmsnumber'];
+    $appointment_date = $_POST['appointment_date'];
+    $appointment_time = $_POST['appointment_time'];
+    
+    // Collect all health conditions into an array
+    $health_conditions = array();
+    foreach($_POST['health_conditions'] as $category => $conditions) {
+        if(is_array($conditions)) {
+            foreach($conditions as $condition) {
+                $health_conditions[] = $condition;
+            }
+        }
+    }
+    
+    // Special handling for liver specification
+    if(isset($_POST['health_conditions']['liver_specify'])) {
+        $liver_spec = trim($_POST['health_conditions']['liver_specify']);
+        if(!empty($liver_spec)) {
+            $health_conditions[] = "Liver condition: " . $liver_spec;
+        }
+    }
+    
+    // Convert array to JSON for storage
+    $conditions_json = json_encode($health_conditions);
+    
+    try {
+        // First insert the health record
+        $sql = "INSERT INTO tblhealthrecords (UserID, HealthConditions, RecordDate) VALUES (:userid, :conditions, NOW())";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':userid', $userid, PDO::PARAM_STR);
+        $query->bindParam(':conditions', $conditions_json, PDO::PARAM_STR);
+        $query->execute();
+        $healthid = $dbh->lastInsertId();
+        
+        // Then create the appointment
+        $sql = "INSERT INTO tblappointment (UserID, HealthRecordID, AppointmentDate, AppointmentTime, Status) 
+                VALUES (:userid, :healthid, :appdate, :apptime, 'Pending')";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':userid', $userid, PDO::PARAM_STR);
+        $query->bindParam(':healthid', $healthid, PDO::PARAM_STR);
+        $query->bindParam(':appdate', $appointment_date, PDO::PARAM_STR);
+        $query->bindParam(':apptime', $appointment_time, PDO::PARAM_STR);
+        $query->execute();
+        
+        echo "<script>alert('Appointment booked successfully!');</script>";
+    } catch(PDOException $e) {
+        echo "<script>alert('Something went wrong. Please try again.');</script>";
+    }
+}
 ?>
 <!doctype html>
 <html>
@@ -72,9 +123,17 @@ include('includes/dbconnection.php');
                 for your optimal oral health.
               </p>
               <div class="readmore">
-                <a href="user/create_account.php">
-                  Book appointment <i class="ri-arrow-right-line"></i>
-                </a>
+                <?php 
+                // Check for multiple possible session variables
+                if(isset($_SESSION['uid']) || isset($_SESSION['userid']) || isset($_SESSION['sturecmsnumber'])) { ?>
+                  <a href="#" data-toggle="modal" data-target="#healthModal">
+                    Book appointment <i class="ri-arrow-right-line"></i>
+                  </a>
+                <?php } else { ?>
+                  <a href="user/create_account.php">
+                    Book appointment <i class="ri-arrow-right-line"></i>
+                  </a>
+                <?php } ?>
               </div>
             </li>
           </ul>
@@ -347,6 +406,194 @@ include('includes/dbconnection.php');
       src="https://www.google.com/maps?q=383+L.Jayme+St.,+Bakilid+2,+Hi-way+Mandaue+City,+6014+Cebu,+Philippines&output=embed"
       width="100%" height="320" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
   </div>
+
+  <!-- Health Condition Modal -->
+<div class="modal fade" id="healthModal" tabindex="-1" role="dialog" aria-labelledby="healthModalLabel" aria-hidden="true">
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <form method="post">
+        <div class="modal-header">
+          <h5 class="modal-title" id="healthModalLabel">Health Condition Form</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Appointment fields -->
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="appointment_date">Preferred Appointment Date</label>
+                <input type="date" class="form-control" name="appointment_date" id="appointment_date">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="appointment_time">Preferred Appointment Time</label>
+                <select class="form-control" name="appointment_time" id="appointment_time">
+                  <option value="">-- Select a time --</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Health Conditions -->
+                        <p>Please check all conditions that apply to you.</p>
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>GENERAL</h6>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[general][]" value="Marked weight change" id="hc_general_1"><label
+                      class="form-check-label" for="hc_general_1">Marked weight change</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[general][]" value="Increase frequency of urination" id="hc_general_2"><label
+                      class="form-check-label" for="hc_general_2">Increase frequency of urination</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[general][]" value="Burning sensation on urination" id="hc_general_3"><label
+                      class="form-check-label" for="hc_general_3">Burning sensation on urination</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[general][]" value="Loss of hearing, ringing of ears"
+                      id="hc_general_4"><label class="form-check-label" for="hc_general_4">Loss of hearing, ringing of
+                      ears</label></div>
+
+                  <h6 class="mt-3">LIVER</h6>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[liver][]" value="History of liver ailment" id="hc_liver_1"><label
+                      class="form-check-label" for="hc_liver_1">History of liver ailment</label></div>
+                  <div class="form-group mt-2"><label for="liver_specify">Specify:</label><input type="text"
+                      class="form-control" name="health_conditions[liver_specify]" id="liver_specify"></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[liver][]" value="Jaundice" id="hc_liver_2"><label class="form-check-label"
+                      for="hc_liver_2">Jaundice</label></div>
+
+                  <h6 class="mt-3">DIABETES</h6>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[diabetes][]" value="Delayed healing of wounds" id="hc_diab_1"><label
+                      class="form-check-label" for="hc_diab_1">Delayed healing of wounds</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[diabetes][]" value="Increase intake of food or water" id="hc_diab_2"><label
+                      class="form-check-label" for="hc_diab_2">Increase intake of food or water</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[diabetes][]" value="Family history of diabetes" id="hc_diab_3"><label
+                      class="form-check-label" for="hc_diab_3">Family history of diabetes</label></div>
+
+                  <h6 class="mt-3">THYROID</h6>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[thyroid][]" value="Perspire easily" id="hc_thy_1"><label
+                      class="form-check-label" for="hc_thy_1">Perspire easily</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[thyroid][]" value="Apprehension" id="hc_thy_2"><label
+                      class="form-check-label" for="hc_thy_2">Apprehension</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[thyroid][]" value="Palpation/rapid heart beat" id="hc_thy_3"><label
+                      class="form-check-label" for="hc_thy_3">Palpation/rapid heart beat</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[thyroid][]" value="Goiter" id="hc_thy_4"><label class="form-check-label"
+                      for="hc_thy_4">Goiter</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[thyroid][]" value="Bulging of eyes" id="hc_thy_5"><label
+                      class="form-check-label" for="hc_thy_5">Bulging of eyes</label></div>
+                </div>
+                <div class="col-md-6">
+                  <h6>URINARY</h6>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[urinary][]" value="Increase frequency of urination" id="hc_ur_1"><label
+                      class="form-check-label" for="hc_ur_1">Increase frequency of urination</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[urinary][]" value="Burning sensation on urination" id="hc_ur_2"><label
+                      class="form-check-label" for="hc_ur_2">Burning sensation on urination</label></div>
+
+                  <h6 class="mt-3">NERVOUS SYSTEM</h6>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[nervous][]" value="Headache" id="hc_nerv_1"><label class="form-check-label"
+                      for="hc_nerv_1">Headache</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[nervous][]" value="Convulsion/epilepsy" id="hc_nerv_2"><label
+                      class="form-check-label" for="hc_nerv_2">Convulsion/epilepsy</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[nervous][]" value="Numbness/Tingling" id="hc_nerv_3"><label
+                      class="form-check-label" for="hc_nerv_3">Numbness/Tingling</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[nervous][]" value="Dizziness/Fainting" id="hc_nerv_4"><label
+                      class="form-check-label" for="hc_nerv_4">Dizziness/Fainting</label></div>
+
+                  <h6 class="mt-3">BLOOD</h6>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[blood][]" value="Bruise easily" id="hc_blood_1"><label
+                      class="form-check-label" for="hc_blood_1">Bruise easily</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[blood][]" value="Anemia" id="hc_blood_2"><label class="form-check-label"
+                      for="hc_blood_2">Anemia</label></div>
+
+                  <h6 class="mt-3">RESPIRATORY</h6>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[respiratory][]" value="Persistent cough" id="hc_resp_1"><label
+                      class="form-check-label" for="hc_resp_1">Persistent cough</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[respiratory][]" value="Difficulty in breathing" id="hc_resp_2"><label
+                      class="form-check-label" for="hc_resp_2">Difficulty in breathing</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox"
+                      name="health_conditions[respiratory][]" value="Asthma" id="hc_resp_3"><label
+                      class="form-check-label" for="hc_resp_3">Asthma</label></div>
+                </div>
+              </div>
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" data-bs-dismiss="modal">Close</button>
+              <button type="submit" name="book_appointment" class="btn btn-primary">Book Appointment</button>
+            </div>
+            </div>
+          </div>
+        </div>
+        
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+// Add this before closing </body> tag
+document.getElementById('appointment_date').addEventListener('change', function() {
+  const date = this.value;
+  const timeSelect = document.getElementById('appointment_time');
+  
+  // Clear existing options
+  timeSelect.innerHTML = '<option value="">-- Select a time --</option>';
+  
+  if (date) {
+    const dayOfWeek = new Date(date).getDay();
+    
+    // Define time slots based on office hours
+    let timeSlots = [];
+    switch(dayOfWeek) {
+      case 1: // Monday
+      case 4: // Thursday
+        timeSlots = ['14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'];
+        break;
+      case 2: // Tuesday
+      case 6: // Saturday
+        timeSlots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'];
+        break;
+      case 3: // Wednesday
+      case 5: // Friday
+        timeSlots = ['16:30', '17:00', '17:30', '18:00', '18:30', '19:00'];
+        break;
+    }
+    
+    // Add time slots to select
+    timeSlots.forEach(time => {
+      const option = document.createElement('option');
+      option.value = time;
+      option.textContent = time;
+      timeSelect.appendChild(option);
+    });
+  }
+});
+</script>
 
   <?php include_once('includes/footer.php'); ?>
 </body> 

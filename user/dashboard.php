@@ -1,7 +1,8 @@
 <?php
 session_start();
 //error_reporting(0);
-include('includes/dbconnection.php');
+// Adjust include path when file is in the `user/` folder
+include_once(__DIR__ . '/../includes/dbconnection.php');
 
 // Updated session check for tblpatient
 if (strlen($_SESSION['sturecmsnumber']) == 0) {
@@ -184,14 +185,14 @@ function time12_dashboard($t) {
 </style>
   
     <!-- partial:partials/_navbar.html -->
-    <?php include_once('includes/sidebar.php'); ?>
+    
     <!-- partial -->
-    <div class="container-fluid page-body-wrapper">
+                
       <!-- partial:partials/_sidebar.html -->
-      <?php include_once('includes/header.php'); ?>
+  <?php include_once(__DIR__ . '/../includes/header.php'); ?>
       <!-- partial --> 
 
-      <div class="main-panel">
+      
         <div class="content-wrapper">
           <div class="row purchace-popup">
             <div class="col-12 stretch-card grid-margin">
@@ -346,7 +347,7 @@ function time12_dashboard($t) {
         </div>
         <!-- content-wrapper ends -->
         <!-- partial:partials/_footer.html -->
-        <?php include_once('includes/footer.php'); ?>
+  <?php include_once(__DIR__ . '/../includes/footer.php'); ?>
         <!-- partial -->
       </div>
       <!-- main-panel ends -->
