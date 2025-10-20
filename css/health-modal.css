@@ -1,0 +1,73 @@
+/* Styles for the health condition modal, based on the provided UI */
+
+.modal-dialog.modal-lg {
+    max-width: 720px;
+}
+
+.modal-content {
+    border-radius: 16px;
+    padding: 16px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+.modal-header {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.modal-body .section {
+    margin-bottom: 24px;
+}
+
+.modal-body .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #000;
+}
+
+.modal-body .divider {
+    height: 1px;
+    background: #e5e5e5;
+    margin-bottom: 20px;
+}
+
+.modal-body .options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.modal-body .option {
+    position: relative;
+}
+
+.modal-body .option input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-body .option label {
+    display: inline-block;
+    padding: 8px 16px;
+    border: 2px solid #e5e5e5;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.2s;
+    user-select: none;
+    margin-bottom: 0; /* Override bootstrap default */
+}
+
+.modal-body .option label:hover {
+    border-color: #cbd5e1;
+}
+
+.modal-body .option input:checked + label {
+    border-color: #2563eb;
+    color: #2563eb;
+    background: #eff6ff;
+}

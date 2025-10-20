@@ -35,74 +35,106 @@ if(isset($_POST['submit'])) {
 <!DOCTYPE html>
 <html lang="en">
   <head>
-  
-  <title>Forgot Password</title>
-    <!-- plugins:css -->
-    <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
-    <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
-    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-    <!-- endinject -->
-    <!-- Plugin css for this page -->
-    <!-- End plugin css for this page -->
-    <!-- inject:css -->
-    <!-- endinject -->
-    <!-- Layout styles -->
-    <link rel="stylesheet" href="css/style.css">
-   <script type="text/javascript">
-function valid()
-{
-if(document.chngpwd.newpassword.value!= document.chngpwd.confirmpassword.value)
-{
-alert("New Password and Confirm Password Field do not match  !!");
-document.chngpwd.confirmpassword.focus();
-return false;
-}
-return true;
-}
-</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/login.css">
+    <style>
+      /* Style for the message box */
+      .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+      }
+      .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+      }
+      .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+      }
+      .alert-warning {
+        color: #856404;
+        background-color: #fff3cd;
+        border-color: #ffeeba;
+      }
+    </style>
+    <link rel="stylesheet" href="css/profile.css">
   </head>
   <body>
-    <div class="container-scroller">
-      <div class="container-fluid page-body-wrapper full-page-wrapper">
-        <div class="content-wrapper d-flex align-items-center auth">
-          <div class="row flex-grow">
-            <div class="col-lg-4 mx-auto">
-          <div class="auth-form-light text-left p-5">
-          <?php if(!empty($message)) echo $message; ?>
-                <div class="text-center mb-4">
-                    <i class="icon-lock text-primary" style="font-size: 50px;"></i>
-                    <h4 class="mt-3">Reset Password</h4>
-                    <p class="text-muted">Enter your email address and we'll send you a link to reset your password.</p>
+    <div class="container-login">
+        <div class="left-section">
+            <div class="floating-shape shape1"></div>
+            <div class="floating-shape shape2"></div>
+            <div class="floating-shape shape3"></div>
+            
+            <div class="illustration">
+                <div class="tooth">
+                    🦷
+                    <div class="tooth-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
                 </div>
-          <form class="pt-3" name="chngpwd" method="post">
-            <div class="form-group">
-              <label>Email Address</label>
-              <input type="email" class="form-control form-control-lg" style="border-radius: 10px;" placeholder="Enter your email" required name="email">
+                <div class="toothbrush-emoji">🪥</div>
+                <div class="syringe-emoji">💉</div>
+                <div class="wrench-emoji">🔧</div>
+                <div class="magnifier-emoji">🔎</div>
             </div>
-            <div class="mt-3">
-              <button type="submit" name="submit" class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" style="border-radius: 10px;">Send Reset Link</button>
-            </div>
-            <div class="text-center mt-4 font-weight-light">
-              Remember your password? <a href="login.php" class="text-primary">Back to Login</a>
-            </div>
-          </form>
-              </div>
-            </div>
-          </div>
+    <div class="auth-container">
+        <div class="left-panel">
+            <a href="../index.php" class="logo">
+                <img src="../images/Jf logo.png" alt="JF Dental Care Logo" class="logo-img">
+                <span class="logo-text">JF DENTAL CARE</span>
+            </a>
+            <div class="tagline">Smile with Confidence</div>
+            <h1 class="hero-title">
+                Forgot Your Password?
+            </h1>
+             <p class="tagline" style="margin-bottom: 60px;">No worries, we'll help you get back on track.</p>
+            <div class="illustration">🔑</div>
         </div>
-        <!-- content-wrapper ends -->
-      </div>
-      <!-- page-body-wrapper ends -->
+
+        <div class="right-section">
+        <div class="right-panel">
+            <a href="login.php" class="close-btn" title="Close">&times;</a>
+            <div class="header">
+                <a href="../index.php" class="logo">
+                    <img src="../images/Jf logo.png" alt="JF Dental Care Logo">
+                    <span>JF DENTAL CARE</span>
+                </a>
+                <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="form-header">
+                <div class="link-container">
+                    <span style="color: #999; font-size: 14px;">Remember your password?</span>
+                    <a href="login.php" class="create-account-link">SIGN IN</a>
+                    <a href="login.php">SIGN IN</a>
+                </div>
+            </div>
+
+            <div class="form-container">
+            <div>
+                <?php if(!empty($message)) echo $message; ?>
+                <h1>Forgot Password?</h1>
+                <h2 class="form-title">Forgot Password?</h2>
+                <p class="subtitle">Enter your email to reset your password.</p>
+
+                <form class="pt-3" method="post">
+                <form method="post">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" class="form-control" id="email" placeholder="Enter your email" required name="email">
+                        <input type="email" id="email" placeholder="Enter your email" required name="email">
+                    </div>
+                    <button type="submit" name="submit" class="login-btn">Send Reset Link</button>
+                    <button type="submit" name="submit" class="auth-btn">Send Reset Link</button>
+                </form>
+            </div>
+        </div>
     </div>
-    <!-- container-scroller -->
-    <!-- plugins:js -->
-    <script src="vendors/js/vendor.bundle.base.js"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
-    <script src="js/off-canvas.js"></script>
-    <script src="js/misc.js"></script>
-    <!-- endinject -->
   </body>
 </html>

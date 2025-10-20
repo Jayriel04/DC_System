@@ -3,142 +3,125 @@ session_start();
 error_reporting(0);
 include('includes/dbconnection.php');
 
-if (strlen($_SESSION['sturecmsstuid']==0)) {
-  header('location:logout.php');
-  } else{
-if(isset($_POST['submit']))
-{
-$sid=$_SESSION['sturecmsstuid'];
-$cpassword=md5($_POST['currentpassword']);
-$newpassword=md5($_POST['newpassword']);
-$sql ="SELECT number FROM tblpatient WHERE number=:sid and password=:cpassword";
-$query= $dbh -> prepare($sql);
-$query-> bindParam(':sid', $sid, PDO::PARAM_STR);
-$query-> bindParam(':cpassword', $cpassword, PDO::PARAM_STR);
-$query-> execute();
-$results = $query -> fetchAll(PDO::FETCH_OBJ);
-
-if($query -> rowCount() > 0)
-{
-$con="update tblpatient set password=:newpassword where number=:sid";
-$chngpwd1 = $dbh->prepare($con);
-$chngpwd1-> bindParam(':sid', $sid, PDO::PARAM_STR);
-$chngpwd1-> bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
-$chngpwd1->execute();
-
-echo '<script>alert("Your password successully changed")</script>';
-} else {
-echo '<script>alert("Your current password is wrong")</script>';
-
+if (strlen($_SESSION['sturecmsnumber']) == 0) {
+    header('location:logout.php');
+    exit();
 }
+
+$patient_number = $_SESSION['sturecmsnumber'];
+$message = '';
+$message_type = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+    // Basic validation
+    if ($_POST['newpassword'] !== $_POST['confirmpassword']) {
+        $message = 'New Password and Confirm Password fields do not match.';
+        $message_type = 'danger';
+    } else {
+        $cpassword = md5($_POST['currentpassword']); // Using md5 for consistency with login
+        $newpassword = md5($_POST['newpassword']);
+
+        $sql = "SELECT number FROM tblpatient WHERE number=:sid AND password=:cpassword";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':sid', $patient_number, PDO::PARAM_INT);
+        $query->bindParam(':cpassword', $cpassword, PDO::PARAM_STR);
+        $query->execute();
+
+        if ($query->rowCount() > 0) {
+            $con = "UPDATE tblpatient SET password=:newpassword WHERE number=:sid";
+            $chngpwd1 = $dbh->prepare($con);
+            $chngpwd1->bindParam(':sid', $patient_number, PDO::PARAM_INT);
+            $chngpwd1->bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
+            if ($chngpwd1->execute()) {
+                $_SESSION['profile_message'] = 'Your password was successfully changed.';
+                header('Location: profile.php');
+                exit();
+            } else {
+                $message = 'Something went wrong. Please try again.';
+                $message_type = 'danger';
+            }
+        } else {
+            $message = 'Your current password is wrong.';
+            $message_type = 'danger';
+        }
+    }
 }
-  ?>
+?>
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-   
-  <title>Patient Management System || Patient Change Password</title>
-    <!-- plugins:css -->
-    <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
-    <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
-    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-    <!-- endinject -->
-    <!-- Plugin css for this page -->
-    <link rel="stylesheet" href="vendors/select2/select2.min.css">
-    <link rel="stylesheet" href="vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
-    <!-- End plugin css for this page -->
-    <!-- inject:css -->
-    <!-- endinject -->
-    <!-- Layout styles -->
-    <link rel="stylesheet" href="css/style.css" />
-    <script type="text/javascript">
-function checkpass()
-{
-if(document.changepassword.newpassword.value!=document.changepassword.confirmpassword.value)
-{
-alert('New Password and Confirm Password field does not match');
-document.changepassword.confirmpassword.focus();
-return false;
-}
-return true;
-}   
 
-</script>
-  </head>
-  <body>
-    <div class="container-scroller">
-      <!-- partial:partials/_navbar.html -->
-     <?php include_once('includes/header.php');?>
-      <!-- partial -->
-      <div class="container-fluid page-body-wrapper">
-        <!-- partial:partials/_sidebar.html -->
-      <?php include_once('includes/sidebar.php');?>
-        <!-- partial -->
-        <div class="main-panel">
-          <div class="content-wrapper">
-            <div class="page-header">
-              <h3 class="page-title"> Change Password </h3>
-              <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Change Password</li>
-                </ol>
-              </nav>
-            </div>
-            <div class="row">
-          
-              <div class="col-12 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title" style="text-align: center;">Change Password</h4>
-                   
-                    <form class="forms-sample" name="changepassword" method="post" onsubmit="return checkpass();">
-                      
-                      <div class="form-group">
-                        <label for="exampleInputName1">Current Password</label>
-                        <input type="password" name="currentpassword" id="currentpassword" class="form-control" required="true">
-                      </div>
-                      <div class="form-group">
-                        <label for="exampleInputEmail3">New Password</label>
-                        <input type="password" name="newpassword"  class="form-control" required="true">
-                      </div>
-                      <div class="form-group">
-                        <label for="exampleInputPassword4">Confirm Password</label>
-                        <input type="password" name="confirmpassword" id="confirmpassword" value=""  class="form-control" required="true">
-                      </div>
-                      
-                      <button type="submit" class="btn btn-primary mr-2" name="submit">Change</button>
-                     
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- content-wrapper ends -->
-          <!-- partial:partials/_footer.html -->
-         <?php include_once('includes/footer.php');?>
-          <!-- partial -->
+<head>
+    <title>Change Password</title>
+    <link rel="stylesheet" href="./css/profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script type="text/javascript">
+        function checkpass() {
+            if (document.changepassword.newpassword.value != document.changepassword.confirmpassword.value) {
+                alert('New Password and Confirm Password fields do not match.');
+                document.changepassword.confirmpassword.focus();
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+
+<body>
+    <?php include_once(__DIR__ . '/../includes/header.php'); ?>
+    <div class="auth-container">
+        <div class="left-panel">
+            <h1 class="hero-title">
+                Secure Your Account
+            </h1>
+            <p class="tagline" style="margin-bottom: 60px;">Keep your account safe by using a strong, unique password.</p>
+            <div class="illustration">🔑</div>
         </div>
-        <!-- main-panel ends -->
-      </div>
-      <!-- page-body-wrapper ends -->
+
+        <div class="right-panel">
+            <a href="profile.php" class="close-btn" title="Back to Profile">&times;</a>
+
+            <h2 class="form-title">Change Password</h2>
+
+            <?php if (!empty($message)): ?>
+                <div class="alert alert-<?php echo $message_type; ?>"><?php echo htmlspecialchars($message); ?></div>
+            <?php endif; ?>
+
+            <form name="changepassword" method="post" onsubmit="return checkpass();">
+                <div class="form-group">
+                    <label for="currentpassword">Current Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" name="currentpassword" id="currentpassword" required="true">
+                        <i class="password-toggle-icon fas fa-eye" onclick="togglePasswordVisibility('currentpassword', this)"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="newpassword">New Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" name="newpassword" id="newpassword" required="true">
+                        <i class="password-toggle-icon fas fa-eye" onclick="togglePasswordVisibility('newpassword', this)"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="confirmpassword">Confirm New Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" name="confirmpassword" id="confirmpassword" required="true">
+                        <i class="password-toggle-icon fas fa-eye" onclick="togglePasswordVisibility('confirmpassword', this)"></i>
+                    </div>
+                </div>
+                <button type="submit" class="auth-btn" name="submit">Update Password</button>
+            </form>
+        </div>
     </div>
-    <!-- container-scroller -->
-    <!-- plugins:js -->
-    <script src="vendors/js/vendor.bundle.base.js"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <script src="vendors/select2/select2.min.js"></script>
-    <script src="vendors/typeahead.js/typeahead.bundle.min.js"></script>
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
-    <script src="js/off-canvas.js"></script>
-    <script src="js/misc.js"></script>
-    <!-- endinject -->
-    <!-- Custom js for this page -->
-    <script src="js/typeahead.js"></script>
-    <script src="js/select2.js"></script>
-    <!-- End custom js for this page -->
-  </body>
-</html><?php }  ?>
+    <script>
+        function togglePasswordVisibility(inputId, icon) {
+            const passwordInput = document.getElementById(inputId);
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        }
+    </script>
+</body>
+
+</html>

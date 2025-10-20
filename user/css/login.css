@@ -1,0 +1,369 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #4dabf7 0%, #3498db 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container-login {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    max-width: 1000px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.left-section {
+    flex: 1;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf4 100%);
+    padding: 60px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.illustration {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+}
+
+.tooth {
+    font-size: 120px;
+    position: relative;
+    animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+}
+
+.tooth-icon {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    background: #3498db;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.toothbrush-emoji {
+    position: absolute;
+    left: 15px;
+    bottom: 80px;
+    font-size: 60px;
+    transform: rotate(-25deg);
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+    animation: float 4s ease-in-out infinite;
+}
+
+.syringe-emoji {
+    position: absolute;
+    right: 10px;
+    top: 50px;
+    font-size: 50px;
+    transform: rotate(15deg);
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+    animation: float 3s ease-in-out infinite;
+    animation-delay: 0.5s;
+}
+
+.wrench-emoji {
+    position: absolute;
+    left: 30px;
+    bottom: 30px;
+    font-size: 45px;
+    transform: rotate(25deg);
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+}
+
+.magnifier-emoji {
+    position: absolute;
+    right: 50px;
+    bottom: 25px;
+    font-size: 40px;
+    transform: rotate(-15deg);
+    filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.2));
+}
+
+.floating-shape {
+    position: absolute;
+    background: rgba(52, 152, 219, 0.1);
+    border-radius: 10px;
+    animation: float 4s ease-in-out infinite;
+}
+
+.shape1 {
+    width: 40px;
+    height: 40px;
+    top: 20px;
+    left: 20px;
+    animation-delay: 0s;
+}
+
+.shape2 {
+    width: 30px;
+    height: 30px;
+    top: 50px;
+    right: 40px;
+    animation-delay: 1s;
+}
+
+.shape3 {
+    width: 35px;
+    height: 35px;
+    bottom: 100px;
+    left: 50%;
+    animation-delay: 2s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.right-section {
+    flex: 1;
+    padding: 60px 50px;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    position: relative;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+}
+
+.logo img {
+    width: 35px;
+}
+
+.create-account-link {
+    color: #3498db;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 8px 20px;
+    border: 1px solid #3498db;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.create-account-link:hover {
+    background: #3498db;
+    color: white;
+}
+
+.form-container {
+    flex: 1;
+}
+
+.form-container h1 {
+    font-size: 32px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #999;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #999;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #4dabf7 0%, #2980b9 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
+}
+
+.form-check-label {
+    font-size: 14px !important;
+    font-weight: 400 !important;
+}
+
+.auth-link {
+    font-size: 14px;
+    color: #3498db;
+}
+
+.auth-link:hover {
+    color: #2980b9;
+}
+
+.social-login {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.social-text {
+    color: #999;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.social-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.social-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    color: #333;
+    text-decoration: none;
+}
+
+.social-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.social-btn.facebook {
+    color: #3b5998;
+}
+
+.social-btn.linkedin {
+    color: #0077b5;
+}
+
+.social-btn.google {
+    color: #db4437;
+}
+
+@media (max-width: 992px) {
+    .left-section {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .container-login {
+        flex-direction: column;
+    }
+
+    .right-section {
+        padding: 40px 30px;
+    }
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 30px;
+    color: #aaa;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: #333;
+}

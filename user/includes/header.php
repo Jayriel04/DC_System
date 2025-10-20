@@ -7,8 +7,8 @@
 
     <?php
     $uid = $_SESSION['sturecmsnumber'];
-    $sql = "SELECT * FROM tblpatient WHERE number = :uid";
-    $query = $dbh->prepare($sql);
+    $sql_header = "SELECT firstname, surname, username, Image FROM tblpatient WHERE number = :uid";
+    $query = $dbh->prepare($sql_header);
     $query->bindParam(':uid', $uid, PDO::PARAM_STR);
     $query->execute();
     $results = $query->fetchAll(PDO::FETCH_OBJ);
@@ -22,20 +22,21 @@
                     <li class="nav-item dropdown d-none d-xl-inline-flex user-dropdown">
                         <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown"
                             aria-expanded="false">
-                            <img class="img-xs rounded-circle ml-2" src="<?php echo htmlentities($row->Image); ?>"
+                            <?php $image_path = !empty($row->Image) ? '/dental-clinic/admin/images/' . htmlentities($row->Image) : '/dental-clinic/admin/images/avatar.png'; ?>
+                            <img class="img-xs rounded-circle ml-2" src="<?php echo $image_path; ?>"
                                 alt="Profile image">
                             <span class="font-weight-normal"><?php echo htmlentities($row->firstname); ?></span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
                             <div class="dropdown-header text-center">
-                                <img class="img-md rounded-circle" src="<?php echo htmlentities($row->Image); ?>"
+                                <img class="img-md rounded-circle" src="<?php echo $image_path; ?>" style="object-fit: cover;"
                                     alt="Profile image">
                                 <p class="mb-1 mt-3"><?php echo htmlentities($row->firstname . ' ' . $row->surname); ?></p>
                                 <p class="font-weight-light text-muted mb-0"><?php echo htmlentities($row->username); ?></p>
                             </div>
-                            <a class="dropdown-item" href="view-profile.php"><i
+                            <a class="dropdown-item" href="profile.php"><i
                                     class="dropdown-item-icon icon-user text-primary"></i> My Profile</a>
-                            <a class="dropdown-item" href="create_password.php"><i
+                            <a class="dropdown-item" href="change-password.php"><i
                                     class="dropdown-item-icon icon-energy text-primary"></i> Change Password</a>
                             <a class="dropdown-item" href="logout.php"><i
                                     class="dropdown-item-icon icon-power text-primary"></i>Sign
