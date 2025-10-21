@@ -36,7 +36,7 @@ if (!empty($_SESSION)) {
   // prefer your app-specific fields for display
   if ($logged_in && isset($_SESSION['sturecmsnumber'])) {
     // Fetch user details including the image from tblpatient
-    $stmt = $dbh->prepare("SELECT firstname, surname, Image FROM tblpatient WHERE number = :id");
+    $stmt = $dbh->prepare("SELECT firstname, surname, Image, sex FROM tblpatient WHERE number = :id");
     $stmt->bindParam(':id', $_SESSION['sturecmsnumber'], PDO::PARAM_INT);
     $stmt->execute();
     $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -44,6 +44,15 @@ if (!empty($_SESSION)) {
       $user_firstname = $user_data['firstname'];
       $user_surname = $user_data['surname'];
       $user_image = $user_data['Image'];
+      $user_sex = $user_data['sex'];
+
+      if (empty($user_image)) {
+          if ($user_sex === 'Male') {
+              $user_image = 'man-icon.png';
+          } else if ($user_sex === 'Female') {
+              $user_image = 'woman-icon.jpg';
+          }
+      }
     }
   }
   // optional notification count stored in session by your app
@@ -344,11 +353,11 @@ if (!empty($_SESSION)) {
               <a href="javascript:void(0)" id="profileLink" class="profile-link" aria-haspopup="true"
                 aria-expanded="false">
                 <?php
-                $avatar_image = !empty($user_image) ? htmlentities($user_image) : 'avatar.png';
+                $avatar_image = !empty($user_image) ? htmlentities($user_image) : 'avatar.png'; // Fallback if sex is not set
                 ?>
                 <img src="<?php echo $base; ?>/admin/images/<?php echo $avatar_image; ?>" alt="Avatar" class="avatar"
                   style="object-fit: cover;">
-                <div class="profile-text">
+                <div class="profile-text" style="color: black;">
                   <div class="name"><?php echo htmlspecialchars(trim($user_firstname . ' ' . $user_surname)); ?></div>
                   <?php if (!empty($user_role)) { ?>
                     <div class="role"><?php echo htmlspecialchars($user_role); ?></div><?php } ?>

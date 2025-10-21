@@ -6,70 +6,148 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
-    // Initialize search and filter variables
-    $search = '';
-    $status_filter = '';
-    $selected_service = '';
-    $selected_calendar = '';
+    // Handle new service appointment and patient creation from modal
+    if (isset($_POST['schedule_service_appointment'])) {
+        $dbh->beginTransaction();
+        try {
+            // 1. Create new patient
+            $firstname = $_POST['firstname'];
+            $surname = $_POST['surname'];
+            $dob = $_POST['date_of_birth'];
+            $sex = $_POST['sex'];
+            $civil_status = $_POST['civil_status'];
+            $occupation = $_POST['occupation'];
+            $contact_number = $_POST['contact_number'];
+            $address = $_POST['address'];
+            $email = $_POST['email'];
+            $password = md5('password'); // Default password
 
-    // Handle the search and status filter
-    if (isset($_POST['search'])) {
-        $search = $_POST['search'];
-    }
-    if (isset($_POST['status_filter'])) {
-        $status_filter = $_POST['status_filter'];
-    }
-    if (isset($_POST['service_filter'])) {
-        $selected_service = $_POST['service_filter'];
-    }
-    if (isset($_POST['calendar_filter'])) {
-        $selected_calendar = $_POST['calendar_filter'];
-    }
+            // Auto-generate a unique username
+            $base_username = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $firstname . $surname));
+            $username = $base_username;
+            $counter = 1;
+            while ($dbh->query("SELECT COUNT(*) FROM tblpatient WHERE username = '$username'")->fetchColumn() > 0) {
+                $username = $base_username . $counter++;
+            }
 
-    // Handle status change from admin
-    if (isset($_POST['appt_id']) && isset($_POST['new_status'])) {
-        $apptId = intval($_POST['appt_id']);
-        $newStatus = trim($_POST['new_status']);
-        $allowed = ['Pending', 'Approved', 'Declined'];
-        if (in_array($newStatus, $allowed, true)) {
-            $sqlUp = "UPDATE tblappointment SET status = :st WHERE id = :id";
-            $qUp = $dbh->prepare($sqlUp);
-            $qUp->bindParam(':st', $newStatus, PDO::PARAM_STR);
-            $qUp->bindParam(':id', $apptId, PDO::PARAM_INT);
-            $qUp->execute();
+            $age = '';
+            if (!empty($dob)) {
+                $birthDate = new DateTime($dob);
+                $today = new DateTime();
+                $age = $today->diff($birthDate)->y;
+            }
+
+            $sql_patient = "INSERT INTO tblpatient (firstname, surname, date_of_birth, sex, status, occupation, age, contact_number, address, email, username, password, created_at) VALUES (:fname, :sname, :dob, :sex, :status, :occupation, :age, :contact, :address, :email, :uname, :password, NOW())";
+            $query_patient = $dbh->prepare($sql_patient);
+            $query_patient->execute([':fname' => $firstname, ':sname' => $surname, ':dob' => $dob, ':sex' => $sex, ':status' => $civil_status, ':occupation' => $occupation, ':age' => $age, ':contact' => $contact_number, ':address' => $address, ':email' => $email, ':uname' => $username, ':password' => $password]);
+            $patient_id = $dbh->lastInsertId();
+
+            // 2. Create new service schedule
+            $service_id = $_POST['service_id'];
+            $app_date = $_POST['date'];
+            $start_time = $_POST['start_time'];
+            $duration = $_POST['duration'];
+            $app_status = 'Ongoing'; // Set default status to Ongoing for services
+
+            $sql_schedule = "INSERT INTO tblschedule (patient_number, firstname, surname, service_id, date, time, duration, status) VALUES (:pnum, :fname, :sname, :service_id, :app_date, :start_time, :duration, :status)";
+            $query_schedule = $dbh->prepare($sql_schedule);
+            $query_schedule->execute([':pnum' => $patient_id, ':fname' => $firstname, ':sname' => $surname, ':service_id' => $service_id, ':app_date' => $app_date, ':start_time' => $start_time, ':duration' => $duration, ':status' => $app_status]);
+
+            $dbh->commit();
+            echo "<script>alert('New patient and service appointment scheduled successfully.'); window.location.href='mas.php';</script>";
+        } catch (Exception $e) {
+            $dbh->rollBack();
+            echo "<script>alert('An error occurred: " . $e->getMessage() . "');</script>";
         }
-        header('Location: mas.php');
-        exit();
     }
 
     // Code for deletion
     if (isset($_GET['delid'])) {
         $rid = intval($_GET['delid']);
-        $sql = "DELETE FROM tblappointment WHERE id = :rid";
+        $sql = "DELETE FROM tblschedule WHERE id = :rid";
         $query = $dbh->prepare($sql);
-        $query->bindParam(':rid', $rid, PDO::PARAM_STR);
+        $query->bindParam(':rid', $rid, PDO::PARAM_INT);
         $query->execute();
-    echo "<script>alert('Data deleted');</script>";
-    echo "<script>window.location.href = 'mas.php'</script>";
+        echo "<script>alert('Service schedule deleted');</script>";
+        echo "<script>window.location.href = 'mas.php'</script>";
     }
-    
+
+    $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
+    // --- SERVICE APPOINTMENT COUNTS ---
+    $sql_all = "SELECT COUNT(*) FROM tblschedule";
+    $query_all = $dbh->prepare($sql_all);
+    $query_all->execute();
+    $count_all = $query_all->fetchColumn();
+
+    $sql_today = "SELECT COUNT(*) FROM tblschedule WHERE date = CURDATE()";
+    $query_today = $dbh->prepare($sql_today);
+    $query_today->execute();
+    $count_today = $query_today->fetchColumn();
+
+    $sql_upcoming = "SELECT COUNT(*) FROM tblschedule WHERE date > CURDATE()";
+    $query_upcoming = $dbh->prepare($sql_upcoming);
+    $query_upcoming->execute();
+    $count_upcoming = $query_upcoming->fetchColumn();
+
+    $sql_pending = "SELECT COUNT(*) FROM tblschedule WHERE status = 'Ongoing'"; // 'Ongoing' is like 'Pending' for services
+    $query_pending = $dbh->prepare($sql_pending);
+    $query_pending->execute();
+    $count_pending = $query_pending->fetchColumn();
+
+    $sql_completed = "SELECT COUNT(*) FROM tblschedule WHERE status = 'Done'";
+    $query_completed = $dbh->prepare($sql_completed);
+    $query_completed->execute();
+    $count_completed = $query_completed->fetchColumn();
+
+    // --- SERVICE APPOINTMENT LIST ---
+    $sql_schedules = "SELECT s.*, svc.name as service_name FROM tblschedule s LEFT JOIN tblservice svc ON s.service_id = svc.number";
+    $where_clauses = [];
+
+    switch ($filter) {
+        case 'today':
+            $where_clauses[] = "s.date = CURDATE()";
+            break;
+        case 'upcoming':
+            $where_clauses[] = "s.date > CURDATE()";
+            break;
+        case 'pending':
+            $where_clauses[] = "s.status = 'Ongoing'";
+            break;
+        case 'completed':
+            $where_clauses[] = "s.status = 'Done'";
+            break;
+    }
+
+    if (!empty($where_clauses)) {
+        $sql_schedules .= " WHERE " . implode(' AND ', $where_clauses);
+    }
+
+    $sql_schedules .= " ORDER BY s.date DESC, s.time DESC";
+    $query_schedules = $dbh->prepare($sql_schedules);
+    $query_schedules->execute();
+    $schedules = $query_schedules->fetchAll(PDO::FETCH_OBJ);
+
+    // Helper to format time
+    function format_time_12hr($time_24hr)
+    {
+        if (empty($time_24hr))
+            return 'N/A';
+        return date("g:i A", strtotime($time_24hr));
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <title>Appointments (MAS)</title>
+    <title>Dashboard | Service Appointments</title>
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-    <link rel="stylesheet" href="vendors/daterangepicker/daterangepicker.css">
-    <link rel="stylesheet" href="vendors/chartist/chartist.min.css">
     <link rel="stylesheet" href="css/style.css">
-    <script>
-        function autoSubmit() {
-            document.getElementById("filterForm").submit();
-        }
-    </script>
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/dashboard.css">
 </head>
 
 <body>
@@ -80,347 +158,213 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
-    <h4 class="page-title">Manage Appointments Service <br></h4> 
-</div>
-<p style="font-size: .9375rem;line-height: 1.5;">Schedule and track patient appointments for service</p>
-                    <div class="row">
-                        <div class="col-md-12 grid-margin">
-                            <!-- Search / Filters Card -->
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <div class="d-sm-flex align-items-center mb-4">
-                                        <!-- <a href="add-appointment.php" class="btn btn-primary ml-auto mb-3 mb-sm-0">Add Appointment</a> -->
-                                    </div>
-                                    <form method="POST" class="form-inline mb-0" id="filterForm">
-                                        <div class="form-group mr-3">
-                                            <input type="text" class="form-control" name="search" id="searchInput" placeholder="Search by First Name or Surname" value="<?php echo htmlentities($search); ?>">
-                                            <script>
-                                            document.getElementById('searchInput').addEventListener('input', function(e) {
-                                                let val = e.target.value;
-                                                if (val.length > 0) {
-                                                    e.target.value = val.charAt(0).toUpperCase() + val.slice(1);
-                                                }
-                                            });
-                                            </script>
-                                        </div>
-                                        <div class="form-group mr-3">
-                                            <select class="form-control" name="status_filter" onchange="autoSubmit()">
-                                                <option value="">All Statuses</option>
-                                                <option value="Pending" <?php if ($status_filter == "Pending") echo 'selected'; ?>>Pending</option>
-                                                <option value="Approved" <?php if ($status_filter == "Approved") echo 'selected'; ?>>Approved</option>
-                                                <option value="Declined" <?php if ($status_filter == "Declined") echo 'selected'; ?>>Declined</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group mr-3">
-                                            <?php
-                                            // Load services for dropdown
-                                            $svcStmt = $dbh->prepare("SELECT number, name FROM tblservice ORDER BY name ASC");
-                                            $svcStmt->execute();
-                                            $services = $svcStmt->fetchAll(PDO::FETCH_OBJ);
-                                            ?>
-                                            <select class="form-control" name="service_filter" onchange="autoSubmit()">
-                                                <option value="">All Services</option>
-                                                <?php foreach ($services as $svc) { ?>
-                                                    <option value="<?php echo htmlentities($svc->number); ?>" <?php if ($selected_service == $svc->number) echo 'selected'; ?>><?php echo htmlentities($svc->name); ?></option>
-                                                <?php } ?>
-                                            </select>
-                                        </div>
-                                        <div class="form-group mr-3">
-                                            <?php
-                                            // Load calendar slots for dropdown (combine date + start_time + duration)
-                                            // Note: removed date >= CURDATE() so existing rows (even past ones) are visible.
-                                            // duration column was removed from tblcalendar; select end_time instead
-                                            $calStmt = $dbh->prepare("SELECT id, date, start_time, end_time FROM tblcalendar ORDER BY date, start_time");
-                                            $calStmt->execute();
-                                            $cals = $calStmt->fetchAll(PDO::FETCH_OBJ);
+                        <h4 class="page-title">Manage Service Appointments</h4>
+                    </div>
+                    <div class="container">
 
-                                            // Helper: convert 24-hour time string to 12-hour with am/pm
-                                            function time12($t) {
-                                                if (empty($t)) return '-';
-                                                // accept formats like HH:MM[:SS]
-                                                $parts = explode(':', $t);
-                                                if (count($parts) < 2) return $t;
-                                                $h = intval($parts[0]);
-                                                $m = str_pad($parts[1],2,'0',STR_PAD_LEFT);
-                                                $ampm = $h >= 12 ? 'pm' : 'am';
-                                                $h12 = $h % 12;
-                                                if ($h12 === 0) $h12 = 12;
-                                                return $h12 . ':' . $m . ' ' . $ampm;
-                                            }
-                                            ?>
-                                            <select class="form-control" name="calendar_filter" onchange="autoSubmit()">
-                                                <option value="">All Slots</option>
-                                                <?php if (count($cals) === 0) { ?>
-                                                    <option value="">No slots available</option>
-                                                <?php } else {
-                                                    foreach ($cals as $cal) {
-                                                        // show start and optional end time in label
-                                                        if (!empty($cal->end_time) && strtotime($cal->end_time) !== false) {
-                                                            $label = $cal->date . ' ' . time12($cal->start_time) . ' - ' . time12($cal->end_time);
-                                                        } else {
-                                                            $label = $cal->date . ' ' . time12($cal->start_time);
-                                                        }
-                                                ?>
-                                                    <option value="<?php echo htmlentities($cal->id); ?>" <?php if ($selected_calendar == $cal->id) echo 'selected'; ?>><?php echo htmlentities($label); ?></option>
-                                                <?php }
-                                                } ?>
-                                            </select>
-                                        </div>
-                                    </form>
+                        <div class="appointment-management-card">
+                            <div class="header-section">
+                                <div class="header-text">
+                                    <h1>Manage Service Appointments</h1>
+                                    <p>Schedule and track patient appointments for services</p>
+                                </div>
+                                <button type="button" class="new-appointment-btn" id="newAppointmentBtn">New Service Appointment</button>
+                            </div>
+
+                            <div class="filter-section">
+                                <div class="search-box">
+                                    <input type="text" placeholder="Search appointments by patient name or service..." aria-label="Search appointments">
+                                </div>
+                                <div class="filter-buttons">
+                                    <a href="mas.php?filter=all" class="filter-btn <?php if ($filter === 'all') echo 'active'; ?>" data-filter="all">
+                                        All Appointments <span class="filter-count"><?php echo $count_all; ?></span>
+                                    </a>
+                                    <a href="mas.php?filter=today" class="filter-btn <?php if ($filter === 'today') echo 'active'; ?>" data-filter="today">
+                                        Today <span class="filter-count"><?php echo $count_today; ?></span>
+                                    </a>
+                                    <a href="mas.php?filter=upcoming" class="filter-btn <?php if ($filter === 'upcoming') echo 'active'; ?>" data-filter="upcoming">
+                                        Upcoming <span class="filter-count"><?php echo $count_upcoming; ?></span>
+                                    </a>
+                                    <a href="mas.php?filter=pending" class="filter-btn <?php if ($filter === 'pending') echo 'active'; ?>" data-filter="pending">
+                                        Ongoing <span class="filter-count"><?php echo $count_pending; ?></span>
+                                    </a>
+                                    <a href="mas.php?filter=completed" class="filter-btn <?php if ($filter === 'completed') echo 'active'; ?>" data-filter="completed">
+                                        Completed <span class="filter-count"><?php echo $count_completed; ?></span>
+                                    </a>
                                 </div>
                             </div>
 
-                            <!-- Appointments Table Card -->
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="table-responsive border rounded p-1">
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th class="font-weight-bold">No</th>
-                                                    <th class="font-weight-bold">First Name</th>
-                                                    <th class="font-weight-bold">Surname</th>
-                                                    <th class="font-weight-bold">Date</th>
-                                                    <th class="font-weight-bold">Time</th>
-                                                    <th class="font-weight-bold">Duration (mins)</th>
-                                                    <th class="font-weight-bold">Service</th>
-                                                    <th class="font-weight-bold">Cancel Reason</th>
-                                                    <th class="font-weight-bold">Status</th>
-                                                    <th class="font-weight-bold">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php
-                                                if (isset($_GET['page_no']) && $_GET['page_no'] != "") {
-                                                    $page_no = $_GET['page_no'];
-                                                } else {
-                                                    $page_no = 1;
-                                                }
-
-                                                $total_records_per_page = 10;
-                                                $offset = ($page_no - 1) * $total_records_per_page;
-
-                                                // Determine if tblschedule has a service_id column so we can join tblservice
-                                                $hasServiceColumn = false;
-                                                try {
-                                                    $svcColChk = $dbh->prepare("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'tblschedule' AND COLUMN_NAME = 'service_id'");
-                                                    $svcColChk->execute();
-                                                    if ($svcColChk->rowCount() > 0) $hasServiceColumn = true;
-                                                } catch (Exception $e) {
-                                                    $hasServiceColumn = false;
-                                                }
-                                                // Determine if tblschedule has a cancel_reason column so we can display it
-                                                $hasCancelReason = false;
-                                                try {
-                                                    $cancelColChk = $dbh->prepare("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'tblschedule' AND COLUMN_NAME = 'cancel_reason'");
-                                                    $cancelColChk->execute();
-                                                    if ($cancelColChk->rowCount() > 0) $hasCancelReason = true;
-                                                } catch (Exception $e) {
-                                                    $hasCancelReason = false;
-                                                }
-
-                                                // Build the query based on search and status filter
-                                                // Left join tblschedule to get schedule date/time/duration if present
-                                                // If service column exists, left join tblservice to fetch service name
-                                                $selectExtra = '';
-                                                if ($hasServiceColumn) $selectExtra .= ", svc.name AS svc_name";
-                                                if ($hasCancelReason) $selectExtra .= ", s.cancel_reason AS cancel_reason";
-                                                $joinService = $hasServiceColumn ? " LEFT JOIN tblservice svc ON svc.number = s.service_id" : "";
-                                                $sql = "SELECT tblappointment.*, s.id AS schedule_id, s.date AS sched_date, s.time AS sched_time, s.duration AS sched_duration, s.status AS sched_status" . $selectExtra . " FROM tblappointment LEFT JOIN tblschedule s ON s.appointment_id = tblappointment.id" . $joinService . " WHERE 1=1";
-                                                if ($search) {
-                                                    $sql .= " AND (firstname LIKE :search OR surname LIKE :search)";
-                                                }
-                                                if ($status_filter) {
-                                                    $sql .= " AND status = :status_filter";
-                                                }
-                                                // If service filter selected and tblschedule has service_id, filter by it
-                                                if (!empty($selected_service) && $hasServiceColumn) {
-                                                    $sql .= " AND (s.service_id = :svc_id)";
-                                                }
-                                                // If calendar slot selected, fetch its date/time and filter appointments to that slot
-                                                if (!empty($selected_calendar)) {
-                                                    $calQf = $dbh->prepare("SELECT date, start_time FROM tblcalendar WHERE id = :cid LIMIT 1");
-                                                    $calQf->bindParam(':cid', $selected_calendar, PDO::PARAM_INT);
-                                                    $calQf->execute();
-                                                    $calRowf = $calQf->fetch(PDO::FETCH_OBJ);
-                                                    if ($calRowf) {
-                                                        $sql .= " AND ((s.date = :cal_date AND s.time = :cal_time) OR (tblappointment.date = :cal_date AND tblappointment.time = :cal_time))";
-                                                        $bind_cal = true;
-                                                    }
-                                                }
-                                                $sql .= " LIMIT $offset, $total_records_per_page";
-
-                                                $query = $dbh->prepare($sql);
-                                                if ($search) {
-                                                    $like_search = "%$search%";
-                                                    $query->bindParam(':search', $like_search, PDO::PARAM_STR);
-                                                }
-                                                if ($status_filter) {
-                                                    $query->bindParam(':status_filter', $status_filter, PDO::PARAM_STR);
-                                                }
-                                                if (!empty($selected_service) && $hasServiceColumn) {
-                                                    $query->bindParam(':svc_id', $selected_service, PDO::PARAM_INT);
-                                                }
-                                                if (!empty($selected_calendar) && !empty($calRowf)) {
-                                                    $query->bindParam(':cal_date', $calRowf->date, PDO::PARAM_STR);
-                                                    $query->bindParam(':cal_time', $calRowf->start_time, PDO::PARAM_STR);
-                                                }
-                                                $query->execute();
-                                                $results = $query->fetchAll(PDO::FETCH_OBJ);
-
-                                                // Get total rows for pagination
-                                                $ret = "SELECT id FROM tblappointment WHERE 1=1";
-                                                if ($search) {
-                                                    $ret .= " AND (firstname LIKE :search OR surname LIKE :search)";
-                                                }
-                                                if ($status_filter) {
-                                                    $ret .= " AND status = :status_filter";
-                                                }
-                                                if (!empty($selected_service) && $hasServiceColumn) {
-                                                    $ret .= " AND (id IN (SELECT appointment_id FROM tblschedule WHERE service_id = :svc_id))";
-                                                }
-                                                if (!empty($selected_calendar) && !empty($calRowf)) {
-                                                    // Count appointments that match the selected calendar slot
-                                                    $ret .= " AND ((id IN (SELECT appointment_id FROM tblschedule WHERE date = :cal_date AND time = :cal_time)) OR (date = :cal_date AND time = :cal_time))";
-                                                }
-                                                $query1 = $dbh->prepare($ret);
-                                                if ($search) {
-                                                    $query1->bindParam(':search', $like_search, PDO::PARAM_STR);
-                                                }
-                                                if ($status_filter) {
-                                                    $query1->bindParam(':status_filter', $status_filter, PDO::PARAM_STR);
-                                                }
-                                                if (!empty($selected_service) && $hasServiceColumn) {
-                                                    $query1->bindParam(':svc_id', $selected_service, PDO::PARAM_INT);
-                                                }
-                                                if (!empty($selected_calendar) && !empty($calRowf)) {
-                                                    $query1->bindParam(':cal_date', $calRowf->date, PDO::PARAM_STR);
-                                                    $query1->bindParam(':cal_time', $calRowf->start_time, PDO::PARAM_STR);
-                                                }
-                                                $query1->execute();
-                                                $total_rows = $query1->rowCount();
-                                                $total_pages = ceil($total_rows / $total_records_per_page);
-
-                                                $cnt = 1;
-                                                if ($query->rowCount() > 0) {
-                                                    foreach ($results as $row) { ?>
-                                                        <tr>
-                                                            <td><?php echo htmlentities($row->id); ?></td>
-                                                            <td><?php echo htmlentities($row->firstname); ?></td>
-                                                            <td><?php echo htmlentities($row->surname); ?></td>
-                                                                <td><?php
-                                                                    $d = !empty($row->sched_date) ? $row->sched_date : $row->date;
-                                                                    $t = !empty($row->sched_time) ? $row->sched_time : $row->time;
-                                                                    $timePart = $t ? time12($t) : '-';
-                                                                    echo htmlentities($d);
-                                                                ?></td>
-                                                                <td><?php echo htmlentities($timePart);
-                                                                ?></td>
-                                                            <td><?php echo htmlentities(!empty($row->sched_duration) ? $row->sched_duration : '-'); ?></td>
-                                                            <td><?php
-                                                                // Show service name from tblschedule if available
-                                                                if (!empty($row->schedule_id) && !empty($row->svc_name)) {
-                                                                    echo htmlentities($row->svc_name);
-                                                                } else {
-                                                                    echo '-';
-                                                                }
-                                                            ?></td>
-                                                                <td>
-                                                                    <?php if (!empty($row->cancel_reason)) { ?>
-                                                                        <button type="button" class="btn btn-sm btn-outline-primary show-cancel-reason" data-reason="<?php echo htmlentities($row->cancel_reason); ?>">View</button>
-                                                                    <?php } else { echo '-'; } ?>
-                                                                </td>
-                                                            <td>
-                                                                <?php
-                                                                // Prefer schedule-level status when present
-                                                                $badgeClass = 'badge badge-secondary';
-                                                                $displayStatus = '';
-                                                                if (!empty($row->sched_status)) {
-                                                                    $displayStatus = $row->sched_status;
-                                                                    if ($row->sched_status === 'Ongoing') $badgeClass = 'badge badge-warning text-dark';
-                                                                    elseif ($row->sched_status === 'Done') $badgeClass = 'badge badge-success';
-                                                                    else $badgeClass = 'badge badge-secondary';
-                                                                } else {
-                                                                    $displayStatus = $row->status;
-                                                                    if ($row->status === 'Pending') $badgeClass = 'badge badge-warning text-dark';
-                                                                    elseif ($row->status === 'Approved') $badgeClass = 'badge badge-success';
-                                                                    elseif ($row->status === 'Declined') $badgeClass = 'badge badge-danger';
-                                                                    else $badgeClass = 'badge badge-secondary';
-                                                                }
-                                                                ?>
-                                                                <span class="<?php echo $badgeClass; ?>"><?php echo htmlentities($displayStatus); ?></span>
-                                                            </td>
-                                                            <td>
-                                                                <div>
-                                                                    <a href="edit-mas.php?editid=<?php echo htmlentities($row->id); ?>" class="btn btn-info btn-xs">Edit</a>
-                                                                    <a href="mas.php?delid=<?php echo intval($row->id); ?>" onclick="return confirm('Do you really want to Delete ?');" class="btn btn-danger btn-xs">Delete</a>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    <?php $cnt++;
-                                                    }
-                                                } ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    
-                                </div>
-                            </div>
                         </div>
+
+                        <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 0;">
+
+                        <div class="patient-list-card" id="appointment-table-container">
+                            <h2 class="section-title">Service Appointments (<?php echo count($schedules); ?>)</h2>
+                            <table class="patient-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>First Name</th>
+                                        <th>Surname</th>
+                                        <th>Service</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Duration</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (count($schedules) > 0) : ?>
+                                        <?php foreach ($schedules as $schedule) : ?>
+                                            <tr>
+                                                <td><?php echo htmlentities($schedule->id); ?></td>
+                                                <td><?php echo htmlentities($schedule->firstname); ?></td>
+                                                <td><?php echo htmlentities($schedule->surname); ?></td>
+                                                <td><?php echo htmlentities($schedule->service_name ?: 'N/A'); ?></td>
+                                                <td><?php echo htmlentities($schedule->date); ?></td>
+                                                <td><?php echo format_time_12hr($schedule->time); ?></td>
+                                                <td><?php echo htmlentities($schedule->duration ? $schedule->duration . ' mins' : 'N/A'); ?></td>
+                                                <td><span class="status-badge status-<?php echo strtolower(htmlentities($schedule->status)); ?>"><?php echo htmlentities($schedule->status); ?></span></td>
+                                                <td class="actions-icons">
+                                                    <a href="edit-mas.php?editid=<?php echo $schedule->appointment_id; ?>" title="Edit">✏️</a>
+                                                    <a href="mas.php?delid=<?php echo $schedule->id; ?>" title="Delete" onclick="return confirm('Do you really want to Delete this service schedule?');">🗑️</a>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else : ?>
+                                        <tr>
+                                            <td colspan="9" style="text-align: center;">No service appointments found.</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+
                     </div>
                 </div>
                 <?php include_once('includes/footer.php'); ?>
             </div>
         </div>
     </div>
-    <script src="vendors/js/vendor.bundle.base.js"></script>
-    <script src="vendors/chart.js/Chart.min.js"></script>
-    <script src="vendors/moment/moment.min.js"></script>
-    <script src="vendors/daterangepicker/daterangepicker.js"></script>
-    <script src="vendors/chartist/chartist.min.js"></script>
-    <script src="js/off-canvas.js"></script>
-    <script src="js/misc.js"></script>
-    <script src="js/dashboard.js"></script>
-        <!-- Cancel Reason Modal -->
-        <div class="modal fade" id="cancelReasonModal" tabindex="-1" role="dialog" aria-labelledby="cancelReasonModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="cancelReasonModalLabel">Cancel Reason</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+
+    <!-- New Service Appointment Modal -->
+    <div id="newAppointmentModal" class="modal-container" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>New Service Appointment</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <form id="appointmentForm" method="POST">
+                <div class="modal-body">
+                    <h3 class="form-section-title">Patient Details</h3>
+                    <div class="form-row">
+                        <div class="form-group"><label for="firstname">First Name</label><input type="text" id="firstname" name="firstname" required></div>
+                        <div class="form-group"><label for="surname">Surname</label><input type="text" id="surname" name="surname" required></div>
                     </div>
-                    <div class="modal-body">
-                        <p id="cancelReasonText"></p>
+                    <div class="form-row">
+                        <div class="form-group"><label for="date_of_birth">Date of Birth</label><input type="date" id="date_of_birth" name="date_of_birth" required></div>
+                        <div class="form-group">
+                            <label for="sex">Sex</label>
+                            <select id="sex" name="sex" required>
+                                <option value="">Select Sex</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <div class="form-row">
+                        <div class="form-group"><label for="civil_status">Civil Status</label><input type="text" id="civil_status" name="civil_status"></div>
+                        <div class="form-group"><label for="occupation">Occupation</label><input type="text" id="occupation" name="occupation"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label for="contact_number">Phone Number</label><input type="tel" id="contact_number" name="contact_number" required></div>
+                        <div class="form-group"><label for="email">Email Address</label><input type="email" id="email" name="email"></div>
+                    </div>
+                    <div class="form-group"><label for="address">Address</label><textarea id="address" name="address" rows="2"></textarea></div>
+
+                    <hr class="form-divider">
+
+                    <h3 class="form-section-title">Service Appointment Details</h3>
+                    <div class="form-group">
+                        <label for="service_id">Service</label>
+                        <select id="service_id" name="service_id" required>
+                            <option value="">Select Service</option>
+                            <?php
+                            $svcs = $dbh->query("SELECT number, name FROM tblservice ORDER BY name")->fetchAll(PDO::FETCH_OBJ);
+                            foreach ($svcs as $s) {
+                                echo "<option value='{$s->number}'>" . htmlentities($s->name) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="date" id="date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="start_time">Time</label>
+                            <input type="time" id="start_time" name="start_time" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Duration (minutes)</label>
+                        <input type="number" id="duration" name="duration" min="1" placeholder="e.g., 30" required>
                     </div>
                 </div>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel">Cancel</button>
+                    <button type="submit" name="schedule_service_appointment" class="btn btn-schedule">Schedule Appointment</button>
+                </div>
+            </form>
         </div>
-        <script>
-            (function(){
-                // Use event delegation for buttons
-                document.addEventListener('click', function(e){
-                    var t = e.target;
-                    if(t && t.classList && t.classList.contains('show-cancel-reason')){
-                        var reason = t.getAttribute('data-reason') || '';
-                        var txt = document.getElementById('cancelReasonText');
-                        if(txt) txt.textContent = reason;
-                        // Try using jQuery/Bootstrap modal if available
-                        if (typeof jQuery !== 'undefined' && typeof jQuery('#cancelReasonModal').modal === 'function') {
-                            jQuery('#cancelReasonModal').modal('show');
-                        } else {
-                            // Fallback: make the modal visible (simple)
-                            var m = document.getElementById('cancelReasonModal');
-                            if(m) m.style.display = 'block';
-                        }
+    </div>
+
+    <script src="vendors/js/vendor.bundle.base.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('newAppointmentModal');
+            const openBtn = document.getElementById('newAppointmentBtn');
+            const closeBtn = modal.querySelector('.close-button');
+            const cancelBtn = modal.querySelector('.btn-cancel');
+
+            function openModal() {
+                modal.style.display = 'flex';
+            }
+
+            function closeModal() {
+                modal.style.display = 'none';
+            }
+
+            if (openBtn) {
+                openBtn.addEventListener('click', openModal);
+            }
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeModal);
+            }
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', closeModal);
+            }
+
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            const form = document.getElementById('appointmentForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    if (!form.checkValidity()) {
+                        e.preventDefault();
+                        alert('Please fill out all required fields.');
                     }
-                }, false);
-            })();
-        </script>
+                });
+            }
+        });
+    </script>
 </body>
+
 </html>
-<?php } ?>
+<?php ?>

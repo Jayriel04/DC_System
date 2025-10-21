@@ -308,9 +308,11 @@ body {
 
 .medical-history-table th,
 .medical-history-table td {
-    padding: 1rem;
+    padding: 1rem 0.5rem;
     text-align: left;
     border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+    word-break: break-word;
 }
 
 .medical-history-table thead th {
@@ -321,6 +323,12 @@ body {
 
 .medical-history-table tbody tr:hover {
     background-color: #f1f3f5;
+}
+
+.medical-history-table tbody td:first-child {
+    font-weight: 600;
+    color: #495057;
+    width: 150px; /* Adjust width as needed */
 }
 
 .card {

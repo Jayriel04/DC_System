@@ -6,248 +6,351 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
-    // Initialize search and filter variables
-    $search = '';
-    $status_filter = '';
+    // Handle new appointment and patient creation from modal
+    if (isset($_POST['schedule_appointment'])) {
+        $dbh->beginTransaction();
+        try {
+            // 1. Create new patient
+            $firstname = $_POST['firstname'];
+            $surname = $_POST['surname'];
+            $dob = $_POST['date_of_birth'];
+            $sex = $_POST['sex'];
+            $civil_status = $_POST['civil_status'];
+            $occupation = $_POST['occupation'];
+            $contact_number = $_POST['contact_number'];
+            $address = $_POST['address'];
+            $email = $_POST['email'];
+            $password = md5('password'); // Default password
 
-    // Handle the search and status filter
-    if (isset($_POST['search'])) {
-        $search = $_POST['search'];
-    }
-    if (isset($_POST['status_filter'])) {
-        $status_filter = $_POST['status_filter'];
-    }
+            // Auto-generate a unique username
+            $base_username = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $firstname . $surname));
+            $username = $base_username;
+            $counter = 1;
+            while($dbh->query("SELECT COUNT(*) FROM tblpatient WHERE username = '$username'")->fetchColumn() > 0) {
+                $username = $base_username . $counter++;
+            }
 
-    // Handle status change from admin
-    if (isset($_POST['appt_id']) && isset($_POST['new_status'])) {
-        $apptId = intval($_POST['appt_id']);
-        $newStatus = trim($_POST['new_status']);
-        $allowed = ['Pending', 'Approved', 'Declined'];
-        if (in_array($newStatus, $allowed, true)) {
-            $sqlUp = "UPDATE tblappointment SET status = :st WHERE id = :id";
-            $qUp = $dbh->prepare($sqlUp);
-            $qUp->bindParam(':st', $newStatus, PDO::PARAM_STR);
-            $qUp->bindParam(':id', $apptId, PDO::PARAM_INT);
-            $qUp->execute();
+            $age = '';
+            if (!empty($dob)) {
+                $birthDate = new DateTime($dob);
+                $today = new DateTime();
+                $age = $today->diff($birthDate)->y;
+            }
+
+            $sql_patient = "INSERT INTO tblpatient (firstname, surname, date_of_birth, sex, status, occupation, age, contact_number, address, email, username, password, created_at) VALUES (:fname, :sname, :dob, :sex, :status, :occupation, :age, :contact, :address, :email, :uname, :password, NOW())";
+            $query_patient = $dbh->prepare($sql_patient);
+            $query_patient->execute([':fname' => $firstname, ':sname' => $surname, ':dob' => $dob, ':sex' => $sex, ':status' => $civil_status, ':occupation' => $occupation, ':age' => $age, ':contact' => $contact_number, ':address' => $address, ':email' => $email, ':uname' => $username, ':password' => $password]);
+            $patient_id = $dbh->lastInsertId();
+
+            // 2. Create new appointment
+            $app_date = $_POST['date'];
+            $start_time = $_POST['start_time'];
+            $end_time = $_POST['end_time'];
+            $app_status = 'walkin'; // Set default status to walk-in
+
+            $sql_appointment = "INSERT INTO tblappointment (patient_number, firstname, surname, date, start_time, end_time, status) VALUES (:pnum, :fname, :sname, :app_date, :start_time, :end_time, :status)";
+            $query_appointment = $dbh->prepare($sql_appointment);
+            $query_appointment->execute([':pnum' => $patient_id, ':fname' => $firstname, ':sname' => $surname, ':app_date' => $app_date, ':start_time' => $start_time, ':end_time' => $end_time, ':status' => $app_status]);
+
+            $dbh->commit();
+            echo "<script>alert('New patient and appointment scheduled successfully.'); window.location.href='mac.php';</script>";
+        } catch (Exception $e) {
+            $dbh->rollBack();
+            echo "<script>alert('An error occurred: " . $e->getMessage() . "');</script>";
         }
-        header('Location: manage-appointment.php');
-        exit();
     }
 
-    // Code for deletion
-    if (isset($_GET['delid'])) {
-        $rid = intval($_GET['delid']);
-        $sql = "DELETE FROM tblappointment WHERE id = :rid";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':rid', $rid, PDO::PARAM_STR);
-        $query->execute();
-    echo "<script>alert('Data deleted');</script>";
-    echo "<script>window.location.href = 'manage-appointment.php'</script>";
+    $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
+    // --- APPOINTMENT COUNTS ---
+    $sql_all = "SELECT COUNT(*) FROM tblappointment";
+    $query_all = $dbh->prepare($sql_all);
+    $query_all->execute();
+    $count_all = $query_all->fetchColumn();
+
+    $sql_today = "SELECT COUNT(*) FROM tblappointment WHERE date = CURDATE()";
+    $query_today = $dbh->prepare($sql_today);
+    $query_today->execute();
+    $count_today = $query_today->fetchColumn();
+
+    $sql_upcoming = "SELECT COUNT(*) FROM tblappointment WHERE date > CURDATE()";
+    $query_upcoming = $dbh->prepare($sql_upcoming);
+    $query_upcoming->execute();
+    $count_upcoming = $query_upcoming->fetchColumn();
+
+    $sql_pending = "SELECT COUNT(*) FROM tblappointment WHERE status = 'Pending'";
+    $query_pending = $dbh->prepare($sql_pending);
+    $query_pending->execute();
+    $count_pending = $query_pending->fetchColumn();
+
+    // 'Completed' is considered as appointments with status 'Approved' or 'walk-in' that are in the past.
+    $sql_completed = "SELECT COUNT(*) FROM tblappointment WHERE date < CURDATE() AND status IN ('Approved', 'walk-in')";
+    $query_completed = $dbh->prepare($sql_completed);
+    $query_completed->execute();
+    $count_completed = $query_completed->fetchColumn();
+
+    // --- APPOINTMENT LIST ---
+    $sql_appointments = "SELECT * FROM tblappointment";
+    $where_clauses = [];
+
+    switch ($filter) {
+        case 'today':
+            $where_clauses[] = "date = CURDATE()";
+            break;
+        case 'upcoming':
+            $where_clauses[] = "date > CURDATE()";
+            break;
+        case 'pending':
+            $where_clauses[] = "status = 'Pending'";
+            break;
+        case 'completed':
+            $where_clauses[] = "date < CURDATE() AND status IN ('Approved', 'walk-in')";
+            break;
     }
-    
+
+    if (!empty($where_clauses)) {
+        $sql_appointments .= " WHERE " . implode(' AND ', $where_clauses);
+    }
+
+    $sql_appointments .= " ORDER BY date DESC, start_time DESC";
+    $query_appointments = $dbh->prepare($sql_appointments);
+    $query_appointments->execute();
+    $appointments = $query_appointments->fetchAll(PDO::FETCH_OBJ);
+
+    // Helper to format time
+    function format_time_12hr($time_24hr)
+    {
+        if (empty($time_24hr))
+            return 'N/A';
+        return date("g:i A", strtotime($time_24hr));
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <title>Appointments</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Appointments & Patients</title>
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-    <link rel="stylesheet" href="vendors/daterangepicker/daterangepicker.css">
-    <link rel="stylesheet" href="vendors/chartist/chartist.min.css">
     <link rel="stylesheet" href="css/style.css">
-    <script>
-        function autoSubmit() {
-            document.getElementById("filterForm").submit();
-        }
-    </script>
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/dashboard.css">
 </head>
-
 <body>
-    <div class="container-scroller">
-        <?php include_once('includes/header.php'); ?>
-        <div class="container-fluid page-body-wrapper">
-            <?php include_once('includes/sidebar.php'); ?>
-            <div class="main-panel">
-                <div class="content-wrapper">
-                    <div class="page-header">
-                        <h3 class="page-title">Manage Appointments</h3>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 grid-margin stretch-card">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="d-sm-flex align-items-center mb-4">
-                                        <!-- <a href="add-appointment.php" class="btn btn-primary ml-auto mb-3 mb-sm-0">Add Appointment</a> -->
-                                    </div>
-                                    <form method="POST" class="form-inline mb-4" id="filterForm">
-                                        <div class="form-group mr-3">
-                                            <input type="text" class="form-control" name="search" id="searchInput" placeholder="Search by First Name or Surname" value="<?php echo htmlentities($search); ?>">
-                                            <script>
-                                            document.getElementById('searchInput').addEventListener('input', function(e) {
-                                                let val = e.target.value;
-                                                if (val.length > 0) {
-                                                    e.target.value = val.charAt(0).toUpperCase() + val.slice(1);
-                                                }
-                                            });
-                                            </script>
-                                        </div>
-                                        <div class="form-group mr-3">
-                                            <select class="form-control" name="status_filter" onchange="autoSubmit()">
-                                                <option value="">All Statuses</option>
-                                                <option value="Pending" <?php if ($status_filter == "Pending") echo 'selected'; ?>>Pending</option>
-                                                <option value="Approved" <?php if ($status_filter == "Approved") echo 'selected'; ?>>Approved</option>
-                                                <option value="Declined" <?php if ($status_filter == "Declined") echo 'selected'; ?>>Declined</option>
-                                            </select>
-                                        </div>
-                                    </form>
+<div class="container-scroller">
+    <?php include_once('includes/header.php'); ?>
+    <div class="container-fluid page-body-wrapper">
+        <?php include_once('includes/sidebar.php'); ?>
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div class="container">
 
-                                    <div class="table-responsive border rounded p-1">
-                                        <?php
-                                        // Helper to format a time string (HH:MM:SS or HH:MM) to 12-hour format
-                                        function time12_single($t) {
-                                            if (empty($t)) return '';
-                                            $ts = strtotime($t);
-                                            if ($ts === false) return $t;
-                                            return date('g:i A', $ts);
-                                        }
-
-                                        // Helper to format a start and optional end time into a range string
-                                        function time_range($start, $end) {
-                                            // prefer start_time; if not present, fall back to legacy `time` value
-                                            $s = isset($start) ? $start : '';
-                                            $e = isset($end) ? $end : '';
-                                            if (empty($s) && empty($e)) return '-';
-                                            $s_formatted = time12_single($s);
-                                            $e_formatted = time12_single($e);
-                                            if (!empty($s_formatted) && !empty($e_formatted)) {
-                                                return $s_formatted . ' - ' . $e_formatted;
-                                            }
-                                            if (!empty($s_formatted)) return $s_formatted;
-                                            if (!empty($e_formatted)) return $e_formatted;
-                                            return '-';
-                                        }
-
-                                        ?>
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th class="font-weight-bold">No</th>
-                                                    <th class="font-weight-bold">First Name</th>
-                                                    <th class="font-weight-bold">Surname</th>
-                                                    <th class="font-weight-bold">Date</th>
-                                                    <th class="font-weight-bold">Start Time</th>
-                                                    <th class="font-weight-bold">End Time</th>
-                                                    <th class="font-weight-bold">Status</th>
-                                                    <th class="font-weight-bold">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php
-                                                if (isset($_GET['page_no']) && $_GET['page_no'] != "") {
-                                                    $page_no = $_GET['page_no'];
-                                                } else {
-                                                    $page_no = 1;
-                                                }
-
-                                                $total_records_per_page = 10;
-                                                $offset = ($page_no - 1) * $total_records_per_page;
-
-                                                // Build the query based on search and status filter
-                                                $sql = "SELECT * FROM tblappointment WHERE 1=1";
-                                                if ($search) {
-                                                    $sql .= " AND (firstname LIKE :search OR surname LIKE :search)";
-                                                }
-                                                if ($status_filter) {
-                                                    $sql .= " AND status = :status_filter";
-                                                }
-                                                $sql .= " LIMIT $offset, $total_records_per_page";
-
-                                                $query = $dbh->prepare($sql);
-                                                if ($search) {
-                                                    $like_search = "%$search%";
-                                                    $query->bindParam(':search', $like_search, PDO::PARAM_STR);
-                                                }
-                                                if ($status_filter) {
-                                                    $query->bindParam(':status_filter', $status_filter, PDO::PARAM_STR);
-                                                }
-                                                $query->execute();
-                                                $results = $query->fetchAll(PDO::FETCH_OBJ);
-
-                                                // Get total rows for pagination
-                                                $ret = "SELECT id FROM tblappointment WHERE 1=1";
-                                                if ($search) {
-                                                    $ret .= " AND (firstname LIKE :search OR surname LIKE :search)";
-                                                }
-                                                if ($status_filter) {
-                                                    $ret .= " AND status = :status_filter";
-                                                }
-                                                $query1 = $dbh->prepare($ret);
-                                                if ($search) {
-                                                    $query1->bindParam(':search', $like_search, PDO::PARAM_STR);
-                                                }
-                                                if ($status_filter) {
-                                                    $query1->bindParam(':status_filter', $status_filter, PDO::PARAM_STR);
-                                                }
-                                                $query1->execute();
-                                                $total_rows = $query1->rowCount();
-                                                $total_pages = ceil($total_rows / $total_records_per_page);
-
-                                                $cnt = 1;
-                                                if ($query->rowCount() > 0) {
-                                                    foreach ($results as $row) { ?>
-                                                        <tr>
-                                                            <td><?php echo htmlentities($row->id); ?></td>
-                                                            <td><?php echo htmlentities($row->firstname); ?></td>
-                                                            <td><?php echo htmlentities($row->surname); ?></td>
-                                                            <td><?php echo htmlentities($row->date); ?></td>
-                                                            <td><?php echo htmlentities(time12_single(isset($row->start_time) ? $row->start_time : (isset($row->time) ? $row->time : ''))); ?></td>
-                                                            <td><?php echo htmlentities(time12_single(isset($row->end_time) ? $row->end_time : '')); ?></td>
-                                                            <td>
-                                                                <?php
-                                                                $status = htmlentities($row->status);
-                                                                if ($status == "Approved") {
-                                                                    $badge = "badge-success";
-                                                                } elseif ($status == "Declined") {
-                                                                    $badge = "badge-danger";
-                                                                } else {
-                                                                    $badge = "badge-secondary";
-                                                                }
-                                                                ?>
-                                                                <span class="badge <?php echo $badge; ?>"><?php echo $status; ?></span>
-                                                            </td>
-                                                            <td>
-                                                                <div>
-                                                                    <a href="edit-appointment-detail.php?editid=<?php echo htmlentities($row->id); ?>" class="btn btn-info btn-xs">Edit</a>
-                                                                    <a href="manage-appointment.php?delid=<?php echo ($row->id); ?>" onclick="return confirm('Do you really want to Delete ?');" class="btn btn-danger btn-xs">Delete</a>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    <?php $cnt++;
-                                                    }
-                                                } ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    
-                                </div>
+                    <div class="appointment-management-card">
+                        <div class="header-section">
+                            <div class="header-text">
+                                <h1>Manage Appointments</h1>
+                                <p>Schedule and track patient appointments</p>
                             </div>
+                            <button type="button" class="new-appointment-btn" id="newAppointmentBtn">New Appointment</button>
+                        </div>
+
+                        <div class="filter-section">
+                            <div class="search-box">
+                                <input type="text" placeholder="Search appointments by patient name or service..." aria-label="Search appointments">
+                            </div>
+                            <div class="filter-buttons">
+                                <a href="mac.php?filter=all" class="filter-btn <?php if ($filter === 'all') echo 'active'; ?>" data-filter="all">
+                                    All Appointments <span class="filter-count"><?php echo $count_all; ?></span>
+                                </a>
+                                <a href="mac.php?filter=today" class="filter-btn <?php if ($filter === 'today') echo 'active'; ?>" data-filter="today">
+                                    Today <span class="filter-count"><?php echo $count_today; ?></span>
+                                </a>
+                                <a href="mac.php?filter=upcoming" class="filter-btn <?php if ($filter === 'upcoming') echo 'active'; ?>" data-filter="upcoming">
+                                    Upcoming <span class="filter-count"><?php echo $count_upcoming; ?></span>
+                                </a>
+                                <a href="mac.php?filter=pending" class="filter-btn <?php if ($filter === 'pending') echo 'active'; ?>" data-filter="pending">
+                                    Pending <span class="filter-count"><?php echo $count_pending; ?></span>
+                                </a>
+                                <a href="mac.php?filter=completed" class="filter-btn <?php if ($filter === 'completed') echo 'active'; ?>" data-filter="completed">
+                                    Completed <span class="filter-count"><?php echo $count_completed; ?></span>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 0;">
+
+                    <div class="patient-list-card" id="appointment-table-container">
+                        <h2 class="section-title">Consultation Appointments (<?php echo count($appointments); ?>)</h2>
+                        <table class="patient-table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>First Name</th>
+                                    <th>Surname</th>
+                                    <th>Date</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (count($appointments) > 0): ?>
+                                    <?php foreach ($appointments as $appointment): ?>
+                                        <tr>
+                                            <td><?php echo htmlentities($appointment->id); ?></td>
+                                            <td><?php echo htmlentities($appointment->firstname); ?></td>
+                                            <td><?php echo htmlentities($appointment->surname); ?></td>
+                                            <td><?php echo htmlentities($appointment->date); ?></td>
+                                            <td><?php echo format_time_12hr($appointment->start_time); ?></td>
+                                            <td><?php echo format_time_12hr($appointment->end_time); ?></td>
+                                            <td><span class="status-badge status-<?php echo strtolower(htmlentities($appointment->status)); ?>"><?php echo htmlentities($appointment->status); ?></span></td>
+                                            <td class="actions-icons">
+                                                <a href="edit-mas.php?editid=<?php echo $appointment->id; ?>" title="Edit">✏️</a>
+                                                <a href="mas.php?delid=<?php echo $appointment->id; ?>" title="Delete" onclick="return confirm('Do you really want to Delete ?');">🗑️</a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="6" style="text-align: center;">No patients found.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <?php include_once('includes/footer.php'); ?>
+        </div>
+    </div>
+</div>
+
+<!-- New Appointment Modal -->
+<div id="newAppointmentModal" class="modal-container" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>New Appointment</h2>
+            <button class="close-button">&times;</button>
+        </div>
+        <form id="appointmentForm" method="POST">
+            <div class="modal-body">
+                <h3 class="form-section-title">Patient Details</h3>
+                <div class="form-row">
+                    <div class="form-group"><label for="firstname">First Name</label><input type="text" id="firstname" name="firstname" required></div>
+                    <div class="form-group"><label for="surname">Surname</label><input type="text" id="surname" name="surname" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="date_of_birth">Date of Birth</label><input type="date" id="date_of_birth" name="date_of_birth" required></div>
+                    <div class="form-group">
+                        <label for="sex">Sex</label>
+                        <select id="sex" name="sex" required>
+                            <option value="">Select Sex</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="civil_status">Civil Status</label><input type="text" id="civil_status" name="civil_status"></div>
+                    <div class="form-group"><label for="occupation">Occupation</label><input type="text" id="occupation" name="occupation"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="contact_number">Phone Number</label><input type="tel" id="contact_number" name="contact_number" required></div>
+                    <div class="form-group"><label for="email">Email Address</label><input type="email" id="email" name="email"></div>
+                </div>
+                <div class="form-group"><label for="address">Address</label><textarea id="address" name="address" rows="2"></textarea></div>
+
+                <hr class="form-divider">
+
+                <h3 class="form-section-title">Appointment Details</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <div class="input-with-icon">
+                            <input type="date" id="date" name="date" required>
+                            <i class="fas fa-calendar-alt input-icon"></i>
                         </div>
                     </div>
                 </div>
-                <?php include_once('includes/footer.php'); ?>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="start_time">Start Time</label>
+                        <div class="input-with-icon">
+                            <input type="time" id="start_time" name="start_time" required>
+                            <i class="fas fa-clock input-icon"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="end_time">End Time</label>
+                        <div class="input-with-icon">
+                            <input type="time" id="end_time" name="end_time" required>
+                            <i class="fas fa-clock input-icon"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel">Cancel</button>
+                <button type="submit" name="schedule_appointment" class="btn btn-schedule">Schedule Appointment</button>
+            </div>
+        </form>
     </div>
-    <script src="vendors/js/vendor.bundle.base.js"></script>
-    <script src="vendors/chart.js/Chart.min.js"></script>
-    <script src="vendors/moment/moment.min.js"></script>
-    <script src="vendors/daterangepicker/daterangepicker.js"></script>
-    <script src="vendors/chartist/chartist.min.js"></script>
-    <script src="js/off-canvas.js"></script>
-    <script src="js/misc.js"></script>
-    <script src="js/dashboard.js"></script>
+</div>
+
+<script src="vendors/js/vendor.bundle.base.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('newAppointmentModal');
+    const openBtn = document.getElementById('newAppointmentBtn');
+    const closeBtn = modal.querySelector('.close-button');
+    const cancelBtn = modal.querySelector('.btn-cancel');
+
+    function openModal() {
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+    }
+
+    if (openBtn) {
+        openBtn.addEventListener('click', openModal);
+    }
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
+    }
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeModal);
+    }
+
+    // Close modal if clicking outside of the modal content
+    window.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    // Form validation
+    const form = document.getElementById('appointmentForm');
+    if(form) {
+        form.addEventListener('submit', function(e) {
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                // Modern browsers will show their own validation messages.
+                // For older ones, you might add custom logic here.
+                alert('Please fill out all required fields.');
+            }
+        });
+    }
+});
+</script>
+
 </body>
 </html>
-<?php } ?>
+<?php ?>

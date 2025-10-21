@@ -1,83 +1,142 @@
-<nav class="sidebar" id="sidebar">
-  <ul class="nav">
-    <li class="nav-item nav-profile">
-      <a href="#" class="nav-link">
-        <div class="profile-image">
-          <img class="img-xs rounded-circle" src="images/faces/face8.jpg" alt="profile image">
-          <div class="dot-indicator bg-success"></div>
-        </div>
-        <div class="text-wrapper">
-          <?php
-          $aid = $_SESSION['sturecmsaid'];
-          $sql = "SELECT * from tbladmin where ID=:aid";
+<aside class="sidebar" id="sidebar">
+    <ul class="nav">
+        <li class="nav-item" data-page="dashboard.php">
+            <a class="nav-link" href="dashboard.php">
+                <span class="nav-icon"><i class="fas fa-th-large"></i></span>
+                <span class="menu-title">Dashboard</span>
+            </a>
+        </li>
 
-          $query = $dbh->prepare($sql);
-          $query->bindParam(':aid', $aid, PDO::PARAM_STR);
-          $query->execute();
-          $results = $query->fetchAll(PDO::FETCH_OBJ);
+        <li class="nav-item has-submenu" data-page="all-appointment.php new-appointment.php add-appointment.php mac.php mas.php">
+            <a class="nav-link" href="#">
+                <span class="nav-icon"><i class="far fa-calendar-alt"></i></span>
+                <span class="menu-title">Appointments</span>
+                <i class="fas fa-chevron-down menu-arrow"></i>
+            </a>
+            <div class="submenu">
+                <ul class="submenu-item">
+                    <li><a class="nav-link" href="mac.php"><i class="fas fa-notes-medical"></i>Consultation</a></li>
+                    <li><a class="nav-link" href="mas.php"><i class="fas fa-briefcase-medical"></i>Services</a></li>
+                </ul>
+            </div>
+        </li>
 
-          $cnt = 1;
-          if ($query->rowCount() > 0) {
-            foreach ($results as $row) { ?>
-              <p class="profile-name"><?php echo htmlentities($row->AdminName); ?></p>
-              <p class="designation"><?php echo htmlentities($row->Email); ?></p><?php $cnt = $cnt + 1;
+        <li class="nav-item" data-page="manage-patient.php add-patient.php edit-patient-detail.php">
+            <a class="nav-link" href="manage-patient.php">
+                <span class="nav-icon"><i class="fas fa-user-injured"></i></span>
+                <span class="menu-title">Patients</span>
+            </a>
+        </li>
+
+        <li class="nav-item" data-page="manage-service.php">
+            <a class="nav-link" href="manage-service.php">
+                <span class="nav-icon"><i class="fas fa-heartbeat"></i></span>
+                <span class="menu-title">Services</span>
+            </a>
+        </li>
+
+        <li class="nav-item" data-page="calendar.php">
+            <a class="nav-link" href="calendar.php">
+                <span class="nav-icon"><i class="fas fa-calendar"></i></span>
+                <span class="menu-title">Calendar</span>
+            </a>
+        </li>
+    </ul>
+</aside>
+
+<style>
+    .sidebar .nav-item .submenu {
+        display: none;
+        padding-left: 2.5rem; /* Indent submenu items */
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
+    }
+
+    .sidebar .nav-item.active .submenu {
+        display: block;
+        max-height: 200px; /* Adjust as needed */
+    }
+
+    .sidebar .nav-item .submenu-item {
+        list-style: none;
+        padding: 0;
+    }
+
+    .sidebar .nav-item .submenu-item li a {
+        padding: 0.5rem 0;
+        display: block;
+        color: #adb5bd; /* Lighter color for submenu items */
+        font-size: 0.875rem;
+        position: relative;
+    }
+
+    .sidebar .nav-item .submenu-item li a i {
+        width: 20px;
+        text-align: center;
+        margin-right: 0.5rem;
+        color: #8898aa;
+    }
+
+    .sidebar .nav-item .submenu-item li a:hover {
+        color: #fff;
+    }
+
+    .sidebar .nav-item .nav-link .menu-arrow {
+        margin-left: auto;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar .nav-item.active > .nav-link .menu-arrow {
+        transform: rotate(180deg);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentPage = "<?php echo basename($_SERVER['PHP_SELF']); ?>";
+        const navItems = document.querySelectorAll('.sidebar .nav-item');
+
+        // Function to open a submenu
+        function openSubmenu(submenu) {
+            if (submenu) {
+                submenu.style.maxHeight = submenu.scrollHeight + "px";
             }
-          } ?>
-        </div>
+        }
 
-      </a>
-    </li>
-    <br>
-    <br>
-    <br>
-    <li class="nav-item">
-      <a class="nav-link" href="dashboard.php">
-        <span class="menu-title">Dashboard</span>
-        <i class="icon-home menu-icon"></i>
-      </a>
-    </li>
+        // Function to close a submenu
+        function closeSubmenu(submenu) {
+            if (submenu) {
+                submenu.style.maxHeight = '0';
+            }
+        }
 
-    <li class="nav-item">
-      <a class="nav-link" data-toggle="collapse" href="#ui-basic-staff" aria-expanded="false"
-        aria-controls="ui-basic-staff">
-        <span class="menu-title">Apointment</span>
-        <i class="icon-clock menu-icon"></i>
-      </a>
-      <div class="collapse" id="ui-basic-staff">
-        <ul class="nav flex-column sub-menu">
-          <li class="nav-item"><a class="nav-link" href="mac.php">Consulation</a></li>
-          <li class="nav-item"><a class="nav-link" href="mas.php">Service</a></li>
-        </ul>
-      </div>
-    </li>
+        // Set active state for the current page
+        navItems.forEach(item => {
+            const pages = item.getAttribute('data-page');
+            if (pages && pages.split(' ').includes(currentPage)) {
+                item.classList.add('active');
+                // If the active item is in a submenu, also open the submenu
+                if (item.closest('.submenu')) {
+                    const parentLi = item.closest('.has-submenu');
+                    if (parentLi) {
+                        parentLi.classList.add('active');
+                        openSubmenu(parentLi.querySelector('.submenu'));
+                    }
+                } else if (item.classList.contains('has-submenu')) {
+                    openSubmenu(item.querySelector('.submenu'));
+                }
+            }
+        });
 
-    <li class="nav-item">
-      <a class="nav-link" href="manage-inventory.php">
-        <span class="menu-title">Inventory</span>
-        <i class="icon-layers menu-icon"></i>
-      </a>
-    </li>
-
-    <li class="nav-item">
-      <a class="nav-link" href="manage-patient.php">
-        <span class="menu-title">Patient</span>
-        <i class="icon-notebook menu-icon"></i>
-      </a>
-    </li>
-
-    <li class="nav-item">
-      <a class="nav-link" href="manage-service.php">
-        <span class="menu-title">Service</span>
-        <i class="icon-star menu-icon"></i>
-      </a>
-    </li>
-
-    <li class="nav-item">
-      <a class="nav-link" href="calendar.php">
-        <span class="menu-title">Calendar</span>
-        <i class="icon-calendar menu-icon"></i>
-      </a>
-    </li>
-    </li>
-  </ul>
-</nav> 
+        // Dropdown functionality
+        const submenuLinks = document.querySelectorAll('.sidebar .nav-item.has-submenu > a');
+        submenuLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+                const parentLi = this.closest('.has-submenu');
+                parentLi.classList.toggle('active');
+            });
+        });
+    });
+</script>

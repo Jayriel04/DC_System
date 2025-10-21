@@ -11,7 +11,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     // Handle form submission for updating medical history
     if (isset($_POST['update_medical_history'])) {
         $health_conditions_data = isset($_POST['health_conditions']) && is_array($_POST['health_conditions']) ? $_POST['health_conditions'] : [];
-        
+
         // Ensure all categories are present, even if empty, to overwrite old data
         $all_categories = ['general', 'liver', 'diabetes', 'thyroid', 'urinary', 'nervous', 'blood', 'respiratory', 'liver_specify'];
         foreach ($all_categories as $cat) {
@@ -74,7 +74,18 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $updateSql = "UPDATE tblpatient SET firstname=:firstname, surname=:surname, date_of_birth=:dob, sex=:sex, status=:status, occupation=:occupation, age=:age, contact_number=:contact, address=:address, username=:uname, image=:image WHERE number=:number";
         $updateQuery = $dbh->prepare($updateSql);
         $updateQuery->execute([
-            ':firstname' => $firstname, ':surname' => $surname, ':dob' => $date_of_birth, ':sex' => $sex, ':status' => $status, ':occupation' => $occupation, ':age' => $age, ':contact' => $contact_number, ':address' => $address, ':uname' => $username, ':image' => $image_to_update, ':number' => $patient_number
+            ':firstname' => $firstname,
+            ':surname' => $surname,
+            ':dob' => $date_of_birth,
+            ':sex' => $sex,
+            ':status' => $status,
+            ':occupation' => $occupation,
+            ':age' => $age,
+            ':contact' => $contact_number,
+            ':address' => $address,
+            ':uname' => $username,
+            ':image' => $image_to_update,
+            ':number' => $patient_number
         ]);
 
         // Redirect to the profile page to show the updated data
@@ -118,7 +129,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $sqlChk = "SELECT COUNT(*) FROM tblappointment WHERE patient_number = :pn AND `date` = :dt AND `start_time` = :tm";
         $qryChk = $dbh->prepare($sqlChk);
         $qryChk->execute([':pn' => $patient_number, ':dt' => $appointment_date, ':tm' => $appointment_time]);
-        if ((int)$qryChk->fetchColumn() > 0) {
+        if ((int) $qryChk->fetchColumn() > 0) {
             $_SESSION['modal_error'] = 'You already have an appointment at that date and time.';
         } else {
             $firstname = $_SESSION['sturecmsfirstname'] ?? '';
@@ -128,7 +139,12 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
             $sqlIns = "INSERT INTO tblappointment (firstname, surname, date, start_time, patient_number, status) VALUES (:fn, :sn, :dt, :tm, :pn, :st)";
             $qryIns = $dbh->prepare($sqlIns);
             $qryIns->execute([
-                ':fn' => $firstname, ':sn' => $surname, ':dt' => $appointment_date, ':tm' => $appointment_time, ':pn' => $patient_number, ':st' => $status_default
+                ':fn' => $firstname,
+                ':sn' => $surname,
+                ':dt' => $appointment_date,
+                ':tm' => $appointment_time,
+                ':pn' => $patient_number,
+                ':st' => $status_default
             ]);
 
             $_SESSION['modal_success'] = 'Appointment booked successfully.';
@@ -221,7 +237,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <div class="container">
         <?php if ($patient): ?>
             <!-- Patient Header -->
-            <?php 
+            <?php
             if (isset($_SESSION['profile_message'])) {
                 echo '<div class="alert alert-success" style="margin-bottom: 20px;">' . htmlspecialchars($_SESSION['profile_message']) . '</div>';
                 unset($_SESSION['profile_message']);
@@ -230,12 +246,23 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
             <div class="patient-header">
                 <div class="patient-info">
                     <div class="patient-avatar">
-                        <img src="../admin/images/<?php echo !empty($patient->Image) ? htmlentities($patient->Image) : 'avatar.png'; ?>" alt="<?php echo htmlentities($patient->firstname); ?>">
+                        <?php
+                        $profile_avatar = 'avatar.png'; // Default fallback
+                        if (!empty($patient->Image)) {
+                            $profile_avatar = $patient->Image;
+                        } elseif ($patient->sex === 'Male') {
+                            $profile_avatar = 'man-icon.png';
+                        } elseif ($patient->sex === 'Female') {
+                            $profile_avatar = 'woman-icon.jpg';
+                        }
+                        ?>
+                        <img src="../admin/images/<?php echo htmlentities($profile_avatar); ?>" alt="<?php echo htmlentities($patient->firstname); ?>">
                     </div>
                     <div class="patient-details">
-                        <h1 class="patient-name"><?php echo htmlentities($patient->firstname . ' ' . $patient->surname); ?></h1>
+                        <h1 class="patient-name"><?php echo htmlentities($patient->surname . ', ' . $patient->firstname); ?>
+                        </h1>
                         <p class="patient-id">Patient ID: <?php echo htmlentities($patient->number); ?></p>
-                        <span class="status-badge"><?php echo htmlentities($patient->status ?: 'Active'); ?></span>
+                        <span class="status-badge">Active</span>
                     </div>
                 </div>
 
@@ -250,17 +277,18 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                     </div>
                     <div class="contact-item">
                         <span class="contact-label">Date of Birth</span>
-                        <span class="contact-value"><?php echo htmlentities($patient->date_of_birth ? date("F j, Y", strtotime($patient->date_of_birth)) : 'N/A'); ?></span>
+                        <span
+                            class="contact-value"><?php echo htmlentities($patient->date_of_birth ? date("F j, Y", strtotime($patient->date_of_birth)) : 'N/A'); ?></span>
                     </div>
                 </div>
 
                 <div class="action-buttons">
                     <button id="editProfileBtn" class="btn btn-outline">
-                        <i class="fas fa-edit"></i>
+                        📝
                         Edit Profile
                     </button>
                     <button id="bookAppointmentBtn" class="btn btn-primary">
-                        <i class="far fa-calendar-plus"></i>
+                        🗓️
                         Book Appointment
                     </button>
                 </div>
@@ -268,37 +296,27 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
             <!-- Tabs -->
             <div class="tabs" id="profileTabs">
-                <div class="tab active" data-tab-target="#overviewContent">
-                    <i class="fas fa-th-large"></i>
-                    Overview
-                </div>
-                <div class="tab" data-tab-target="#medicalContent">
-                    <i class="far fa-file-alt"></i>
+                
+                <div class="tab active" data-tab-target="#medicalContent">
+                    🩺
                     Medical History
                 </div>
                 <div class="tab" data-tab-target="#appointmentsContent">
-                    <i class="far fa-calendar"></i>
+                    🗓️
                     Appointments
                 </div>
             </div>
 
             <!-- Tab Content Panels -->
             <div class="tab-content-container">
-                <div id="overviewContent" class="tab-pane active">
-                    <div class="card">
-                        <div class="card-body">
-                            <h2 class="card-title">Profile Overview</h2>
-                            <p class="card-subtitle">Welcome to your patient dashboard. Here you can manage your appointments and view your medical records.</p>
-                        </div>
-                    </div>
-                </div>
 
-                <div id="medicalContent" class="tab-pane">
+                <div id="medicalContent" class="tab-pane active">
                     <div class="card">
                         <div class="card-header">
                             <h2 class="card-title" style="margin: 0;">Medical History</h2>
-                            <button id="editMedicalHistoryBtn" class="btn btn-outline" style="padding: 5px 10px; font-size: 14px;">
-                                <i class="fas fa-edit"></i>
+                            <button id="editMedicalHistoryBtn" class="btn btn-outline"
+                                style="padding: 5px 10px; font-size: 14px;">
+                                📝
                                 Edit
                             </button>
                         </div>
@@ -317,14 +335,16 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($health_arr as $category => $conditions): 
-                                                if (empty($conditions)) continue;
+                                            <?php foreach ($health_arr as $category => $conditions):
+                                                if (empty($conditions))
+                                                    continue;
                                                 $display_value = is_array($conditions) ? implode(', ', array_map('htmlspecialchars', $conditions)) : htmlspecialchars($conditions);
-                                            ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $category))); ?></td>
-                                                <td><?php echo $display_value; ?></td>
-                                            </tr>
+                                                ?>
+                                                <tr>
+                                                    <td><?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $category))); ?>
+                                                    </td>
+                                                    <td><?php echo $display_value; ?></td>
+                                                </tr>
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
@@ -347,9 +367,10 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                                         <div class="appointment-item">
                                             <div class="appointment-header">
                                                 <div class="appointment-status">
-                                                    <span class="status-tag <?php echo strtolower(htmlentities($appt['status'])); ?>"><?php echo htmlentities($appt['status']); ?></span>
+                                                    <span
+                                                        class="status-tag <?php echo strtolower(htmlentities($appt['status'])); ?>"><?php echo htmlentities($appt['status']); ?></span>
                                                     <div class="appointment-datetime">
-                                                        <i class="far fa-calendar"></i>
+                                                        📅
                                                         <?php echo date("F j, Y", strtotime($appt['date'])) . ' at ' . format_time_12hr($appt['start_time']); ?>
                                                     </div>
                                                 </div>
@@ -374,14 +395,16 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                                         <div class="appointment-item">
                                             <div class="appointment-header">
                                                 <div class="appointment-status">
-                                                    <span class="status-tag <?php echo strtolower(htmlentities($schedule['sched_status'])); ?>"><?php echo htmlentities($schedule['sched_status']); ?></span>
+                                                    <span
+                                                        class="status-tag <?php echo strtolower(htmlentities($schedule['sched_status'])); ?>"><?php echo htmlentities($schedule['sched_status']); ?></span>
                                                     <div class="appointment-datetime">
-                                                        <i class="far fa-calendar"></i>
+                                                        📅
                                                         <?php echo date("F j, Y", strtotime($schedule['date'])) . ' at ' . format_time_12hr($schedule['time']); ?>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="appointment-title"><?php echo htmlentities($schedule['service_name'] ?: 'Dental Service'); ?></div>
+                                            <div class="appointment-title">
+                                                <?php echo htmlentities($schedule['service_name'] ?: 'Dental Service'); ?></div>
                                         </div>
                                     <?php endforeach; ?>
                                 <?php else: ?>
@@ -397,12 +420,6 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 Could not load patient profile. Please try logging in again.
             </div>
         <?php endif; ?>
-    </div>
-
-    <!-- Chat Button -->
-    <div class="chat-button">
-        <i class="fas fa-headset chat-icon"></i>
-        Talk with Us
     </div>
 
     <!-- Book Appointment Modal -->
@@ -422,7 +439,8 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                     ?>
                     <div class="form-group">
                         <label for="appointment_date_modal">Preferred Date</label>
-                        <input type="date" class="form-control" name="appointment_date" id="appointment_date_modal" required>
+                        <input type="date" class="form-control" name="appointment_date" id="appointment_date_modal"
+                            required>
                     </div>
                     <div class="form-group">
                         <label for="appointment_time_modal">Available Times</label>
@@ -430,7 +448,8 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                             <option value="">-- Select a date first --</option>
                         </select>
                     </div>
-                    <div class="modal-footer" style="padding: 15px 0 0 0; border-top: 1px solid #e5e5e5; margin-top: 15px;">
+                    <div class="modal-footer"
+                        style="padding: 15px 0 0 0; border-top: 1px solid #e5e5e5; margin-top: 15px;">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         <button type="submit" name="book_appointment" class="btn btn-primary">Book Now</button>
                     </div>
@@ -448,43 +467,72 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
             </div>
             <div class="modal-body" style="padding: 15px;">
                 <?php if ($patient): ?>
-                <form method="post" action="profile.php" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group"><label>First Name</label><input type="text" class="form-control" name="firstname" value="<?php echo htmlentities($patient->firstname); ?>" required></div>
-                            <div class="form-group"><label>Surname</label><input type="text" class="form-control" name="surname" value="<?php echo htmlentities($patient->surname); ?>" required></div>
-                            <div class="form-group"><label>Username</label><input type="text" class="form-control" name="username" value="<?php echo htmlentities($patient->username); ?>" required></div>
-                            <div class="form-group"><label>Contact Number</label><input type="text" class="form-control" name="contact_number" value="<?php echo htmlentities($patient->contact_number); ?>" required></div>
-                            <div class="form-group"><label>Address</label><textarea class="form-control" name="address" required><?php echo htmlentities($patient->address); ?></textarea></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group"><label>Date of Birth</label><input type="date" class="form-control" name="date_of_birth" value="<?php echo htmlentities($patient->date_of_birth); ?>" required></div>
-                            <div class="form-group">
-                                <label>Sex</label>
-                                <select class="form-control" name="sex" required>
-                                    <option value="">-- Select --</option>
-                                    <option value="Male" <?php if($patient->sex == 'Male') echo 'selected'; ?>>Male</option>
-                                    <option value="Female" <?php if($patient->sex == 'Female') echo 'selected'; ?>>Female</option>
-                                    <option value="Other" <?php if($patient->sex == 'Other') echo 'selected'; ?>>Other</option>
-                                </select>
+                    <form method="post" action="profile.php" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group"><label>First Name</label><input type="text" class="form-control"
+                                        name="firstname" value="<?php echo htmlentities($patient->firstname); ?>" required>
+                                </div>
+                                <div class="form-group"><label>Surname</label><input type="text" class="form-control"
+                                        name="surname" value="<?php echo htmlentities($patient->surname); ?>" required>
+                                </div>
+                                <div class="form-group"><label>Username</label><input type="text" class="form-control"
+                                        name="username" value="<?php echo htmlentities($patient->username); ?>" required>
+                                </div>
+                                <div class="form-group"><label>Contact Number</label><input type="text" class="form-control"
+                                        name="contact_number" value="<?php echo htmlentities($patient->contact_number); ?>"
+                                        required></div>
+                                <div class="form-group"><label>Address</label><textarea class="form-control" name="address"
+                                        required><?php echo htmlentities($patient->address); ?></textarea></div>
                             </div>
-                            <div class="form-group"><label>Civil Status</label><input type="text" class="form-control" name="status" value="<?php echo htmlentities($patient->status); ?>"></div>
-                            <div class="form-group"><label>Occupation</label><input type="text" class="form-control" name="occupation" value="<?php echo htmlentities($patient->occupation); ?>"></div>
-                            <div class="form-group">
-                                <label>Profile Picture</label>
-                                <input type="file" class="form-control" name="image">
-                                <small class="form-text text-muted">Leave blank to keep current image.</small>
-                                <?php if(!empty($patient->Image)): ?>
-                                    <img src="../admin/images/<?php echo htmlentities($patient->Image); ?>" width="50" class="mt-2">
-                                <?php endif; ?>
+                            <div class="col-md-6">
+                                <div class="form-group"><label>Date of Birth</label><input type="date" class="form-control"
+                                        name="date_of_birth" value="<?php echo htmlentities($patient->date_of_birth); ?>"
+                                        required></div>
+                                <div class="form-group">
+                                    <label>Sex</label>
+                                    <select class="form-control" name="sex" required>
+                                        <option value="">-- Select --</option>
+                                        <option value="Male" <?php if ($patient->sex == 'Male')
+                                            echo 'selected'; ?>>Male
+                                        </option>
+                                        <option value="Female" <?php if ($patient->sex == 'Female')
+                                            echo 'selected'; ?>>Female
+                                        </option>
+                                        <option value="Other" <?php if ($patient->sex == 'Other')
+                                            echo 'selected'; ?>>Other
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label>Civil Status</label><input type="text" class="form-control"
+                                        name="status" value="<?php echo htmlentities($patient->status); ?>"></div>
+                                <div class="form-group"><label>Occupation</label><input type="text" class="form-control"
+                                        name="occupation" value="<?php echo htmlentities($patient->occupation); ?>"></div>
+                                <div class="form-group">
+                                    <label>Profile Picture</label>
+                                    <input type="file" class="form-control" name="image">
+                                    <small class="form-text text-muted">Leave blank to keep the current image.</small>
+                                    <?php
+                                    $modal_avatar = 'avatar.png'; // Default fallback
+                                    if (!empty($patient->Image)) {
+                                        $modal_avatar = $patient->Image;
+                                    } elseif ($patient->sex === 'Male') {
+                                        $modal_avatar = 'man-icon.png';
+                                    } elseif ($patient->sex === 'Female') {
+                                        $modal_avatar = 'woman-icon.jpg';
+                                    }
+                                    ?>
+                                        <img src="../admin/images/<?php echo htmlentities($modal_avatar); ?>" width="50"
+                                            class="mt-2">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer" style="padding: 15px 0 0 0; border-top: 1px solid #e5e5e5; margin-top: 15px;">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="submit" name="update_profile" class="btn btn-primary">Save Changes</button>
-                    </div>
-                </form>
+                        <div class="modal-footer"
+                            style="padding: 15px 0 0 0; border-top: 1px solid #e5e5e5; margin-top: 15px;">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="submit" name="update_profile" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
                 <?php else: ?>
                     <p>Could not load profile data.</p>
                 <?php endif; ?>
@@ -506,67 +554,117 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                         <div class="col-md-6 ">
                             <h2 class="section-title">GENERAL</h2>
                             <div class="options">
-                                <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Marked weight change" id="hc_modal_general_1" <?php echo hc_checked('general', 'Marked weight change', $health_arr); ?>><label for="hc_modal_general_1">Marked weight change</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Increase frequency of urination" id="hc_modal_general_2" <?php echo hc_checked('general', 'Increase frequency of urination', $health_arr); ?>><label for="hc_modal_general_2">Increase frequency of urination</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Burning sensation on urination" id="hc_modal_general_3" <?php echo hc_checked('general', 'Burning sensation on urination', $health_arr); ?>><label for="hc_modal_general_3">Burning sensation on urination</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Loss of hearing, ringing of ears" id="hc_modal_general_4" <?php echo hc_checked('general', 'Loss of hearing, ringing of ears', $health_arr); ?>><label for="hc_modal_general_4">Loss of hearing, ringing of ears</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[general][]"
+                                        value="Marked weight change" id="hc_modal_general_1" <?php echo hc_checked('general', 'Marked weight change', $health_arr); ?>><label
+                                        for="hc_modal_general_1">Marked weight change</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[general][]"
+                                        value="Increase frequency of urination" id="hc_modal_general_2" <?php echo hc_checked('general', 'Increase frequency of urination', $health_arr); ?>><label
+                                        for="hc_modal_general_2">Increase frequency of urination</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[general][]"
+                                        value="Burning sensation on urination" id="hc_modal_general_3" <?php echo hc_checked('general', 'Burning sensation on urination', $health_arr); ?>><label
+                                        for="hc_modal_general_3">Burning sensation on urination</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[general][]"
+                                        value="Loss of hearing, ringing of ears" id="hc_modal_general_4" <?php echo hc_checked('general', 'Loss of hearing, ringing of ears', $health_arr); ?>><label for="hc_modal_general_4">Loss of hearing, ringing of ears</label>
+                                </div> 
                             </div>
 
                             <h2 class="section-title mt-3">LIVER</h2>
                             <div class="options">
-                                <div class="option"><input type="checkbox" name="health_conditions[liver][]" value="History of liver ailment" id="hc_modal_liver_1" <?php echo hc_checked('liver', 'History of liver ailment', $health_arr); ?>><label for="hc_modal_liver_1">History of liver ailment</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[liver][]" value="Jaundice" id="hc_modal_liver_2" <?php echo hc_checked('liver', 'Jaundice', $health_arr); ?>><label for="hc_modal_liver_2">Jaundice</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[liver][]"
+                                        value="History of liver ailment" id="hc_modal_liver_1" <?php echo hc_checked('liver', 'History of liver ailment', $health_arr); ?>><label
+                                        for="hc_modal_liver_1">History of liver ailment</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[liver][]"
+                                        value="Jaundice" id="hc_modal_liver_2" <?php echo hc_checked('liver', 'Jaundice', $health_arr); ?>><label for="hc_modal_liver_2">Jaundice</label>
+                                </div>
                             </div>
-                            <div class="form-group mt-2"><label for="liver_specify_modal">Specify:</label><input type="text" class="form-control" name="health_conditions[liver_specify]" id="liver_specify_modal" value="<?php echo hc_text('liver_specify', $health_arr); ?>"></div>
+                            <div class="form-group mt-2"><label for="liver_specify_modal">Specify:</label><input
+                                    type="text" class="form-control" name="health_conditions[liver_specify]"
+                                    id="liver_specify_modal"
+                                    value="<?php echo hc_text('liver_specify', $health_arr); ?>"></div>
 
                             <h2 class="section-title mt-3">DIABETES</h2>
                             <div class="options">
-                                <div class="option"><input type="checkbox" name="health_conditions[diabetes][]" value="Delayed healing of wounds" id="hc_modal_diab_1" <?php echo hc_checked('diabetes', 'Delayed healing of wounds', $health_arr); ?>><label for="hc_modal_diab_1">Delayed healing of wounds</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[diabetes][]" value="Increase intake of food or water" id="hc_modal_diab_2" <?php echo hc_checked('diabetes', 'Increase intake of food or water', $health_arr); ?>><label for="hc_modal_diab_2">Increase intake of food or water</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[diabetes][]" value="Family history of diabetes" id="hc_modal_diab_3" <?php echo hc_checked('diabetes', 'Family history of diabetes', $health_arr); ?>><label for="hc_modal_diab_3">Family history of diabetes</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[diabetes][]"
+                                        value="Delayed healing of wounds" id="hc_modal_diab_1" <?php echo hc_checked('diabetes', 'Delayed healing of wounds', $health_arr); ?>><label
+                                        for="hc_modal_diab_1">Delayed healing of wounds</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[diabetes][]"
+                                        value="Increase intake of food or water" id="hc_modal_diab_2" <?php echo hc_checked('diabetes', 'Increase intake of food or water', $health_arr); ?>><label for="hc_modal_diab_2">Increase intake of food or water</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[diabetes][]"
+                                        value="Family history of diabetes" id="hc_modal_diab_3" <?php echo hc_checked('diabetes', 'Family history of diabetes', $health_arr); ?>><label
+                                        for="hc_modal_diab_3">Family history of diabetes</label></div>
                             </div>
 
                             <h2 class="section-title mt-3">THYROID</h2>
                             <div class="options">
-                                <div class="option"><input type="checkbox" name="health_conditions[thyroid][]" value="Perspire easily" id="hc_modal_thy_1" <?php echo hc_checked('thyroid', 'Perspire easily', $health_arr); ?>><label for="hc_modal_thy_1">Perspire easily</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[thyroid][]" value="Apprehension" id="hc_modal_thy_2" <?php echo hc_checked('thyroid', 'Apprehension', $health_arr); ?>><label for="hc_modal_thy_2">Apprehension</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[thyroid][]" value="Palpation/rapid heart beat" id="hc_modal_thy_3" <?php echo hc_checked('thyroid', 'Palpation/rapid heart beat', $health_arr); ?>><label for="hc_modal_thy_3">Palpation/rapid heart beat</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[thyroid][]" value="Goiter" id="hc_modal_thy_4" <?php echo hc_checked('thyroid', 'Goiter', $health_arr); ?>><label for="hc_modal_thy_4">Goiter</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[thyroid][]" value="Bulging of eyes" id="hc_modal_thy_5" <?php echo hc_checked('thyroid', 'Bulging of eyes', $health_arr); ?>><label for="hc_modal_thy_5">Bulging of eyes</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[thyroid][]"
+                                        value="Perspire easily" id="hc_modal_thy_1" <?php echo hc_checked('thyroid', 'Perspire easily', $health_arr); ?>><label for="hc_modal_thy_1">Perspire
+                                        easily</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[thyroid][]"
+                                        value="Apprehension" id="hc_modal_thy_2" <?php echo hc_checked('thyroid', 'Apprehension', $health_arr); ?>><label
+                                        for="hc_modal_thy_2">Apprehension</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[thyroid][]"
+                                        value="Palpation/rapid heart beat" id="hc_modal_thy_3" <?php echo hc_checked('thyroid', 'Palpation/rapid heart beat', $health_arr); ?>><label
+                                        for="hc_modal_thy_3">Palpation/rapid heart beat</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[thyroid][]"
+                                        value="Goiter" id="hc_modal_thy_4" <?php echo hc_checked('thyroid', 'Goiter', $health_arr); ?>><label for="hc_modal_thy_4">Goiter</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[thyroid][]"
+                                        value="Bulging of eyes" id="hc_modal_thy_5" <?php echo hc_checked('thyroid', 'Bulging of eyes', $health_arr); ?>><label for="hc_modal_thy_5">Bulging of
+                                        eyes</label></div>
                             </div>
                         </div>
                         <div class="col-md-6 ">
                             <h2 class="section-title">URINARY</h2>
                             <div class="options">
-                                <div class="option"><input type="checkbox" name="health_conditions[urinary][]" value="Increase frequency of urination" id="hc_modal_ur_1" <?php echo hc_checked('urinary', 'Increase frequency of urination', $health_arr); ?>><label for="hc_modal_ur_1">Increase frequency of urination</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[urinary][]" value="Burning sensation on urination" id="hc_modal_ur_2" <?php echo hc_checked('urinary', 'Burning sensation on urination', $health_arr); ?>><label for="hc_modal_ur_2">Burning sensation on urination</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[urinary][]"
+                                        value="Increase frequency of urination" id="hc_modal_ur_1" <?php echo hc_checked('urinary', 'Increase frequency of urination', $health_arr); ?>><label
+                                        for="hc_modal_ur_1">Increase frequency of urination</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[urinary][]"
+                                        value="Burning sensation on urination" id="hc_modal_ur_2" <?php echo hc_checked('urinary', 'Burning sensation on urination', $health_arr); ?>><label
+                                        for="hc_modal_ur_2">Burning sensation on urination</label></div>
                             </div>
 
                             <h2 class="section-title mt-3">NERVOUS SYSTEM</h2>
                             <div class="options">
-                                <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Headache" id="hc_modal_nerv_1" <?php echo hc_checked('nervous', 'Headache', $health_arr); ?>><label for="hc_modal_nerv_1">Headache</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Convulsion/epilepsy" id="hc_modal_nerv_2" <?php echo hc_checked('nervous', 'Convulsion/epilepsy', $health_arr); ?>><label for="hc_modal_nerv_2">Convulsion/epilepsy</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Numbness/Tingling" id="hc_modal_nerv_3" <?php echo hc_checked('nervous', 'Numbness/Tingling', $health_arr); ?>><label for="hc_modal_nerv_3">Numbness/Tingling</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Dizziness/Fainting" id="hc_modal_nerv_4" <?php echo hc_checked('nervous', 'Dizziness/Fainting', $health_arr); ?>><label for="hc_modal_nerv_4">Dizziness/Fainting</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[nervous][]"
+                                        value="Headache" id="hc_modal_nerv_1" <?php echo hc_checked('nervous', 'Headache', $health_arr); ?>><label for="hc_modal_nerv_1">Headache</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[nervous][]"
+                                        value="Convulsion/epilepsy" id="hc_modal_nerv_2" <?php echo hc_checked('nervous', 'Convulsion/epilepsy', $health_arr); ?>><label
+                                        for="hc_modal_nerv_2">Convulsion/epilepsy</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[nervous][]"
+                                        value="Numbness/Tingling" id="hc_modal_nerv_3" <?php echo hc_checked('nervous', 'Numbness/Tingling', $health_arr); ?>><label
+                                        for="hc_modal_nerv_3">Numbness/Tingling</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[nervous][]"
+                                        value="Dizziness/Fainting" id="hc_modal_nerv_4" <?php echo hc_checked('nervous', 'Dizziness/Fainting', $health_arr); ?>><label
+                                        for="hc_modal_nerv_4">Dizziness/Fainting</label></div>
                             </div>
 
                             <h2 class="section-title mt-3">BLOOD</h2>
                             <div class="options">
-                                <div class="option"><input type="checkbox" name="health_conditions[blood][]" value="Bruise easily" id="hc_modal_blood_1" <?php echo hc_checked('blood', 'Bruise easily', $health_arr); ?>><label for="hc_modal_blood_1">Bruise easily</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[blood][]" value="Anemia" id="hc_modal_blood_2" <?php echo hc_checked('blood', 'Anemia', $health_arr); ?>><label for="hc_modal_blood_2">Anemia</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[blood][]"
+                                        value="Bruise easily" id="hc_modal_blood_1" <?php echo hc_checked('blood', 'Bruise easily', $health_arr); ?>><label for="hc_modal_blood_1">Bruise
+                                        easily</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[blood][]"
+                                        value="Anemia" id="hc_modal_blood_2" <?php echo hc_checked('blood', 'Anemia', $health_arr); ?>><label for="hc_modal_blood_2">Anemia</label></div>
                             </div>
 
                             <h2 class="section-title mt-3">RESPIRATORY</h2>
                             <div class="options">
-                                <div class="option"><input type="checkbox" name="health_conditions[respiratory][]" value="Persistent cough" id="hc_modal_resp_1" <?php echo hc_checked('respiratory', 'Persistent cough', $health_arr); ?>><label for="hc_modal_resp_1">Persistent cough</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[respiratory][]" value="Difficulty in breathing" id="hc_modal_resp_2" <?php echo hc_checked('respiratory', 'Difficulty in breathing', $health_arr); ?>><label for="hc_modal_resp_2">Difficulty in breathing</label></div>
-                                <div class="option"><input type="checkbox" name="health_conditions[respiratory][]" value="Asthma" id="hc_modal_resp_3" <?php echo hc_checked('respiratory', 'Asthma', $health_arr); ?>><label for="hc_modal_resp_3">Asthma</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[respiratory][]"
+                                        value="Persistent cough" id="hc_modal_resp_1" <?php echo hc_checked('respiratory', 'Persistent cough', $health_arr); ?>><label
+                                        for="hc_modal_resp_1">Persistent cough</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[respiratory][]"
+                                        value="Difficulty in breathing" id="hc_modal_resp_2" <?php echo hc_checked('respiratory', 'Difficulty in breathing', $health_arr); ?>><label
+                                        for="hc_modal_resp_2">Difficulty in breathing</label></div>
+                                <div class="option"><input type="checkbox" name="health_conditions[respiratory][]"
+                                        value="Asthma" id="hc_modal_resp_3" <?php echo hc_checked('respiratory', 'Asthma', $health_arr); ?>><label for="hc_modal_resp_3">Asthma</label></div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer" style="padding: 15px 0 0 0; border-top: 1px solid #e5e5e5; margin-top: 15px;">
+                    <div class="modal-footer"
+                        style="padding: 15px 0 0 0; border-top: 1px solid #e5e5e5; margin-top: 15px;">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="submit" name="update_medical_history" class="btn btn-primary">Save Changes</button>
+                        <button type="submit" name="update_medical_history" class="btn btn-primary">Save
+                            Changes</button>
                     </div>
                 </form>
             </div>
@@ -578,21 +676,58 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <script src="../js/bootstrap.js"></script> <!-- For Bootstrap 3 components -->
     <style>
         /* Add some basic styling for form-check from Bootstrap 4 since it's not in the main CSS */
-        .form-check { position: relative; display: block; padding-left: 1.25rem; }
-        .form-check-input { position: absolute; margin-top: 0.3rem; margin-left: -1.25rem; }
-        .form-check-label { margin-bottom: 0; }
-        .mt-3 { margin-top: 1rem !important; }
-        .modal-body .row { margin-left: -15px; margin-right: -15px; }
-        .modal-body .col-md-6 { padding-left: 15px; padding-right: 15px; }
-        .modal-body .form-group { margin-bottom: 1rem; }
-        .modal-body .form-control { width: 100%; padding: .375rem .75rem; font-size: 1rem; line-height: 1.5; border: 1px solid #ced4da; border-radius: .25rem; }
-        .modal-body label { display: inline-block; margin-bottom: .5rem; }
+        .form-check {
+            position: relative;
+            display: block;
+            padding-left: 1.25rem;
+        }
 
+        .form-check-input {
+            position: absolute;
+            margin-top: 0.3rem;
+            margin-left: -1.25rem;
+        }
+
+        .form-check-label {
+            margin-bottom: 0;
+        }
+
+        .mt-3 {
+            margin-top: 1rem !important;
+        }
+
+        .modal-body .row {
+            margin-left: -15px;
+            margin-right: -15px;
+        }
+
+        .modal-body .col-md-6 {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .modal-body .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal-body .form-control {
+            width: 100%;
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+        }
+
+        .modal-body label {
+            display: inline-block;
+            margin-bottom: .5rem;
+        }
     </style>
 
     <script>
         // Tab switching functionality
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const urlParams = new URLSearchParams(window.location.search);
             const tabToOpen = urlParams.get('tab');
             const tabsContainer = document.getElementById('profileTabs');
@@ -602,7 +737,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
             const contentPanes = document.querySelectorAll('.tab-content-container > .tab-pane');
 
             tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
+                tab.addEventListener('click', function () {
                     tabs.forEach(t => t.classList.remove('active'));
                     this.classList.add('active');
 
@@ -622,7 +757,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
             // Chat button
             const chatButton = document.querySelector('.chat-button');
             if (chatButton) {
-                chatButton.addEventListener('click', function() {
+                chatButton.addEventListener('click', function () {
                     alert('Opening chat support...');
                 });
             }
@@ -638,7 +773,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                     timeSelectModal.innerHTML = '<option value="">-- Select a date first --</option>';
                     return;
                 }
-                
+
                 const url = `profile.php?get_calendar_times=1&date=${encodeURIComponent(date)}`;
                 fetch(url)
                     .then(response => response.json())

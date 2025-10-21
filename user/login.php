@@ -93,7 +93,7 @@ if (isset($_POST['login'])) {
 
                 <form id="login" method="post" name="login">
                     <div class="form-group">
-                        <label for="username">Usernamex</label>
+                        <label for="username">Username</label>
                         <input type="text" class="form-control" id="username" placeholder="Username or email" required="true" name="username" value="<?php if(isset($_COOKIE['user_login'])) { echo $_COOKIE['user_login']; } ?>">
                     </div>
 

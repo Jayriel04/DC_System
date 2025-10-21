@@ -55,7 +55,7 @@ if (isset($_POST['register'])) {
             $password = md5($password_raw);
 
             // Prepare INSERT using only tblpatient columns (email added)
-            $sql = "INSERT INTO tblpatient (firstname, surname, date_of_birth, sex, status, occupation, age, contact_number, address, email, username, password, Image, health_conditions) VALUES (:firstname, :surname, :date_of_birth, :sex, NULL, NULL, :age, :contact_number, :address, :email, :username, :password, NULL, NULL)";
+            $sql = "INSERT INTO tblpatient (firstname, surname, date_of_birth, sex, status, occupation, age, contact_number, address, email, username, password, Image, health_conditions, created_at) VALUES (:firstname, :surname, :date_of_birth, :sex, NULL, NULL, :age, :contact_number, :address, :email, :username, :password, NULL, NULL, NOW())";
             $query = $dbh->prepare($sql);
 
             // Bind values, use PARAM_NULL when appropriate to avoid type errors

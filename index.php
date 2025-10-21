@@ -210,10 +210,10 @@ if (isset($_POST['submit_feedback'])) {
           <ul class="rslides" id="slider">
             <li>
               <h2>Where beautiful</h2>
-              <h2> smiles come to life</h2>
+              <h2> Smiles come to life</h2>
               <p class="hero-description">
                 Experience comprehensive dental care with our advanced patient management system.
-                We provide personalized treatment plans and state-of-the-art dental services
+                We provide personalized treatment plans and state of the art dental services
                 for your optimal oral health. 
               </p>
               <div class="readmore">
