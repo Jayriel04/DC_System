@@ -53,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
 <head>
     <title>Change Password</title>
     <link rel="stylesheet" href="./css/profile.css">
+    <link href="./css/header.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <script type="text/javascript">
@@ -68,13 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
 </head>
 
 <body>
-    <?php include_once(__DIR__ . '/../includes/header.php'); ?>
+    <?php include_once(__DIR__ . './includes/header.php'); ?>
     <div class="auth-container">
         <div class="left-panel">
             <h1 class="hero-title">
                 Secure Your Account
             </h1>
-            <p class="tagline" style="margin-bottom: 60px;">Keep your account safe by using a strong, unique password.</p>
+            <p class="tagline" style="margin-bottom: 60px;">Keep your account safe by using a strong, unique password.
+            </p>
             <div class="illustration">🔑</div>
         </div>
 
@@ -92,21 +94,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
                     <label for="currentpassword">Current Password</label>
                     <div class="input-wrapper">
                         <input type="password" name="currentpassword" id="currentpassword" required="true">
-                        <i class="password-toggle-icon fas fa-eye" onclick="togglePasswordVisibility('currentpassword', this)"></i>
+                        <i class="password-toggle-icon fas fa-eye"
+                            onclick="togglePasswordVisibility('currentpassword', this)"></i>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="newpassword">New Password</label>
                     <div class="input-wrapper">
                         <input type="password" name="newpassword" id="newpassword" required="true">
-                        <i class="password-toggle-icon fas fa-eye" onclick="togglePasswordVisibility('newpassword', this)"></i>
+                        <i class="password-toggle-icon fas fa-eye"
+                            onclick="togglePasswordVisibility('newpassword', this)"></i>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="confirmpassword">Confirm New Password</label>
                     <div class="input-wrapper">
                         <input type="password" name="confirmpassword" id="confirmpassword" required="true">
-                        <i class="password-toggle-icon fas fa-eye" onclick="togglePasswordVisibility('confirmpassword', this)"></i>
+                        <i class="password-toggle-icon fas fa-eye"
+                            onclick="togglePasswordVisibility('confirmpassword', this)"></i>
                     </div>
                 </div>
                 <button type="submit" class="auth-btn" name="submit">Update Password</button>

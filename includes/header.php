@@ -305,7 +305,7 @@ if (!empty($_SESSION)) {
         <div class="logo-container">
 
           <!-- use $base and url-encode the filename to avoid space issues in the URL -->
-          <img src="<?php echo $base; ?>/images/<?php echo rawurlencode('Jf logo.png'); ?>" alt="JF Dental Care Logo"
+          <img src="<?php echo $base; ?>./images/<?php echo rawurlencode('Jf logo.png'); ?>" alt="JF Dental Care Logo"
             class="logo-img" style="height:40px; margin-right:10px;">
           <span class="logo-text">JF DENTAL CARE</span>
         </div>
@@ -315,22 +315,22 @@ if (!empty($_SESSION)) {
       ?>
       <nav class="desktop-nav">
         <?php if ($current == 'index.php'): ?>
-          <a href="#home" class="nav-link scroll">Home</a>
-          <a href="#about" class="nav-link scroll">About Us</a>
-          <a href="#services" class="nav-link scroll">Services</a>
-          <a href="#contact" class="nav-link scroll">Contact Us</a>
+          <a href="/index#home" class="nav-link scroll">Home</a>
+          <a href="/index#about" class="nav-link scroll">About Us</a>
+          <a href="/index#services" class="nav-link scroll">Services</a>
+          <a href="/index#contact" class="nav-link scroll">Contact Us</a>
         <?php else: ?>
-          <a href="<?php echo $base; ?>/index.php#home" class="nav-link">Home</a>
-          <a href="<?php echo $base; ?>/index.php#about" class="nav-link">About Us</a>
-          <a href="<?php echo $base; ?>/index.php#services" class="nav-link">Services</a>
-          <a href="<?php echo $base; ?>/index.php#contact" class="nav-link">Contact Us</a>
+          <a href="<?php echo $base; ?>/index.php#home scroll" class="nav-link">Home</a>
+          <a href="<?php echo $base; ?>/index.php#about scroll" class="nav-link">About Us</a>
+          <a href="<?php echo $base; ?>/index.php#services scroll" class="nav-link">Services</a>
+          <a href="<?php echo $base; ?>/index.php#contact scroll" class="nav-link">Contact Us</a>
         <?php endif; ?>
       </nav>
       <div class="action-buttons">
         <?php if (!$logged_in): ?>
           <!-- Not logged in: show Login / Sign up -->
-          <a href="<?php echo $base; ?>/user/login.php" class="login-btn">LOGIN</a>
-          <a href="<?php echo $base; ?>/user/create_account.php" class="signup-btn">SIGN UP</a>
+          <a href="<?php echo $base; ?>./user/login.php" class="login-btn">LOGIN</a>
+          <a href="<?php echo $base; ?>./user/create_account.php" class="signup-btn">SIGN UP</a>
         <?php else: ?>
           <!-- Logged in: bell with badge (activity) + profile avatar/name + logout -->
           <div class="hdr-icons" style="position:relative;">
@@ -355,7 +355,7 @@ if (!empty($_SESSION)) {
                 <?php
                 $avatar_image = !empty($user_image) ? htmlentities($user_image) : 'avatar.png'; // Fallback if sex is not set
                 ?>
-                <img src="<?php echo $base; ?>/admin/images/<?php echo $avatar_image; ?>" alt="Avatar" class="avatar"
+                <img src="<?php echo $base; ?>./admin/images/<?php echo $avatar_image; ?>" alt="Avatar" class="avatar"
                   style="object-fit: cover;">
                 <div class="profile-text" style="color: black;">
                   <div class="name"><?php echo htmlspecialchars(trim($user_firstname . ' ' . $user_surname)); ?></div>
@@ -365,11 +365,11 @@ if (!empty($_SESSION)) {
               </a>
 
               <div class="profile-dropdown-menu" id="profileDropdownMenu" role="menu">
-                <a href="<?php echo $base; ?>/user/profile.php" role="menuitem"><i class="ri-user-line"></i>My Profile</a>
-                <a href="<?php echo $base; ?>/user/change-password.php" role="menuitem"><i
+                <a href="<?php echo $base; ?>./user/profile.php" role="menuitem"><i class="ri-user-line"></i>My Profile</a>
+                <a href="<?php echo $base; ?>./user/change-password.php" role="menuitem"><i
                     class="ri-lock-password-line"></i>Change Password</a>
                 <div style="height:1px; background:#eee; margin: 6px 0;"></div>
-                <a href="<?php echo $base; ?>/user/logout.php" role="menuitem" style="color: #c0392b;"><i
+                <a href="<?php echo $base; ?>./user/logout.php" role="menuitem" style="color: #c0392b;"><i
                     class="ri-logout-box-r-line"></i>Sign Out</a>
               </div>
             </div>

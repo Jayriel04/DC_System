@@ -228,12 +228,13 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <link rel="stylesheet" href="./vendors/daterangepicker/daterangepicker.css">
     <link rel="stylesheet" href="./vendors/chartist/chartist.min.css">
     <link href="./css/profile.css" rel="stylesheet">
+    <link href="./css/header.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 
 <body>
-    <?php include_once(__DIR__ . '/../includes/header.php'); ?>
+    <?php include_once(__DIR__ . './includes/header.php'); ?>
     <div class="container">
         <?php if ($patient): ?>
             <!-- Patient Header -->
@@ -256,7 +257,8 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                             $profile_avatar = 'woman-icon.jpg';
                         }
                         ?>
-                        <img src="../admin/images/<?php echo htmlentities($profile_avatar); ?>" alt="<?php echo htmlentities($patient->firstname); ?>">
+                        <img src="../admin/images/<?php echo htmlentities($profile_avatar); ?>"
+                            alt="<?php echo htmlentities($patient->firstname); ?>">
                     </div>
                     <div class="patient-details">
                         <h1 class="patient-name"><?php echo htmlentities($patient->surname . ', ' . $patient->firstname); ?>
@@ -296,7 +298,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
             <!-- Tabs -->
             <div class="tabs" id="profileTabs">
-                
+
                 <div class="tab active" data-tab-target="#medicalContent">
                     🩺
                     Medical History
@@ -404,7 +406,8 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                                                 </div>
                                             </div>
                                             <div class="appointment-title">
-                                                <?php echo htmlentities($schedule['service_name'] ?: 'Dental Service'); ?></div>
+                                                <?php echo htmlentities($schedule['service_name'] ?: 'Dental Service'); ?>
+                                            </div>
                                         </div>
                                     <?php endforeach; ?>
                                 <?php else: ?>
@@ -522,8 +525,8 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                                         $modal_avatar = 'woman-icon.jpg';
                                     }
                                     ?>
-                                        <img src="../admin/images/<?php echo htmlentities($modal_avatar); ?>" width="50"
-                                            class="mt-2">
+                                    <img src="../admin/images/<?php echo htmlentities($modal_avatar); ?>" width="50"
+                                        class="mt-2">
                                 </div>
                             </div>
                         </div>
@@ -565,7 +568,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                                         for="hc_modal_general_3">Burning sensation on urination</label></div>
                                 <div class="option"><input type="checkbox" name="health_conditions[general][]"
                                         value="Loss of hearing, ringing of ears" id="hc_modal_general_4" <?php echo hc_checked('general', 'Loss of hearing, ringing of ears', $health_arr); ?>><label for="hc_modal_general_4">Loss of hearing, ringing of ears</label>
-                                </div> 
+                                </div>
                             </div>
 
                             <h2 class="section-title mt-3">LIVER</h2>

@@ -7,20 +7,22 @@ include('includes/dbconnection.php');
 $message = '';
 if(isset($_POST['submit'])) {
   $email = $_POST['email'];
-  // Check if email exists in database
-  $sql = "SELECT id, username FROM tblpatient WHERE username=:email";
+  // Check if email exists in the database
+  $sql = "SELECT id, username FROM tblpatient WHERE email=:email";
   $query = $dbh->prepare($sql);
   $query->bindParam(':email', $email, PDO::PARAM_STR);
   $query->execute();
   if($query->rowCount() > 0) {
-    // Generate temporary password
+    // Generate a temporary password
     $temp_password = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 10);
     $hashed_password = md5($temp_password);
-    // Update password in database
-    $update_sql = "UPDATE tblpatient SET password=:password WHERE username=:email";
+
+    // Update the password in the database
+    $update_sql = "UPDATE tblpatient SET password=:password WHERE email=:email";
     $update_query = $dbh->prepare($update_sql);
     $update_query->bindParam(':password', $hashed_password, PDO::PARAM_STR);
     $update_query->bindParam(':email', $email, PDO::PARAM_STR);
+
     if($update_query->execute()) {
       $message = '<div class="alert alert-success text-center">A temporary password has been generated: <strong>' . $temp_password . '</strong><br>Please login with this password and change it immediately.</div>';
     } else {
@@ -39,7 +41,6 @@ if(isset($_POST['submit'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/login.css">
     <style>
       /* Style for the message box */
       .alert {
@@ -64,7 +65,7 @@ if(isset($_POST['submit'])) {
         border-color: #ffeeba;
       }
     </style>
-    <link rel="stylesheet" href="css/profile.css">
+    <link rel="stylesheet" href="css/login.css">
   </head>
   <body>
     <div class="container-login">
@@ -77,7 +78,7 @@ if(isset($_POST['submit'])) {
                 <div class="tooth">
                     🦷
                     <div class="tooth-icon">
-                        <i class="fas fa-check"></i>
+                        <i class="fas fa-key"></i>
                     </div>
                 </div>
                 <div class="toothbrush-emoji">🪥</div>
@@ -85,22 +86,9 @@ if(isset($_POST['submit'])) {
                 <div class="wrench-emoji">🔧</div>
                 <div class="magnifier-emoji">🔎</div>
             </div>
-    <div class="auth-container">
-        <div class="left-panel">
-            <a href="../index.php" class="logo">
-                <img src="../images/Jf logo.png" alt="JF Dental Care Logo" class="logo-img">
-                <span class="logo-text">JF DENTAL CARE</span>
-            </a>
-            <div class="tagline">Smile with Confidence</div>
-            <h1 class="hero-title">
-                Forgot Your Password?
-            </h1>
-             <p class="tagline" style="margin-bottom: 60px;">No worries, we'll help you get back on track.</p>
-            <div class="illustration">🔑</div>
         </div>
 
         <div class="right-section">
-        <div class="right-panel">
             <a href="login.php" class="close-btn" title="Close">&times;</a>
             <div class="header">
                 <a href="../index.php" class="logo">
@@ -108,30 +96,21 @@ if(isset($_POST['submit'])) {
                     <span>JF DENTAL CARE</span>
                 </a>
                 <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="form-header">
-                <div class="link-container">
                     <span style="color: #999; font-size: 14px;">Remember your password?</span>
-                    <a href="login.php" class="create-account-link">SIGN IN</a>
-                    <a href="login.php">SIGN IN</a>
+                    <a href="login.php" class="create-account-link" style="background: #3498db; color: white;">SIGN IN</a>
                 </div>
             </div>
 
             <div class="form-container">
-            <div>
+                <h1>Reset Password</h1>
+                <p class="subtitle">Enter your email to receive a temporary password.</p>
                 <?php if(!empty($message)) echo $message; ?>
-                <h1>Forgot Password?</h1>
-                <h2 class="form-title">Forgot Password?</h2>
-                <p class="subtitle">Enter your email to reset your password.</p>
-
-                <form class="pt-3" method="post">
                 <form method="post">
-                    <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" class="form-control" id="email" placeholder="Enter your email" required name="email">
-                        <input type="email" id="email" placeholder="Enter your email" required name="email">
-                    </div>
-                    <button type="submit" name="submit" class="login-btn">Send Reset Link</button>
-                    <button type="submit" name="submit" class="auth-btn">Send Reset Link</button>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="Enter your email" required name="email">
+                </div>
+                <button type="submit" name="submit" class="login-btn">Send Temporary Password</button>
                 </form>
             </div>
         </div>
