@@ -311,20 +311,22 @@ if (!empty($_SESSION)) {
         </div>
       </div>
       <?php
-      $current = basename($_SERVER['PHP_SELF']);
+      // Build a stable link to the site's index page.
+      // If $base is set (e.g. '/dental-clinic'), use that. Otherwise fall back to the known project
+      // folder so links don't point to the server root (XAMPP welcome page).
+      $project = 'dental-clinic';
+      if (!empty($base)) {
+        $index_url = rtrim($base, '/') . '/index.php';
+      } else {
+        // ensure we point to the project folder on the server
+        $index_url = '/' . trim($project, '/') . '/index.php';
+      }
       ?>
       <nav class="desktop-nav">
-        <?php if ($current == '../index.php'): ?>
-          <a href="../index.php#home" class="nav-link scroll">Home</a>
-          <a href="../index.php#about" class="nav-link scroll">About Us</a>
-          <a href="../index.php#services" class="nav-link scroll">Services</a>
-          <a href="../index.php#contact" class="nav-link scroll">Contact Us</a>
-        <?php else: ?>
-          <a href="<?php echo $base; ?>../index.php#home" class="nav-link scroll">Home</a>
-          <a href="<?php echo $base; ?>../index.php#about" class="nav-link scroll">About Us</a>
-          <a href="<?php echo $base; ?>../index.php#services" class="nav-link scroll">Services</a>
-          <a href="<?php echo $base; ?>../index.php#contact" class="nav-link scroll">Contact Us</a>
-        <?php endif; ?>
+        <a href="<?php echo $index_url; ?>#home" class="nav-link scroll">Home</a>
+        <a href="<?php echo $index_url; ?>#about" class="nav-link scroll">About Us</a>
+        <a href="<?php echo $index_url; ?>#services" class="nav-link scroll">Services</a>
+        <a href="<?php echo $index_url; ?>#contact" class="nav-link scroll">Contact Us</a>
       </nav>
       <div class="action-buttons">
         <?php if (!$logged_in): ?>

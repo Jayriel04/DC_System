@@ -599,6 +599,32 @@ if (isset($_POST['submit_feedback'])) {
 
   <?php include_once('includes/footer.php'); ?>
   <script src="js/health-modal.js"></script>
+  <script>
+    // Ensure that when arriving at the page with a hash (e.g. /index.php#about)
+    // we scroll to the target after load. This overrides other load-time
+    // scrolls (like hideURLbar) that may reset the position to the top.
+    window.addEventListener('load', function () {
+      if (window.location.hash) {
+        // delay slightly so other load handlers finish
+        setTimeout(function () {
+          try {
+            var el = document.querySelector(window.location.hash);
+            if (el) {
+              // use smooth scrolling if supported
+              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+              // fallback: try scrolling to top of page or to the element by id
+              var id = window.location.hash.substring(1);
+              var byId = document.getElementById(id);
+              if (byId) byId.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          } catch (e) {
+            // ignore errors
+          }
+  }, 10);
+      }
+    });
+  </script>
 </body> 
 
 </html>
