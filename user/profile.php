@@ -234,7 +234,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 </head>
 
 <body>
-    <?php include_once(__DIR__ . './includes/header.php'); ?>
+    <?php include_once(__DIR__ . '../includes/header.php'); ?>
     <div class="container">
         <?php if ($patient): ?>
             <!-- Patient Header -->
@@ -301,7 +301,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
                 <div class="tab active" data-tab-target="#medicalContent">
                     🩺
-                    Medical History
+                    Examination Record
                 </div>
                 <div class="tab" data-tab-target="#appointmentsContent">
                     🗓️
@@ -315,7 +315,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 <div id="medicalContent" class="tab-pane active">
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="card-title" style="margin: 0;">Medical History</h2>
+                            <h2 class="card-title" style="margin: 0;">Examination Records</h2>
                             <button id="editMedicalHistoryBtn" class="btn btn-outline"
                                 style="padding: 5px 10px; font-size: 14px;">
                                 📝

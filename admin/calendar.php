@@ -147,7 +147,9 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     <link rel="stylesheet" href="vendors/daterangepicker/daterangepicker.css">
     <link rel="stylesheet" href="vendors/chartist/chartist.min.css">
     <link rel="stylesheet" href="css/style.css">
+     <link rel="stylesheet" href="./css/sidebar.css">
     <link rel="stylesheet" href="css/calendar.css">
+    
   </head>
 
   <body>

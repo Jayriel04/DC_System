@@ -482,11 +482,36 @@ if (isset($_POST['submit_feedback'])) {
                   <h2 class="section-title">GENERAL</h2>
                   <div class="options">
                     <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Marked weight change" id="hc_general_1"><label for="hc_general_1">Marked weight change</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Increase frequency of urination" id="hc_general_2"><label for="hc_general_2">Increase frequency of urination</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Burning sensation on urination" id="hc_general_3"><label for="hc_general_3">Burning sensation on urination</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Loss of hearing, ringing of ears" id="hc_general_4"><label for="hc_general_4">Loss of hearing, ringing of ears</label></div>
                   </div>
-                  
+                  <h2 class="section-title">EAR</h2>
+                  <div class="options">
+                    <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Marked weight change" id="hc_general_1"><label for="hc_general_1">Loss of hearing, ringing of ears</label></div>
+                  </div>
+                  <h2 class="section-title mt-3">NERVOUS SYSTEM</h2>
+                  <div class="options">
+                    <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Headache" id="hc_nerv_1"><label for="hc_nerv_1">Headache</label></div>
+                    <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Convulsion/epilepsy" id="hc_nerv_2"><label for="hc_nerv_2">Convulsion/epilepsy</label></div>
+                    <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Numbness/Tingling" id="hc_nerv_3"><label for="hc_nerv_3">Numbness/Tingling</label></div>
+                    <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Dizziness/Fainting" id="hc_nerv_4"><label for="hc_nerv_4">Dizziness/Fainting</label></div>
+                  </div>
+                  <h2 class="section-title mt-3">BLOOD</h2>
+                  <div class="options">
+                    <div class="option"><input type="checkbox" name="health_conditions[blood][]" value="Bruise easily" id="hc_blood_1"><label for="hc_blood_1">Bruise easily</label></div>
+                    <div class="option"><input type="checkbox" name="health_conditions[blood][]" value="Anemia" id="hc_blood_2"><label for="hc_blood_2">Anemia</label></div>
+                  </div>
+                  <h2 class="section-title mt-3">RESPIRATORY</h2>
+                  <div class="options">
+                    <div class="option"><input type="checkbox" name="health_conditions[respiratory][]" value="Persistent cough" id="hc_resp_1"><label for="hc_resp_1">Persistent cough</label></div>
+                    <div class="option"><input type="checkbox" name="health_conditions[respiratory][]" value="Difficulty in breathing" id="hc_resp_2"><label for="hc_resp_2">Difficulty in breathing</label></div>
+                    <div class="option"><input type="checkbox" name="health_conditions[respiratory][]" value="Asthma" id="hc_resp_3"><label for="hc_resp_3">Asthma</label></div>
+                  </div>
+                  <div class="row">
+                <div class="col-md-6 section">
+                  <h2 class="section-title">URINARY</h2>
+                  <div class="options">
+                    <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Marked weight change" id="hc_general_1"><label for="hc_general_1">Increase frequency of urination</label></div>
+                    <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Marked weight change" id="hc_general_1"><label for="hc_general_1">Burning sensation on urination</label></div>
+                  </div>
                   <h2 class="section-title mt-3">LIVER</h2>
                   <div class="options">
                     <div class="option"><input type="checkbox" name="health_conditions[liver][]" value="History of liver ailment" id="hc_liver_1"><label for="hc_liver_1">History of liver ailment</label></div>
@@ -510,33 +535,13 @@ if (isset($_POST['submit_feedback'])) {
                     <div class="option"><input type="checkbox" name="health_conditions[thyroid][]" value="Bulging of eyes" id="hc_thy_5"><label for="hc_thy_5">Bulging of eyes</label></div>
                   </div>
                 </div>
-                <div class="col-md-6 section">
-                  <h2 class="section-title">URINARY</h2>
-                  <div class="options">
-                    <div class="option"><input type="checkbox" name="health_conditions[urinary][]" value="Increase frequency of urination" id="hc_ur_1"><label for="hc_ur_1">Increase frequency of urination</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[urinary][]" value="Burning sensation on urination" id="hc_ur_2"><label for="hc_ur_2">Burning sensation on urination</label></div>
-                  </div>
+  </div>
+  </div>
+                
 
-                  <h2 class="section-title mt-3">NERVOUS SYSTEM</h2>
-                  <div class="options">
-                    <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Headache" id="hc_nerv_1"><label for="hc_nerv_1">Headache</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Convulsion/epilepsy" id="hc_nerv_2"><label for="hc_nerv_2">Convulsion/epilepsy</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Numbness/Tingling" id="hc_nerv_3"><label for="hc_nerv_3">Numbness/Tingling</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Dizziness/Fainting" id="hc_nerv_4"><label for="hc_nerv_4">Dizziness/Fainting</label></div>
-                  </div>
 
-                  <h2 class="section-title mt-3">BLOOD</h2>
-                  <div class="options">
-                    <div class="option"><input type="checkbox" name="health_conditions[blood][]" value="Bruise easily" id="hc_blood_1"><label for="hc_blood_1">Bruise easily</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[blood][]" value="Anemia" id="hc_blood_2"><label for="hc_blood_2">Anemia</label></div>
-                  </div>
 
-                  <h2 class="section-title mt-3">RESPIRATORY</h2>
-                  <div class="options">
-                    <div class="option"><input type="checkbox" name="health_conditions[respiratory][]" value="Persistent cough" id="hc_resp_1"><label for="hc_resp_1">Persistent cough</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[respiratory][]" value="Difficulty in breathing" id="hc_resp_2"><label for="hc_resp_2">Difficulty in breathing</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[respiratory][]" value="Asthma" id="hc_resp_3"><label for="hc_resp_3">Asthma</label></div>
-                  </div>
+                  
                 </div>
               </div>
 

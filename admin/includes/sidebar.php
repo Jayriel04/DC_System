@@ -34,6 +34,12 @@
                 <span class="menu-title">Services</span>
             </a>
         </li>
+        <li class="nav-item" data-page="manage-inventory.php">
+            <a class="nav-link" href="manage-inventory.php">
+                <span class="nav-icon"><i class="fas fa-pills"></i></span>
+                <span class="menu-title">Inventory</span>
+            </a>
+        </li>
 
         <li class="nav-item" data-page="calendar.php">
             <a class="nav-link" href="calendar.php">

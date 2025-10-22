@@ -6,6 +6,24 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
+    // Handle appointment update from edit modal
+    if (isset($_POST['update_appointment'])) {
+        $appointment_id = $_POST['appointment_id'];
+        $status = $_POST['status'];
+
+        $sql_update = "UPDATE tblappointment SET status = :status WHERE id = :id";
+        $query_update = $dbh->prepare($sql_update);
+        $query_update->bindParam(':status', $status, PDO::PARAM_STR);
+        $query_update->bindParam(':id', $appointment_id, PDO::PARAM_INT);
+
+        if ($query_update->execute()) {
+            echo "<script>alert('Appointment status updated successfully.'); window.location.href='mac.php';</script>";
+        } else {
+            echo "<script>alert('An error occurred while updating the status.');</script>";
+        }
+        exit();
+    }
+
     // Handle new appointment and patient creation from modal
     if (isset($_POST['schedule_appointment'])) {
         $dbh->beginTransaction();
@@ -43,10 +61,10 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             $patient_id = $dbh->lastInsertId();
 
             // 2. Create new appointment
-            $app_date = $_POST['date'];
-            $start_time = $_POST['start_time'];
-            $end_time = $_POST['end_time'];
-            $app_status = 'walkin'; // Set default status to walk-in
+            $app_date = $_POST['date']; // from the form
+            $start_time = $_POST['start_time']; // from the form
+            $end_time = $_POST['end_time']; // from the form
+            $app_status = 'walkin'; // Set default status to walk-in for appointments created this way
 
             $sql_appointment = "INSERT INTO tblappointment (patient_number, firstname, surname, date, start_time, end_time, status) VALUES (:pnum, :fname, :sname, :app_date, :start_time, :end_time, :status)";
             $query_appointment = $dbh->prepare($sql_appointment);
@@ -60,6 +78,16 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         }
     }
 
+    // Code for deletion
+    if (isset($_GET['delid'])) {
+        $rid = intval($_GET['delid']);
+        $sql = "DELETE FROM tblappointment WHERE id = :rid";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':rid', $rid, PDO::PARAM_INT);
+        $query->execute();
+        echo "<script>alert('Appointment deleted');</script>";
+        echo "<script>window.location.href = 'mac.php'</script>";
+    }
     $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
     // --- APPOINTMENT COUNTS ---
     $sql_all = "SELECT COUNT(*) FROM tblappointment";
@@ -138,6 +166,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/mac-modal.css">
 </head>
 <body>
 <div class="container-scroller">
@@ -211,8 +240,18 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                             <td><?php echo format_time_12hr($appointment->end_time); ?></td>
                                             <td><span class="status-badge status-<?php echo strtolower(htmlentities($appointment->status)); ?>"><?php echo htmlentities($appointment->status); ?></span></td>
                                             <td class="actions-icons">
-                                                <a href="edit-mas.php?editid=<?php echo $appointment->id; ?>" title="Edit">✏️</a>
-                                                <a href="mas.php?delid=<?php echo $appointment->id; ?>" title="Delete" onclick="return confirm('Do you really want to Delete ?');">🗑️</a>
+                                                <button class="edit-appointment-btn" title="Edit"
+                                                    data-id="<?php echo htmlentities($appointment->id); ?>"
+                                                    data-firstname="<?php echo htmlentities($appointment->firstname); ?>"
+                                                    data-surname="<?php echo htmlentities($appointment->surname); ?>"
+                                                    data-date="<?php echo htmlentities($appointment->date); ?>"
+                                                    data-start-time="<?php echo htmlentities($appointment->start_time); ?>"
+                                                    data-end-time="<?php echo htmlentities($appointment->end_time); ?>"
+                                                    data-status="<?php echo htmlentities($appointment->status); ?>"
+                                                    style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0;"
+                                                >✏️</button>
+                                                
+                                                <a href="mac.php?delid=<?php echo $appointment->id; ?>" title="Delete" onclick="return confirm('Do you really want to Delete ?');" style="font-size: 1.25rem; color: #a0aec0;">🗑️</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -303,6 +342,58 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     </div>
 </div>
 
+<!-- Edit Appointment Modal -->
+<div id="editAppointmentModal" class="modal-container" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Appointment Status</h2>
+            <button class="close-button">&times;</button>
+        </div>
+        <form id="editAppointmentForm" method="POST">
+            <div class="modal-body">
+                <input type="hidden" name="appointment_id" id="edit_appointment_id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit_firstname">First Name</label>
+                        <input type="text" id="edit_firstname" name="firstname" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_surname">Surname</label>
+                        <input type="text" id="edit_surname" name="surname" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit_date">Date</label>
+                        <input type="date" id="edit_date" name="date" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_start_time">Start Time</label>
+                        <input type="time" id="edit_start_time" name="start_time" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_end_time">End Time</label>
+                        <input type="time" id="edit_end_time" name="end_time" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit_status">Status</label>
+                    <select id="edit_status" name="status" class="form-control" required>
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Declined">Declined</option>
+                        <option value="walkin">Walk-in</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel">Cancel</button>
+                <button type="submit" name="update_appointment" class="btn btn-update">Update Status</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script src="vendors/js/vendor.bundle.base.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -350,6 +441,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+<script src="js/mac-modal.js"></script>
 
 </body>
 </html>

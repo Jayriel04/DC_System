@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
 </head>
 
 <body>
-    <?php include_once(__DIR__ . './includes/header.php'); ?>
+    <?php include_once(__DIR__ . '/./includes/header.php'); ?>
     <div class="auth-container">
         <div class="left-panel">
             <h1 class="hero-title">

@@ -314,7 +314,7 @@ if (!empty($_SESSION)) {
       // Build a stable link to the site's index page.
       // If $base is set (e.g. '/dental-clinic'), use that. Otherwise fall back to the known project
       // folder so links don't point to the server root (XAMPP welcome page).
-      $project = 'dental-clinic';
+      $project = 'DC_System';
       if (!empty($base)) {
         $index_url = rtrim($base, '/') . '/index.php';
       } else {

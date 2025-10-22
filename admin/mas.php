@@ -6,6 +6,24 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
+    // Handle schedule update from edit modal
+    if (isset($_POST['update_schedule'])) {
+        $schedule_id = $_POST['schedule_id'];
+        $status = $_POST['status'];
+
+        $sql_update = "UPDATE tblschedule SET status = :status WHERE id = :id";
+        $query_update = $dbh->prepare($sql_update);
+        $query_update->bindParam(':status', $status, PDO::PARAM_STR);
+        $query_update->bindParam(':id', $schedule_id, PDO::PARAM_INT);
+
+        if ($query_update->execute()) {
+            echo "<script>alert('Schedule status updated successfully.'); window.location.href='mas.php';</script>";
+        } else {
+            echo "<script>alert('An error occurred while updating the status.');</script>";
+        }
+        exit();
+    }
+
     // Handle new service appointment and patient creation from modal
     if (isset($_POST['schedule_service_appointment'])) {
         $dbh->beginTransaction();
@@ -148,6 +166,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/mas-modal.css">
 </head>
 
 <body>
@@ -157,9 +176,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             <?php include_once('includes/sidebar.php'); ?>
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <div class="page-header">
-                        <h4 class="page-title">Manage Service Appointments</h4>
-                    </div>
+                    
                     <div class="container">
 
                         <div class="appointment-management-card">
@@ -227,8 +244,17 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                 <td><?php echo htmlentities($schedule->duration ? $schedule->duration . ' mins' : 'N/A'); ?></td>
                                                 <td><span class="status-badge status-<?php echo strtolower(htmlentities($schedule->status)); ?>"><?php echo htmlentities($schedule->status); ?></span></td>
                                                 <td class="actions-icons">
-                                                    <a href="edit-mas.php?editid=<?php echo $schedule->appointment_id; ?>" title="Edit">✏️</a>
-                                                    <a href="mas.php?delid=<?php echo $schedule->id; ?>" title="Delete" onclick="return confirm('Do you really want to Delete this service schedule?');">🗑️</a>
+                                                    <button class="edit-schedule-btn" title="Edit"
+                                                        data-id="<?php echo htmlentities($schedule->id); ?>"
+                                                        data-firstname="<?php echo htmlentities($schedule->firstname); ?>"
+                                                        data-surname="<?php echo htmlentities($schedule->surname); ?>"
+                                                        data-service="<?php echo htmlentities($schedule->service_name ?: 'N/A'); ?>"
+                                                        data-date="<?php echo htmlentities($schedule->date); ?>"
+                                                        data-time="<?php echo htmlentities($schedule->time); ?>"
+                                                        data-duration="<?php echo htmlentities($schedule->duration ? $schedule->duration . ' mins' : 'N/A'); ?>"
+                                                        data-status="<?php echo htmlentities($schedule->status); ?>"
+                                                        style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0;">✏️</button>
+                                                    <a href="mas.php?delid=<?php echo $schedule->id; ?>" title="Delete" onclick="return confirm('Do you really want to Delete this service schedule?');" style="font-size: 1.25rem; color: #a0aec0; text-decoration: none;">🗑️</a>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -321,6 +347,60 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         </div>
     </div>
 
+    <!-- Edit Service Schedule Modal -->
+    <div id="editScheduleModal" class="modal-container" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Service Schedule Status</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <form id="editScheduleForm" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="schedule_id" id="edit_schedule_id">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit_firstname">First Name</label>
+                            <input type="text" id="edit_firstname" name="firstname" class="form-control" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_surname">Surname</label>
+                            <input type="text" id="edit_surname" name="surname" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_service">Service</label>
+                        <input type="text" id="edit_service" name="service" class="form-control" readonly>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit_date">Date</label>
+                            <input type="date" id="edit_date" name="date" class="form-control" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_time">Time</label>
+                            <input type="time" id="edit_time" name="time" class="form-control" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_duration">Duration</label>
+                            <input type="text" id="edit_duration" name="duration" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_status">Status</label>
+                        <select id="edit_status" name="status" class="form-control" required>
+                            <option value="Ongoing">Ongoing</option>
+                            <option value="Done">Done</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel">Cancel</button>
+                    <button type="submit" name="update_schedule" class="btn btn-update">Update Status</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="vendors/js/vendor.bundle.base.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -364,6 +444,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             }
         });
     </script>
+    <script src="js/mas-modal.js"></script>
 </body>
 
 </html>

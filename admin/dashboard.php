@@ -284,7 +284,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 <div class="card">
                                     <div class="card-header">
                                         <h2 class="card-title">Latest Appointments</h2>
-                                        <a href="all-appointment.php" class="view-link">View All</a>
+                                        <a href="mac.php" class="view-link">View All</a>
                                     </div>
 
                                     <?php foreach ($latest_appointments as $appointment): ?>
@@ -327,7 +327,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 <div class="card">
                                     <div class="card-header">
                                         <h2 class="card-title">Popular Services</h2>
-                                        <a href="manage-service.php" class="view-link">View Details</a>
+                                        <a href="mas.php" class="view-link">View Details</a>
                                     </div>
 
                                     <?php foreach ($popular_services as $service):
