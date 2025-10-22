@@ -6,6 +6,40 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
     // Handle new patient creation from modal
+    if (isset($_POST['update_patient'])) {
+        $patient_id = $_POST['patient_id'];
+        $firstname = $_POST['firstname'];
+        $surname = $_POST['surname'];
+        $dob = $_POST['date_of_birth'];
+        $sex = $_POST['sex'];
+        $civil_status = $_POST['civil_status'];
+        $occupation = $_POST['occupation'];
+        $contact_number = $_POST['contact_number'];
+        $address = $_POST['address'];
+        $email = $_POST['email'];
+
+        $age = '';
+        if (!empty($dob)) {
+            $birthDate = new DateTime($dob);
+            $today = new DateTime();
+            $age = $today->diff($birthDate)->y;
+        }
+
+        $sql_update = "UPDATE tblpatient SET firstname=:fname, surname=:sname, date_of_birth=:dob, sex=:sex, status=:status, occupation=:occupation, age=:age, contact_number=:contact, address=:address, email=:email WHERE number=:pid";
+        $query_update = $dbh->prepare($sql_update);
+        $query_update->execute([
+            ':fname' => $firstname, ':sname' => $surname, ':dob' => $dob, ':sex' => $sex, ':status' => $civil_status, 
+            ':occupation' => $occupation, ':age' => $age, ':contact' => $contact_number, ':address' => $address, 
+            ':email' => $email, ':pid' => $patient_id
+        ]);
+
+        if ($query_update) {
+            echo "<script>alert('Patient details updated successfully.'); window.location.href='manage-patient.php';</script>";
+        } else {
+            echo "<script>alert('An error occurred while updating patient details.');</script>";
+        }
+        exit();
+    }
     if (isset($_POST['add_patient'])) {
         $dbh->beginTransaction();
         try {
@@ -188,8 +222,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <th>Email</th>
                                     <th>Contact No.</th>
                                     <th>Address</th>
-                                    <th>History</th>
-                                    <th>Exam Record</th>
+                                    <th>Patient History</th>
+                                    <th>Examination Record</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -221,7 +255,19 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <td><a href="view-er.php?stid=<?php echo $row->number; ?>" class="action-icon" title="View Examination Record"><i class="fas fa-file-medical"></i></a></td>
                                     <td>
                                         <div class="actions-cell">
-                                            <a href="edit-patient.php?number=<?php echo htmlentities($row->number); ?>" class="action-icon" title="Edit">✏️</a>
+                                            <button class="action-icon edit-patient-btn" title="Edit"
+                                                data-id="<?php echo htmlentities($row->number); ?>"
+                                                data-firstname="<?php echo htmlentities($row->firstname); ?>"
+                                                data-surname="<?php echo htmlentities($row->surname); ?>"
+                                                data-dob="<?php echo htmlentities($row->date_of_birth); ?>"
+                                                data-sex="<?php echo htmlentities($row->sex); ?>"
+                                                data-status="<?php echo htmlentities($row->status); ?>"
+                                                data-occupation="<?php echo htmlentities($row->occupation); ?>"
+                                                data-contact="<?php echo htmlentities($row->contact_number); ?>"
+                                                data-address="<?php echo htmlentities($row->address); ?>"
+                                                data-email="<?php echo htmlentities($row->email); ?>"
+                                                style="background:none; border:none; cursor:pointer; padding:0; font-size: 1rem;"
+                                            >✏️</button>
                                             <a href="manage-patient.php?delid=<?php echo ($row->number); ?>" onclick="return confirm('Do you really want to Delete?');" class="action-icon" title="Delete">🗑️</a>
                                         </div>
                                     </td>
@@ -304,9 +350,53 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         </div>
     </div>
 
+    <!-- Edit Patient Modal -->
+    <div id="editPatientModal" class="modal-container" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Patient Details</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <form id="editPatientForm" method="POST">
+                <input type="hidden" name="patient_id" id="edit_patient_id">
+                <div class="modal-body">
+                    <h3 class="form-section-title">View Patient Details</h3>
+                    <div class="form-row">
+                        <div class="form-group"><label for="edit_firstname">First Name</label><input type="text" id="edit_firstname" name="firstname" readonly></div>
+                        <div class="form-group"><label for="edit_surname">Surname</label><input type="text" id="edit_surname" name="surname" readonly></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label for="edit_date_of_birth">Date of Birth</label><input type="date" id="edit_date_of_birth" name="date_of_birth" readonly></div>
+                        <div class="form-group">
+                            <label for="edit_sex">Sex</label>
+                            <select id="edit_sex" name="sex" disabled>
+                                <option value="">Select Sex</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label for="edit_civil_status">Civil Status</label><input type="text" id="edit_civil_status" name="civil_status" readonly></div>
+                        <div class="form-group"><label for="edit_occupation">Occupation</label><input type="text" id="edit_occupation" name="occupation" readonly></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label for="edit_contact_number">Phone Number</label><input type="tel" id="edit_contact_number" name="contact_number" readonly></div>
+                        <div class="form-group"><label for="edit_email">Email Address</label><input type="email" id="edit_email" name="email" readonly></div>
+                    </div>
+                    <div class="form-group"><label for="edit_address">Address</label><textarea id="edit_address" name="address" rows="2" readonly></textarea></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="vendors/js/vendor.bundle.base.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // --- Add Patient Modal ---
         const modal = document.getElementById('addPatientModal');
         const openBtn = document.getElementById('addPatientBtn');
         const closeBtn = modal.querySelector('.close-button');
@@ -321,6 +411,44 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 modal.style.display = 'none';
             }
         });
+
+        // --- Edit Patient Modal ---
+        const editModal = document.getElementById('editPatientModal');
+        const editCloseBtn = editModal.querySelector('.close-button');
+        const editCancelBtn = editModal.querySelector('.btn-cancel');
+
+        function closeEditModal() {
+            editModal.style.display = 'none';
+        }
+
+        editCloseBtn.addEventListener('click', closeEditModal);
+        editCancelBtn.addEventListener('click', closeEditModal);
+
+        window.addEventListener('click', function (event) {
+            if (event.target === editModal) {
+                closeEditModal();
+            }
+        });
+
+        document.querySelectorAll('.edit-patient-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const dataset = this.dataset;
+                document.getElementById('edit_patient_id').value = dataset.id;
+                document.getElementById('edit_firstname').value = dataset.firstname;
+                document.getElementById('edit_surname').value = dataset.surname;
+                document.getElementById('edit_date_of_birth').value = dataset.dob;
+                document.getElementById('edit_sex').value = dataset.sex;
+                document.getElementById('edit_civil_status').value = dataset.status;
+                document.getElementById('edit_occupation').value = dataset.occupation;
+                document.getElementById('edit_contact_number').value = dataset.contact;
+                document.getElementById('edit_address').value = dataset.address;
+                document.getElementById('edit_email').value = dataset.email;
+                document.getElementById('edit_sex').disabled = true; // Ensure select is disabled
+
+                editModal.style.display = 'flex';
+            });
+        });
+
     });
     </script>
 </body>
