@@ -277,7 +277,6 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                 <label for="modal_end">End Time</label>
                 <input type="time" class="form-control" name="end_time" id="modal_end" required>
               </div>
-              <!-- duration column removed from DB; no input here anymore -->
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
