@@ -104,6 +104,25 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     }
   }
 
+  // Handle new schedule creation from modal
+  if (isset($_POST['add_schedule'])) {
+    $date = $_POST['date'];
+    $start_time = $_POST['start_time'];
+    $end_time = $_POST['end_time'];
+
+    if (!empty($date) && !empty($start_time)) {
+        $sql = "INSERT INTO tblcalendar (date, start_time, end_time) VALUES (:date, :start_time, :end_time)";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':date', $date, PDO::PARAM_STR);
+        $query->bindParam(':start_time', $start_time, PDO::PARAM_STR);
+        $query->bindParam(':end_time', $end_time, PDO::PARAM_STR);
+        if ($query->execute()) {
+            echo "<script>alert('New schedule added successfully.'); window.location.href='calendar.php';</script>";
+        } else {
+            echo "<script>alert('An error occurred. Please try again.');</script>";
+        }
+    }
+  }
   // Month navigation
   $currentMonth = isset($_GET['month']) ? $_GET['month'] : date('m');
   $currentYear = isset($_GET['year']) ? $_GET['year'] : date('Y');
@@ -141,15 +160,21 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
   <head>
     <title>Calendar</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
     <link rel="stylesheet" href="vendors/daterangepicker/daterangepicker.css">
     <link rel="stylesheet" href="vendors/chartist/chartist.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
     <link rel="stylesheet" href="css/style.css">
-     <link rel="stylesheet" href="./css/sidebar.css">
-    <link rel="stylesheet" href="css/calendar.css">
-    
+    <link rel="stylesheet" href="./css/sidebar.css">
+    <!-- endinject -->
+    <!-- Custom CSS for new calendar UI -->
+    <link rel="stylesheet" href="css/new-calendar.css">
   </head>
 
   <body>
@@ -158,99 +183,117 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
       <div class="container-fluid page-body-wrapper">
         <?php include_once('includes/sidebar.php'); ?>
         <div class="main-panel">
-          <div class="content-wrapper">
-                    <div class="page-header">
-                        <h3 class="page-title">Manage Calendar</h3>
+            <div class="content-wrapper">
+                <div class="header">
+                        <div class="header-text">
+                            <h2>Calendar</h2>
+                            <p>View and manage schedule </p>
+                        </div>
+                            <a href="#" class="add-btn" id="addScheduleBtn">
+                                <span>+</span> Add Schedule
+                            </a>
                     </div>
-            
-            <div style="text-align: right; margin: 10px;">
-              <a href="add-calendar-entry.php" class="btn"
-                style="padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">
-                Add Schedule
-              </a>
-            </div>
-            <div class="calendar-wrapper">
-              <div class="calendar-header">
-                <h3><?php echo $months[$currentMonth - 1] . " " . $currentYear; ?></h3>
-                <div>
-                  <a href="?month=<?php echo ($currentMonth == 1) ? 12 : $currentMonth - 1; ?>&year=<?php echo ($currentMonth == 1) ? $currentYear - 1 : $currentYear; ?>"
-                    class="btn">Prev</a>
-                  <a href="?month=<?php echo ($currentMonth == 12) ? 1 : $currentMonth + 1; ?>&year=<?php echo ($currentMonth == 12) ? $currentYear + 1 : $currentYear; ?>"
-                    class="btn">Next</a>
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <h2><?php echo $months[$currentMonth - 1] . " " . $currentYear; ?></h2>
+                        <div class="header-controls">
+                            <a href="?month=<?php echo ($currentMonth == 1) ? 12 : $currentMonth - 1; ?>&year=<?php echo ($currentMonth == 1) ? $currentYear - 1 : $currentYear; ?>" class="btn btn-outline-primary btn-sm">&gt;</a>
+                            <a href="?month=<?php echo ($currentMonth == 12) ? 1 : $currentMonth + 1; ?>&year=<?php echo ($currentMonth == 12) ? $currentYear + 1 : $currentYear; ?>" class="btn btn-outline-primary btn-sm">&gt;</a>
+                        </div>
+                    </div>
+
+                    <div class="calendar">
+                        <?php foreach ($weekdays as $weekday): ?>
+                            <div class="day-header"><?php echo substr($weekday, 0, 3); ?></div>
+                        <?php endforeach; ?>
+
+                        <?php
+                        // Previous month's days
+                        $prevMonth = ($currentMonth == 1) ? 12 : $currentMonth - 1;
+                        $prevYear = ($currentMonth == 1) ? $currentYear - 1 : $currentYear;
+                        $daysInPrevMonth = date('t', strtotime("{$prevYear}-{$prevMonth}-01"));
+                        for ($i = $startDay - 1; $i >= 0; $i--) {
+                            echo '<div class="day-cell other-month"><div class="day-number">' . ($daysInPrevMonth - $i) . '</div></div>';
+                        }
+
+                        // Current month's days
+                        for ($day = 1; $day <= $daysInMonth; $day++) {
+                            echo '<div class="day-cell">';
+                            echo '<div class="day-number">' . $day . '</div>';
+
+                            if (isset($eventDays[$day])) {
+                                foreach ($eventDays[$day] as $event) {
+                                    $eventClass = !empty($event->booked) ? 'booked' : 'available';
+                                    
+                                    $start_formatted = !empty($event->start_time) ? date('g:i A', strtotime($event->start_time)) : '';
+                                    $end_formatted = !empty($event->end_time) ? date('g:i A', strtotime($event->end_time)) : '';
+                                    $time_display = trim($start_formatted . ' - ' . $end_formatted, ' -');
+
+                                    echo '<div class="event ' . $eventClass . '" title="Click to edit">';
+                                    echo '<div>' . htmlentities($time_display) . '</div>';
+                                    
+                                    // Action buttons
+                                    echo '<div class="event-actions" style="margin-top: 5px;">';
+                                    if (!empty($event->booked)) {
+                                        echo '<button class="btn btn-secondary btn-xs" disabled title="This schedule has an appointment and cannot be edited or deleted.">Booked</button>';
+                                    } else {
+                                        // Use emojis for edit and delete actions
+                                        echo '<button class="btn btn-primary btn-xs edit-event-btn"
+                                                data-id="' . htmlentities($event->id) . '" 
+                                                data-date="' . htmlentities($event->date) . '" 
+                                                data-start="' . htmlentities($event->start_time) . '" 
+                                                data-end="' . htmlentities($event->end_time) . '" 
+                                                title="Edit" 
+                                                style="background:none; border:none; padding:0; font-size: 1.2rem; color: #007bff; cursor:pointer;">✏️</button>';
+                                        echo ' <a href="calendar.php?delid=' . htmlentities($event->id) . '" 
+                                                onclick="return confirm(\'Do you really want to delete this schedule?\');" 
+                                                class="btn btn-danger-emoji btn-xs" title="Delete" style="background:none; border:none; padding:0 0 0 8px; font-size: 1.2rem; color: #dc3545; cursor:pointer;">🗑️</a>';
+                                    }
+                                    echo '</div>';
+                                    echo '</div>';
+                                }
+                            }
+                            echo '</div>';
+                        }
+
+                        // Next month's days
+                        $totalCells = $startDay + $daysInMonth;
+                        $remainingCells = (7 - ($totalCells % 7)) % 7;
+                        for ($i = 1; $i <= $remainingCells; $i++) {
+                            echo '<div class="day-cell other-month"><div class="day-number">' . $i . '</div></div>';
+                        }
+                        ?>
+                    </div>
                 </div>
-              </div>
-
-              <div class="calendar">
-                <!-- Weekday Headers -->
-                <?php foreach ($weekdays as $weekday): ?>
-                  <div class="weekday"><?php echo $weekday; ?></div>
-                <?php endforeach; ?>
-
-                <?php
-                // Empty days before the first day of the month
-                for ($i = 0; $i < $startDay; $i++) {
-                  echo '<div class="day"></div>';
-                }
-
-                // Display days of the month
-                for ($day = 1; $day <= $daysInMonth; $day++) {
-                  echo '<div class="day">';
-                  echo '<h4>' . $day . '</h4>'; // Display day number
-              
-                  // Display events for the day
-                  if (isset($eventDays[$day])) {
-                    foreach ($eventDays[$day] as $event) {
-                      $bookedClass = !empty($event->booked) ? ' booked' : '';
-                      echo '<div class="event' . $bookedClass . '">';
-                      // Format times to 12-hour AM/PM for display, fall back to raw value if parsing fails
-                      $start_formatted = '';
-                      $end_formatted = '';
-                      if (!empty($event->start_time) && strtotime($event->start_time) !== false) {
-                        $start_formatted = date('g:i A', strtotime($event->start_time));
-                      } elseif (!empty($event->start_time)) {
-                        $start_formatted = htmlentities($event->start_time);
-                      }
-                      if (!empty($event->end_time) && strtotime($event->end_time) !== false) {
-                        $end_formatted = date('g:i A', strtotime($event->end_time));
-                      } elseif (!empty($event->end_time)) {
-                        $end_formatted = htmlentities($event->end_time);
-                      }
-                      echo 'Time: ' . $start_formatted . ' - ' . $end_formatted . '<br>';
-                      echo '<div>';
-                      // If the event is booked (an appointment exists), disable edit/delete controls
-                      if (!empty($event->booked)) {
-                        echo '<button class="btn btn-secondary btn-sm" disabled title="This schedule has an appointment and cannot be edited">Edit</button>';
-                        echo ' ';
-                        echo '<button class="btn btn-secondary btn-sm" disabled title="This schedule has an appointment and cannot be deleted">Delete</button>';
-                      } else {
-                        // Edit button opens modal and passes data attributes
-                        echo '<button class="btn btn-primary btn-sm edit-event-btn" data-id="' . htmlentities($event->id) . '" data-date="' . htmlentities($event->date) . '" data-start="' . htmlentities($event->start_time) . '" data-end="' . htmlentities($event->end_time) . '">Edit</button>';
-                        // Delete now points to calendar.php for deletion
-                        echo '<a href="calendar.php?delid=' . htmlentities($event->id) . '" onclick="return confirm(\'Do you really want to Delete ?\');" class="btn btn-danger btn-sm">Delete</a>';
-                      }
-                      echo '</div>';
-                      echo '</div>';
-                    }
-                  }
-
-                  echo '</div>';
-                }
-                ?>
-              </div>
             </div>
-          </div>
-          <?php include_once('includes/footer.php'); ?>
+            <?php include_once('includes/footer.php'); ?>
         </div>
       </div>
     </div>
+    <!-- plugins:js -->
     <script src="vendors/js/vendor.bundle.base.js"></script>
-    <script src="vendors/chart.js/Chart.min.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
     <script src="vendors/moment/moment.min.js"></script>
     <script src="vendors/daterangepicker/daterangepicker.js"></script>
-    <script src="vendors/chartist/chartist.min.js"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
     <script src="js/off-canvas.js"></script>
     <script src="js/misc.js"></script>
-    <script src="js/dashboard.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script src="js/new-calendar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('addScheduleBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                const addModal = new bootstrap.Modal(document.getElementById('addScheduleModal'));
+                addModal.show();
+            });
+        });
+    </script>
+    <!-- End custom js for this page -->
+
     <!-- Edit Event Modal -->
     <div class="modal fade" id="editEventModal" tabindex="-1" role="dialog" aria-labelledby="editEventModalLabel"
       aria-hidden="true">
@@ -258,7 +301,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
         <div class="modal-content">
           <form method="post">
             <div class="modal-header">
-              <h5 class="modal-title" id="editEventModalLabel">Edit Calendar Event</h5>
+              <h5 class="modal-title" id="editEventModalLabel">Edit Calendar Schedule</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -287,33 +330,40 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
       </div>
     </div>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        // delegate click events for edit buttons
-        document.querySelectorAll('.edit-event-btn').forEach(function (btn) {
-          btn.addEventListener('click', function () {
-            var id = this.getAttribute('data-id');
-            var date = this.getAttribute('data-date');
-            var start = this.getAttribute('data-start');
-            var end = this.getAttribute('data-end');
-            // duration removed from the calendar table; do not read or populate it
-            document.getElementById('modal_event_id').value = id;
-            document.getElementById('modal_date').value = date;
-            document.getElementById('modal_start').value = start;
-            document.getElementById('modal_end').value = end;
-
-            // Show bootstrap modal
-            if (typeof $ !== 'undefined' && typeof $.fn.modal === 'function') {
-              $('#editEventModal').modal('show');
-            } else if (typeof bootstrap !== 'undefined') {
-              var myModal = new bootstrap.Modal(document.getElementById('editEventModal'));
-              myModal.show();
-            }
-          });
-        });
-      });
-    </script>
+    <!-- Add Schedule Modal -->
+    <div class="modal fade" id="addScheduleModal" tabindex="-1" role="dialog" aria-labelledby="addScheduleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form method="post">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addScheduleModalLabel">Add New Schedule</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="add_date">Date</label>
+                <input type="date" class="form-control" name="date" id="add_date" required>
+              </div>
+              <div class="form-group">
+                <label for="add_start">Start Time</label>
+                <input type="time" class="form-control" name="start_time" id="add_start" required>
+              </div>
+              <div class="form-group">
+                <label for="add_end">End Time</label>
+                <input type="time" class="form-control" name="end_time" id="add_end">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="submit" name="add_schedule" class="btn btn-primary">Add Schedule</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </body>
-
   </html>
 <?php } ?>
