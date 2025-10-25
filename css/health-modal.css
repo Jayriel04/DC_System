@@ -6,9 +6,10 @@
 
 .modal-content {
     border-radius: 16px;
-    padding: 16px;
+    padding: 5px;
     border: none;
     box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    margin-left: -500px;
 }
 
 .modal-header {

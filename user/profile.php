@@ -40,6 +40,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $contact_number = $_POST['contact_number'];
         $address = $_POST['address'];
         $username = $_POST['username'];
+        $email = $_POST['email'];
         $sex = isset($_POST['sex']) ? $_POST['sex'] : '';
         $status = isset($_POST['status']) ? $_POST['status'] : '';
         $occupation = isset($_POST['occupation']) ? $_POST['occupation'] : '';
@@ -71,7 +72,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
             $image_to_update = $old_image;
         }
 
-        $updateSql = "UPDATE tblpatient SET firstname=:firstname, surname=:surname, date_of_birth=:dob, sex=:sex, status=:status, occupation=:occupation, age=:age, contact_number=:contact, address=:address, username=:uname, image=:image WHERE number=:number";
+        $updateSql = "UPDATE tblpatient SET firstname=:firstname, surname=:surname, date_of_birth=:dob, sex=:sex, status=:status, occupation=:occupation, age=:age, contact_number=:contact, address=:address, email=:email, username=:uname, image=:image WHERE number=:number";
         $updateQuery = $dbh->prepare($updateSql);
         $updateQuery->execute([
             ':firstname' => $firstname,
@@ -83,6 +84,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
             ':age' => $age,
             ':contact' => $contact_number,
             ':address' => $address,
+            ':email' => $email,
             ':uname' => $username,
             ':image' => $image_to_update,
             ':number' => $patient_number
@@ -229,9 +231,12 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <link rel="stylesheet" href="./vendors/chartist/chartist.min.css">
     <link href="./css/profile.css" rel="stylesheet">
     <link href="./css/header.css" rel="stylesheet">
+    <link href="./css/edit.css" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
+
 
 <body>
     <?php include_once(__DIR__ . '../includes/header.php'); ?>
@@ -463,83 +468,86 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
     <!-- Edit Profile Modal -->
     <div id="editProfileModal" class="modal">
-        <div class="modal-content" style="max-width: 700px;">
-            <div class="modal-header">
-                <h4 class="modal-title">Edit Profile</h4>
-                <span class="close" data-dismiss="modal">&times;</span>
-            </div>
-            <div class="modal-body" style="padding: 15px;">
-                <?php if ($patient): ?>
-                    <form method="post" action="profile.php" enctype="multipart/form-data">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group"><label>First Name</label><input type="text" class="form-control"
-                                        name="firstname" value="<?php echo htmlentities($patient->firstname); ?>" required>
-                                </div>
-                                <div class="form-group"><label>Surname</label><input type="text" class="form-control"
-                                        name="surname" value="<?php echo htmlentities($patient->surname); ?>" required>
-                                </div>
-                                <div class="form-group"><label>Username</label><input type="text" class="form-control"
-                                        name="username" value="<?php echo htmlentities($patient->username); ?>" required>
-                                </div>
-                                <div class="form-group"><label>Contact Number</label><input type="text" class="form-control"
-                                        name="contact_number" value="<?php echo htmlentities($patient->contact_number); ?>"
-                                        required></div>
-                                <div class="form-group"><label>Address</label><textarea class="form-control" name="address"
-                                        required><?php echo htmlentities($patient->address); ?></textarea></div>
+        <div class="edit-profile-modal-content">
+            <?php if ($patient): ?>
+                <form method="post" action="profile.php" enctype="multipart/form-data">
+                    <div class="header">
+                        <div class="breadcrumb">My profile › <span>Edit Profile</span></div>
+                        <button type="submit" name="update_profile" class="save-btn">Save →</button>
+                    </div>
+
+                    <div class="profile-section">
+                        <div class="left-column">
+                            <div class="profile-pic-container">
+                                <img src="../admin/images/<?php echo htmlentities($profile_avatar); ?>" alt="Profile" class="profile-pic" id="profilePic">
+                                <button type="button" class="edit-pic-btn" onclick="document.getElementById('fileInput').click()">✎</button>
+                                <input type="file" name="image" id="fileInput" style="display:none" accept="image/*" onchange="changeProfilePic(event)">
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group"><label>Date of Birth</label><input type="date" class="form-control"
-                                        name="date_of_birth" value="<?php echo htmlentities($patient->date_of_birth); ?>"
-                                        required></div>
+
+                            <div class="name-row">
                                 <div class="form-group">
-                                    <label>Sex</label>
-                                    <select class="form-control" name="sex" required>
-                                        <option value="">-- Select --</option>
-                                        <option value="Male" <?php if ($patient->sex == 'Male')
-                                            echo 'selected'; ?>>Male
-                                        </option>
-                                        <option value="Female" <?php if ($patient->sex == 'Female')
-                                            echo 'selected'; ?>>Female
-                                        </option>
-                                        <option value="Other" <?php if ($patient->sex == 'Other')
-                                            echo 'selected'; ?>>Other
-                                        </option>
-                                    </select>
+                                    <label>First Name</label>
+                                    <input type="text" name="firstname" value="<?php echo htmlentities($patient->firstname); ?>" required>
                                 </div>
-                                <div class="form-group"><label>Civil Status</label><input type="text" class="form-control"
-                                        name="status" value="<?php echo htmlentities($patient->status); ?>"></div>
-                                <div class="form-group"><label>Occupation</label><input type="text" class="form-control"
-                                        name="occupation" value="<?php echo htmlentities($patient->occupation); ?>"></div>
+                                <br>
                                 <div class="form-group">
-                                    <label>Profile Picture</label>
-                                    <input type="file" class="form-control" name="image">
-                                    <small class="form-text text-muted">Leave blank to keep the current image.</small>
-                                    <?php
-                                    $modal_avatar = 'avatar.png'; // Default fallback
-                                    if (!empty($patient->Image)) {
-                                        $modal_avatar = $patient->Image;
-                                    } elseif ($patient->sex === 'Male') {
-                                        $modal_avatar = 'man-icon.png';
-                                    } elseif ($patient->sex === 'Female') {
-                                        $modal_avatar = 'woman-icon.jpg';
-                                    }
-                                    ?>
-                                    <img src="../admin/images/<?php echo htmlentities($modal_avatar); ?>" width="50"
-                                        class="mt-2">
+                                    <label>Last Name</label>
+                                    <input type="text" name="surname" value="<?php echo htmlentities($patient->surname); ?>" required>
                                 </div>
                             </div>
+
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" name="email" value="<?php echo htmlentities($patient->email); ?>">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="tel" name="contact_number" value="<?php echo htmlentities($patient->contact_number); ?>">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Address</label>
+                                <textarea name="address" rows="2"><?php echo htmlentities($patient->address); ?></textarea>
+                            </div>
                         </div>
-                        <div class="modal-footer"
-                            style="padding: 15px 0 0 0; border-top: 1px solid #e5e5e5; margin-top: 15px;">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                            <button type="submit" name="update_profile" class="btn btn-primary">Save Changes</button>
+
+                        <div class="right-column">
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" name="username" value="<?php echo htmlentities($patient->username); ?>">
+                            </div>
+                            <div class="form-group">
+                                <label>Date of Birth</label>
+                                <input type="date" name="date_of_birth" value="<?php echo htmlentities($patient->date_of_birth); ?>">
+                            </div>
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <select name="sex">
+                                    <option value="Male" <?php if ($patient->sex == 'Male') echo 'selected'; ?>>Male</option>
+                                    <option value="Female" <?php if ($patient->sex == 'Female') echo 'selected'; ?>>Female</option>
+                                    <option value="Other" <?php if ($patient->sex == 'Other') echo 'selected'; ?>>Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Civil Status</label>
+                                <select name="status">
+                                    <option value="Single" <?php if ($patient->status == 'Single') echo 'selected'; ?>>Single</option>
+                                    <option value="Married" <?php if ($patient->status == 'Married') echo 'selected'; ?>>Married</option>
+                                    <option value="Widowed" <?php if ($patient->status == 'Widowed') echo 'selected'; ?>>Widowed</option>
+                                    <option value="Separated" <?php if ($patient->status == 'Separated') echo 'selected'; ?>>Separated</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Occupation</label>
+                                <input type="text" name="occupation" value="<?php echo htmlentities($patient->occupation); ?>">
+                            </div>
                         </div>
-                    </form>
-                <?php else: ?>
-                    <p>Could not load profile data.</p>
-                <?php endif; ?>
-            </div>
+                    </div>
+                </form>
+            <?php else: ?>
+                <p>Could not load profile data.</p>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -809,6 +817,19 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <script src="js/profile-medical-modal.js"></script>
     <script src="js/profile-edit-modal.js"></script>
     <script src="js/profile-booking-modal.js"></script>
+
+    <script>
+        function changeProfilePic(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profilePic').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
 
 </body>
 

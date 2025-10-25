@@ -140,6 +140,8 @@ if (isset($_POST['submit_feedback'])) {
   <link href="./css/header.css" rel="stylesheet" type="text/css" />
   <link href="./css/footer.css" rel="stylesheet" type="text/css" />
   <link href="css/health-modal.css" rel="stylesheet" type="text/css" />
+  <link href="css/health-questionnaire.css" rel="stylesheet" type="text/css" />
+  <link href="css/interactive-calendar.css" rel="stylesheet" type="text/css" />
 
   <!--script-->
   <style>
@@ -443,112 +445,173 @@ if (isset($_POST['submit_feedback'])) {
   </div>
 
   <!-- Health Condition Modal -->
-<div class="modal fade" id="healthModal" tabindex="-1" role="dialog" aria-labelledby="healthModalLabel" aria-hidden="true">
-  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-  <div class="modal-dialog modal-lg" role="document">
+<div class="modal fade health-questionnaire-modal" id="healthModal" tabindex="-1" role="dialog" aria-labelledby="healthModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
     <div class="modal-content">
       <form method="post">
         <div class="modal-header">
-          <h5 class="modal-title" id="healthModalLabel">Health Condition Form</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <h3 class="modal-title" id="healthModalLabel"><b>Health Condition Form</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="font-size: 1.5rem; background: none; border: none;">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
           <!-- Appointment fields -->
-          <div class="row mt-3">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="appointment_date">Preferred Appointment Date</label>
-                <input type="date" class="form-control" name="appointment_date" id="appointment_date" required>
+          <div class="appointment-fields">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="appointment_date">Preferred Date</label>
+                  <!-- This input is now the trigger and will be populated by the calendar -->
+                  <input type="text" class="form-control" name="appointment_date" id="appointment_date" placeholder="Select a date" required readonly>
+                  <!-- Interactive Calendar HTML -->
+                  <div class="calendar-wrapper" id="calendarWrapper">
+                      <div class="calendar-header">
+                          <button type="button" class="nav-btn" id="prevBtn">‹</button>
+                          <h2 id="monthYear"></h2>
+                          <button type="button" class="nav-btn" id="nextBtn">›</button>
+                      </div>
+                      <div class="weekdays">
+                          <div class="weekday">Mon</div><div class="weekday">Tue</div><div class="weekday">Wed</div><div class="weekday">Thu</div><div class="weekday">Fri</div><div class="weekday">Sat</div><div class="weekday">Sun</div>
+                      </div>
+                      <div class="days" id="daysContainer"></div>
+                  </div>
+                  <!-- End Interactive Calendar -->
+                </div>
               </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="appointment_time">Preferred Appointment Time</label>
-                <select class="form-control" name="appointment_time" id="appointment_time">
-                  <option value="">-- Select a time --</option>
-                </select required>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="appointment_time">Preferred Time</label>
+                  <select class="form-control" name="appointment_time" id="appointment_time" required>
+                    <option value="">Select a date first</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Health Conditions -->
-                        <p>Please check all conditions that apply to you.</p>
-              <div class="row">
-                <div class="col-md-6 section">
-                  <h2 class="section-title">GENERAL</h2>
-                  <div class="options">
-                    <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Marked weight change" id="hc_general_1"><label for="hc_general_1">Marked weight change</label></div>
-                  </div>
-                  <h2 class="section-title">EAR</h2>
-                  <div class="options">
-                    <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Marked weight change" id="hc_general_1"><label for="hc_general_1">Loss of hearing, ringing of ears</label></div>
-                  </div>
-                  <h2 class="section-title mt-3">NERVOUS SYSTEM</h2>
-                  <div class="options">
-                    <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Headache" id="hc_nerv_1"><label for="hc_nerv_1">Headache</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Convulsion/epilepsy" id="hc_nerv_2"><label for="hc_nerv_2">Convulsion/epilepsy</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Numbness/Tingling" id="hc_nerv_3"><label for="hc_nerv_3">Numbness/Tingling</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[nervous][]" value="Dizziness/Fainting" id="hc_nerv_4"><label for="hc_nerv_4">Dizziness/Fainting</label></div>
-                  </div>
-                  <h2 class="section-title mt-3">BLOOD</h2>
-                  <div class="options">
-                    <div class="option"><input type="checkbox" name="health_conditions[blood][]" value="Bruise easily" id="hc_blood_1"><label for="hc_blood_1">Bruise easily</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[blood][]" value="Anemia" id="hc_blood_2"><label for="hc_blood_2">Anemia</label></div>
-                  </div>
-                  <h2 class="section-title mt-3">RESPIRATORY</h2>
-                  <div class="options">
-                    <div class="option"><input type="checkbox" name="health_conditions[respiratory][]" value="Persistent cough" id="hc_resp_1"><label for="hc_resp_1">Persistent cough</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[respiratory][]" value="Difficulty in breathing" id="hc_resp_2"><label for="hc_resp_2">Difficulty in breathing</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[respiratory][]" value="Asthma" id="hc_resp_3"><label for="hc_resp_3">Asthma</label></div>
-                  </div>
-                  <div class="row">
-                <div class="col-md-6 section">
-                  <h2 class="section-title">URINARY</h2>
-                  <div class="options">
-                    <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Marked weight change" id="hc_general_1"><label for="hc_general_1">Increase frequency of urination</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[general][]" value="Marked weight change" id="hc_general_1"><label for="hc_general_1">Burning sensation on urination</label></div>
-                  </div>
-                  <h2 class="section-title mt-3">LIVER</h2>
-                  <div class="options">
-                    <div class="option"><input type="checkbox" name="health_conditions[liver][]" value="History of liver ailment" id="hc_liver_1"><label for="hc_liver_1">History of liver ailment</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[liver][]" value="Jaundice" id="hc_liver_2"><label for="hc_liver_2">Jaundice</label></div>
-                  </div>
-                  <div class="form-group mt-2"><label for="liver_specify">Specify:</label><input type="text" class="form-control" name="health_conditions[liver_specify]" id="liver_specify"></div>
+          <p>Please check all conditions that apply to you.</p>
+          <div class="two-column">
+            <div>
+              <div class="section">
+                <div class="section-title">General</div>
+                <div class="form-group"><label>Marked weight change</label><input type="checkbox" name="health_conditions[general][]" value="Marked weight change"></div>
+              </div>
+              <div class="section">
+                <div class="section-title">Ear</div>
+                <div class="form-group"><label>Loss of hearing, ringing of ears</label><input type="checkbox" name="health_conditions[ear][]" value="Loss of hearing, ringing of ears"></div>
+              </div>
+              <div class="section">
+                <div class="section-title">Nervous System</div>
+                <div class="form-group"><label>Headache</label><input type="checkbox" name="health_conditions[nervous][]" value="Headache"></div>
+                <div class="form-group"><label>Convulsion / epilepsy</label><input type="checkbox" name="health_conditions[nervous][]" value="Convulsion/epilepsy"></div>
+                <div class="form-group"><label>Numbness / Tingling</label><input type="checkbox" name="health_conditions[nervous][]" value="Numbness/Tingling"></div>
+                <div class="form-group"><label>Dizziness / Fainting</label><input type="checkbox" name="health_conditions[nervous][]" value="Dizziness/Fainting"></div>
+              </div>
+              <div class="section">
+                <div class="section-title">Blood</div>
+                <div class="form-group"><label>Bruise easily</label><input type="checkbox" name="health_conditions[blood][]" value="Bruise easily"></div>
+                <div class="form-group"><label>Anemia</label><input type="checkbox" name="health_conditions[blood][]" value="Anemia"></div>
+              </div>
+              <div class="section">
+                <div class="section-title">Respiratory</div>
+                <div class="form-group"><label>Persistent cough</label><input type="checkbox" name="health_conditions[respiratory][]" value="Persistent cough"></div>
+                <div class="form-group"><label>Difficulty in breathing</label><input type="checkbox" name="health_conditions[respiratory][]" value="Difficulty in breathing"></div>
+                <div class="form-group"><label>Asthma</label><input type="checkbox" name="health_conditions[respiratory][]" value="Asthma"></div>
+              </div>
+              <div class="section">
+                <div class="section-title">Heart</div>
+                <div class="form-group"><label>Chest pain/discomfort</label><input type="checkbox" name="health_conditions[heart][]" value="Chest pain/discomfort"></div>
+                <div class="form-group"><label>Shortness of breath</label><input type="checkbox" name="health_conditions[heart][]" value="Shortness of breath"></div>
+                <div class="form-group"><label>Hypertension</label><input type="checkbox" name="health_conditions[heart][]" value="Hypertension"></div>
+                <div class="form-group"><label>Ankle edema</label><input type="checkbox" name="health_conditions[heart][]" value="Ankle edema"></div>
+                <div class="form-group"><label>Rheumatic fever (age)</label><input type="checkbox" name="health_conditions[heart][]" value="Rheumatic fever"></div>
+                <div class="input-group"><input type="text" placeholder="Specify age" name="health_conditions[rheumatic_age]"></div>
+                <div class="form-group"><label>History of stroke (When)</label><input type="checkbox" name="health_conditions[heart][]" value="History of stroke"></div>
+                <div class="input-group"><input type="text" placeholder="When" name="health_conditions[stroke_when]"></div>
+              </div>
+            </div>
+            <div>
+              <div class="section">
+                <div class="section-title">Urinary</div>
+                <div class="form-group"><label>Increase frequency of urination</label><input type="checkbox" name="health_conditions[urinary][]" value="Increase frequency of urination"></div>
+                <div class="form-group"><label>Burning sensation on urination</label><input type="checkbox" name="health_conditions[urinary][]" value="Burning sensation on urination"></div>
+              </div>
+              <div class="section">
+                <div class="section-title">Liver</div>
+                <div class="form-group"><label>History of liver ailment</label><input type="checkbox" name="health_conditions[liver][]" value="History of liver ailment"></div>
+                <div class="input-group"><input type="text" placeholder="Specify" name="health_conditions[liver_specify]"></div>
+                <div class="form-group"><label>Jaundice</label><input type="checkbox" name="health_conditions[liver][]" value="Jaundice"></div>
+              </div>
+              <div class="section">
+                <div class="section-title">Diabetes</div>
+                <div class="form-group"><label>Delayed healing of wounds</label><input type="checkbox" name="health_conditions[diabetes][]" value="Delayed healing of wounds"></div>
+                <div class="form-group"><label>Increase intake of food or water</label><input type="checkbox" name="health_conditions[diabetes][]" value="Increase intake of food or water"></div>
+                <div class="form-group"><label>Family history of diabetes</label><input type="checkbox" name="health_conditions[diabetes][]" value="Family history of diabetes"></div>
+              </div>
+              <div class="section">
+                <div class="section-title">Thyroid</div>
+                <div class="form-group"><label>Perspire easily</label><input type="checkbox" name="health_conditions[thyroid][]" value="Perspire easily"></div>
+                <div class="form-group"><label>Apprehension</label><input type="checkbox" name="health_conditions[thyroid][]" value="Apprehension"></div>
+                <div class="form-group"><label>Palpitation/rapid heart beat</label><input type="checkbox" name="health_conditions[thyroid][]" value="Palpation/rapid heart beat"></div>
+                <div class="form-group"><label>Goiter</label><input type="checkbox" name="health_conditions[thyroid][]" value="Goiter"></div>
+                <div class="form-group"><label>Bulging of eyes</label><input type="checkbox" name="health_conditions[thyroid][]" value="Bulging of eyes"></div>
+              </div>
+              <div class="section">
+                <div class="section-title">Arthritis</div>
+                <div class="form-group"><label>Joint pain</label><input type="checkbox" name="health_conditions[arthritis][]" value="Joint pain"></div>
+                <div class="form-group"><label>Joint Swelling</label><input type="checkbox" name="health_conditions[arthritis][]" value="Joint Swelling"></div>
+              </div>
+              <div class="section">
+                <div class="section-title">Radiograph</div>
+                <div class="form-group"><label>Undergo radiation therapy</label><input type="checkbox" name="health_conditions[radiograph][]" value="Undergo radiation therapy"></div>
+              </div>
+              <div class="section">
+                <div class="section-title">Women</div>
+                <div class="form-group"><label>Pregnancy (No. of month)</label><input type="checkbox" name="health_conditions[women][]" value="Pregnancy"></div>
+                <div class="input-group"><input type="number" placeholder="Number of months" name="health_conditions[pregnancy_months]" min="1" max="9"></div>
+                <div class="form-group"><label>Breast feed</label><input type="checkbox" name="health_conditions[women][]" value="Breast feed"></div>
+              </div>
+            </div>
+          </div>
 
-                  <h2 class="section-title mt-3">DIABETES</h2>
-                  <div class="options">
-                    <div class="option"><input type="checkbox" name="health_conditions[diabetes][]" value="Delayed healing of wounds" id="hc_diab_1"><label for="hc_diab_1">Delayed healing of wounds</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[diabetes][]" value="Increase intake of food or water" id="hc_diab_2"><label for="hc_diab_2">Increase intake of food or water</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[diabetes][]" value="Family history of diabetes" id="hc_diab_3"><label for="hc_diab_3">Family history of diabetes</label></div>
-                  </div>
+          <div class="section">
+            <div class="section-title">Hospitalization</div>
+            <div class="inline-group"><label>Have you been hospitalized</label><input type="checkbox" name="health_conditions[hospitalization][]" value="Hospitalized"></div>
+            <div class="input-group"><label>Date:</label><input type="date" name="health_conditions[hospitalization_date]"></div>
+            <div class="input-group"><label>Specify:</label><input type="text" name="health_conditions[hospitalization_specify]" placeholder="Please specify reason"></div>
+          </div>
 
-                  <h2 class="section-title mt-3">THYROID</h2>
-                  <div class="options">
-                    <div class="option"><input type="checkbox" name="health_conditions[thyroid][]" value="Perspire easily" id="hc_thy_1"><label for="hc_thy_1">Perspire easily</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[thyroid][]" value="Apprehension" id="hc_thy_2"><label for="hc_thy_2">Apprehension</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[thyroid][]" value="Palpation/rapid heart beat" id="hc_thy_3"><label for="hc_thy_3">Palpation/rapid heart beat</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[thyroid][]" value="Goiter" id="hc_thy_4"><label for="hc_thy_4">Goiter</label></div>
-                    <div class="option"><input type="checkbox" name="health_conditions[thyroid][]" value="Bulging of eyes" id="hc_thy_5"><label for="hc_thy_5">Bulging of eyes</label></div>
-                  </div>
-                </div>
-  </div>
-  </div>
-                
+          <div class="allergy-section">
+            <div class="allergy-title">Are you allergic or have ever experienced any reaction to the ff?</div>
+            <div class="inline-group">
+              <label>Sleeping pills</label><input type="checkbox" name="health_conditions[allergies][]" value="Sleeping pills">
+              <label>Aspirin</label><input type="checkbox" name="health_conditions[allergies][]" value="Aspirin">
+              <label>Food</label><input type="checkbox" name="health_conditions[allergies][]" value="Food">
+            </div>
+            <div class="inline-group">
+              <label>Penicillin/other antibiotics</label><input type="checkbox" name="health_conditions[allergies][]" value="Penicillin/other antibiotics">
+              <label>Sulfa Drugs</label><input type="checkbox" name="health_conditions[allergies][]" value="Sulfa Drugs">
+              <label>Others</label><input type="checkbox" name="health_conditions[allergies][]" value="Others">
+            </div>
+            <div class="input-group"><label>Specify:</label><input type="text" name="health_conditions[allergy_specify]" placeholder="Please specify allergies"></div>
+          </div><br>
 
-
-
-                  
+          <div class="section">
+            <div class="section-title">Previous Extraction History</div>
+            <div class="form-group"><label>Have you had any previous extraction</label><input type="checkbox" name="health_conditions[extraction][]" value="Previous extraction"></div>
+            <div class="input-group"><label>Date of last extraction:</label><input type="date" name="health_conditions[extraction_date]"></div>
+            <div class="input-group"><label>Specify:</label><textarea name="health_conditions[extraction_specify]" rows="2" placeholder="Please provide details"></textarea></div>
+            <div class="form-group"><label>Untoward reaction to extraction</label><input type="checkbox" name="health_conditions[extraction][]" value="Untoward reaction to extraction"></div>
+            <div class="input-group"><label>Specify:</label><input type="text" name="health_conditions[extraction_reaction_specify]" placeholder="Please specify reaction"></div>
+            <div class="form-group"><label>Were you under local anesthesia</label><input type="checkbox" name="health_conditions[extraction][]" value="Under local anesthesia"></div>
+            <div class="form-group"><label>Allergic reaction to local anesthesia</label><input type="checkbox" name="health_conditions[extraction][]" value="Allergic reaction to local anesthesia"></div>
+          </div>
+          <button type="submit" class="submit-btn">Submit Form</button>
+        </div>
                 </div>
               </div>
 
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal" data-bs-dismiss="modal">Close</button>
-              <button type="submit" name="book_appointment" class="btn btn-primary">Book Appointment</button>
             </div>
             </div>
           </div>
@@ -604,6 +667,8 @@ if (isset($_POST['submit_feedback'])) {
 
   <?php include_once('includes/footer.php'); ?>
   <script src="js/health-modal.js"></script>
+  <script src="js/health-questionnaire.js"></script>
+  <script src="js/interactive-calendar.js"></script>
   <script>
     // Ensure that when arriving at the page with a hash (e.g. /index.php#about)
     // we scroll to the target after load. This overrides other load-time
