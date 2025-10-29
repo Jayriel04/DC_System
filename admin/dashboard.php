@@ -19,7 +19,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         <link rel="stylesheet" href="./css/sidebar.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     </head>
-
     <body>
         <div class="container-scroller">
             <?php include_once('includes/header.php'); ?>

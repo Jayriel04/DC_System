@@ -1,0 +1,411 @@
+/* Interactive Calendar Styles */
+.calendar-wrapper {
+    position: absolute;
+    z-index: 1051; /* Above the modal */
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    max-width: 400px;
+    width: 100%;
+    display: none; /* Initially hidden */
+    margin-top: 10px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.calendar-header h2 {
+    font-size: 20px;
+    color: #333;
+    font-weight: 600;
+    margin: 0;
+}
+
+.calendar-header .nav-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #667eea;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-header .nav-btn:hover {
+    background: #f0f0f0;
+    transform: scale(1.1);
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.weekday {
+    text-align: center;
+    font-weight: 600;
+    color: #999;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.2s ease;
+    position: relative;
+    border: 2px solid transparent;
+}
+
+.day:not(.empty):not(.other-month):hover {
+    background: #eef0ff;
+}
+
+.day.disabled {
+    color: #ccc;
+    cursor: default;
+    text-decoration: line-through;
+}
+
+.day.disabled:hover {
+    background: none;
+}
+
+.day.empty {
+    cursor: default;
+}
+
+.day.other-month {
+    color: #ccc;
+    cursor: default;
+}
+
+.day.other-month:hover {
+    background: none;
+}
+
+.day.selected {
+    background: #667eea;
+    color: white;
+    font-weight: 600;
+}
+
+.day.today {
+    border-color: #667eea;
+}
+
+.day.available:not(.other-month) {
+    background-color: #e6fffa;
+    color: #004d40;
+}
+
+.day.fully-booked:not(.other-month) {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+/* Positioning relative to the date input */
+.appointment-fields .col-md-6 {
+    position: relative;
+}
+
+/* Health Questionnaire Modal Styles */
+.health-questionnaire-modal .modal-dialog {
+    max-width: 1200px;
+}
+
+.health-questionnaire-modal .modal-body {
+    padding: 10px;
+    background-color: #fff;
+}
+
+.health-questionnaire-modal .section {
+    margin-bottom: 35px;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+}
+
+.health-questionnaire-modal .section-title {
+    font-size: 1.3em;
+    color: #667eea;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 10px;
+}
+
+.health-questionnaire-modal .form-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.health-questionnaire-modal .form-group:last-child {
+    border-bottom: none;
+}
+
+.health-questionnaire-modal .form-group label {
+    flex: 1;
+    font-size: 1em;
+    color: #333;
+    margin-bottom: 0; /* Override default label margin */
+}
+
+.health-questionnaire-modal .checkbox-wrapper {
+    width: 30px;
+    height: 30px;
+    position: relative;
+}
+
+.health-questionnaire-modal input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+.health-questionnaire-modal input[type="text"],
+.health-questionnaire-modal input[type="date"],
+.health-questionnaire-modal input[type="number"],
+.health-questionnaire-modal textarea {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.95em;
+    width: 100%;
+    transition: border-color 0.3s;
+}
+
+.health-questionnaire-modal input[type="text"]:focus,
+.health-questionnaire-modal input[type="date"]:focus,
+.health-questionnaire-modal input[type="number"]:focus,
+.health-questionnaire-modal textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.health-questionnaire-modal .two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.health-questionnaire-modal .input-group {
+    margin-top: 15px;
+}
+
+.health-questionnaire-modal .input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #555;
+}
+
+.health-questionnaire-modal .inline-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.health-questionnaire-modal .inline-group label {
+    margin: 0;
+    color:#333;
+}
+
+.health-questionnaire-modal .allergy-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    border-left: 4px solid #667eea;
+}
+
+.health-questionnaire-modal .allergy-title {
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: black;
+    font-size: 1.1em;
+}
+
+.health-questionnaire-modal .form-group.highlight {
+    background-color: #e8f5e9;
+    border-radius: 4px;
+}
+
+/* Appointment fields specific styles */
+.health-questionnaire-modal .appointment-fields {
+    padding: 20px;
+    background: #f1f3f5;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.health-questionnaire-modal .appointment-fields .row {
+    display: flex;
+    gap: 20px;
+}
+
+.health-questionnaire-modal .appointment-fields .col-md-6 {
+    flex: 1;
+}
+
+.health-questionnaire-modal .appointment-fields .form-group {
+    border: none;
+    padding: 0;
+    display: block;
+}
+
+.health-questionnaire-modal .appointment-fields .form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.health-questionnaire-modal .appointment-fields .form-control {
+    width: 100%;
+}
+.submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 50px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto 0;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-weight: bold;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+
+@media (max-width: 992px) {
+    .health-questionnaire-modal .two-column {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .health-questionnaire-modal .modal-body {
+        padding: 20px;
+    }
+
+    .health-questionnaire-modal .section {
+        padding: 15px;
+    }
+
+    .health-questionnaire-modal .appointment-fields .row {
+        flex-direction: column;
+    }
+}
+
+/* Styles for the health condition modal, based on the provided UI */
+
+.modal-dialog.modal-lg {
+    max-width: 720px;
+}
+
+.modal-content {
+    border-radius: 16px;
+    padding: 5px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    width: 1200px;
+    margin: 5% -50%;
+}
+
+.modal-header {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.modal-body .section {
+    margin-bottom: 24px;
+}
+
+.modal-body .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #000;
+}
+
+.modal-body .divider {
+    height: 1px;
+    background: #e5e5e5;
+    margin-bottom: 20px;
+}
+
+.modal-body .options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.modal-body .option {
+    position: relative;
+}
+
+.modal-body .option input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-body .option label {
+    display: inline-block;
+    padding: 8px 16px;
+    border: 2px solid #e5e5e5;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.2s;
+    user-select: none;
+    margin-bottom: 0; /* Override bootstrap default */
+}
+
+.modal-body .option label:hover {
+    border-color: #cbd5e1;
+}
+
+.modal-body .option input:checked + label {
+    border-color: #2563eb;
+    color: #2563eb;
+    background: #eff6ff;
+}

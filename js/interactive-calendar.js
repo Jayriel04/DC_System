@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!dateInput || !calendarWrapper) return;
 
-    let currentDate = new Date();
+    // Make currentDate global so other scripts can access it
+    window.currentDate = new Date();
     let selectedDate = null;
 
     const months = ['January', 'February', 'March', 'April', 'May', 'June',

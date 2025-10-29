@@ -19,15 +19,22 @@
     border: 1px solid #888;
     width: 80%;
     max-width: 600px;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     border-radius: 0.5rem;
     animation: animatetop 0.4s;
     position: relative;
 }
 
 @keyframes animatetop {
-    from {top: -300px; opacity: 0}
-    to {top: 0; opacity: 1}
+    from {
+        top: -300px;
+        opacity: 0
+    }
+
+    to {
+        top: 0;
+        opacity: 1
+    }
 }
 
 .modal-header {
@@ -75,4 +82,32 @@
 .btn-update {
     background-color: #007bff;
     color: white;
+}
+
+.patient-table tbody {
+    display: block;
+    max-height: 500px;
+    /* Adjust this value based on your row height to show ~10 rows */
+    overflow-y: auto;
+}
+
+.patient-table thead,
+.patient-table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.patient-table tbody {
+    display: block;
+    max-height: 500px;
+    /* Adjust this value based on your row height to show ~10 rows */
+    overflow-y: auto;
+}
+
+.patient-table thead,
+.patient-table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
 }

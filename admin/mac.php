@@ -257,7 +257,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="6" style="text-align: center;">No patients found.</td>
+                                        <td colspan="8" style="text-align: center;">No patients found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>

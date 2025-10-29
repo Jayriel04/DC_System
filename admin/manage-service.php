@@ -34,6 +34,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="./css/sidebar.css">
     <link rel="stylesheet" href="./css/manage-service.css">
+        
     
 </head>
 <body>
@@ -68,7 +69,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         } else {
                             $pageno = 1;
                         }
-                        $no_of_records_per_page = 12;
+                        $no_of_records_per_page = 10;
                         $offset = ($pageno - 1) * $no_of_records_per_page;
 
                         $count_sql = "SELECT COUNT(*) FROM tblservice WHERE 1=1";

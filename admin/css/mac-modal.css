@@ -76,3 +76,32 @@
     background-color: #007bff;
     color: white;
 }
+
+
+.patient-table tbody {
+    display: block;
+    max-height: 500px;
+    /* Adjust this value based on your row height to show ~10 rows */
+    overflow-y: auto;
+}
+
+.patient-table thead,
+.patient-table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.patient-table tbody {
+    display: block;
+    max-height: 500px;
+    /* Adjust this value based on your row height to show ~10 rows */
+    overflow-y: auto;
+}
+
+.patient-table thead,
+.patient-table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}

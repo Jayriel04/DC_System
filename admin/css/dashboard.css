@@ -9,7 +9,9 @@
     margin: 0 auto;
 }
 
-.stats-grid, .metrics-grid, .content-grid {
+.stats-grid,
+.metrics-grid,
+.content-grid {
     padding: 0 15px;
 }
 
@@ -62,10 +64,25 @@
     flex-shrink: 0;
 }
 
-.icon-blue { background: #dbeafe; color: #3b82f6; }
-.icon-green { background: #dcfce7; color: #10b981; }
-.icon-purple { background: #e9d5ff; color: #a855f7; }
-.icon-yellow { background: #fef08a; color: #eab308; }
+.icon-blue {
+    background: #dbeafe;
+    color: #3b82f6;
+}
+
+.icon-green {
+    background: #dcfce7;
+    color: #10b981;
+}
+
+.icon-purple {
+    background: #e9d5ff;
+    color: #a855f7;
+}
+
+.icon-yellow {
+    background: #fef08a;
+    color: #eab308;
+}
 
 .stars {
     color: #fbbf24;
@@ -184,7 +201,7 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: #c7f0d8;    
+    background: #c7f0d8;
     font-size: 24px;
     color: #047857;
     flex-shrink: 0;
@@ -223,7 +240,8 @@
     text-align: right;
 }
 
-.status-approved, .status-done {
+.status-approved,
+.status-done {
     background: #dcfce7;
     color: #15803d;
 }
@@ -363,16 +381,33 @@
     border-radius: 2px;
 }
 
-.dot-teal { background: #14b8a6; }
-.dot-blue { background: #3b82f6; }
-.dot-green { background: #10b981; }
+.dot-teal {
+    background: #14b8a6;
+}
 
-.metric-value.blue { color: #3b82f6; }
-.metric-value.teal { color: #10b981; }
-.metric-value.green { color: #10b981; }
+.dot-blue {
+    background: #3b82f6;
+}
+
+.dot-green {
+    background: #10b981;
+}
+
+.metric-value.blue {
+    color: #3b82f6;
+}
+
+.metric-value.teal {
+    color: #10b981;
+}
+
+.metric-value.green {
+    color: #10b981;
+}
 
 /* --- Card Styles --- */
-.patient-list-card, .appointment-management-card {
+.patient-list-card,
+.appointment-management-card {
     background-color: #fff !important;
     padding: 20px !important;
     border-radius: 8px !important;
@@ -421,6 +456,7 @@ h2.section-title {
     font-size: 14px !important;
     transition: background-color 0.3s !important;
 }
+
 .new-appointment-btn:hover {
     background-color: #006b5f !important;
 }
@@ -461,7 +497,8 @@ h2.section-title {
 }
 
 .search-box::before {
-    content: '🔍' !important; /* Search Icon */
+    content: '🔍' !important;
+    /* Search Icon */
     position: absolute !important;
     left: 15px !important;
     top: 50% !important;
@@ -517,7 +554,8 @@ h2.section-title {
     border-collapse: collapse !important;
 }
 
-.patient-table th, .patient-table td {
+.patient-table th,
+.patient-table td {
     padding: 15px 0 !important;
     text-align: left !important;
     border-bottom: 1px solid #eee !important;
@@ -553,9 +591,20 @@ h2.section-title {
 }
 
 /* Status & Actions */
-.status-badge.status-approved { background: #e6f7d9 !important; color: #52c41a !important; }
-.status-badge.status-pending { background: #fffbe6 !important; color: #faad14 !important; }
-.status-badge.status-declined { background: #fff1f0 !important; color: #f5222d !important; }
+.status-badge.status-approved {
+    background: #e6f7d9 !important;
+    color: #52c41a !important;
+}
+
+.status-badge.status-pending {
+    background: #fffbe6 !important;
+    color: #faad14 !important;
+}
+
+.status-badge.status-declined {
+    background: #fff1f0 !important;
+    color: #f5222d !important;
+}
 
 .actions-icons a {
     margin-left: 10px !important;
@@ -564,15 +613,30 @@ h2.section-title {
     font-size: 16px !important;
     text-decoration: none;
 }
+
 .actions-icons a:hover {
     color: #333 !important;
 }
 
-.avatar.avatar-sj { background-color: #3498db; }
-.avatar.avatar-mc { background-color: #2ecc71; }
-.avatar.avatar-ed { background-color: #9b59b6; }
-.avatar.avatar-rw { background-color: #e67e22; }
-.avatar.avatar-la { background-color: #1abc9c; }
+.avatar.avatar-sj {
+    background-color: #3498db;
+}
+
+.avatar.avatar-mc {
+    background-color: #2ecc71;
+}
+
+.avatar.avatar-ed {
+    background-color: #9b59b6;
+}
+
+.avatar.avatar-rw {
+    background-color: #e67e22;
+}
+
+.avatar.avatar-la {
+    background-color: #1abc9c;
+}
 
 .contact-info a {
     color: #3498db;
@@ -764,7 +828,21 @@ h2.section-title {
         gap: 15px;
         margin-bottom: 0;
     }
+
     .form-group {
         margin-bottom: 15px;
     }
+}
+
+.container-scroller {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.main-panel {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }

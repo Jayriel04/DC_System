@@ -8,13 +8,12 @@ if (session_status() === PHP_SESSION_NONE) {
 // If not found, $base will be empty (site assumed at webroot). Adjust $project if your folder name differs.
 $base = '';
 if (isset($_SERVER['SCRIPT_NAME'])) {
-  $project = 'dental-clinic';
-  if (strpos($_SERVER['SCRIPT_NAME'], '/' . $project . '/') !== false || substr($_SERVER['SCRIPT_NAME'], -strlen('/' . $project)) === '/' . $project) {
-    // set base to "/DC_System" (or to the matched project folder)
-    $base = '/' . $project;
-  } else {
-    // leave $base empty so links resolve from webroot
-    $base = '';
+  $project_folders = ['dental-clinic', 'DC_System'];
+  foreach ($project_folders as $project) {
+    if (strpos($_SERVER['SCRIPT_NAME'], '/' . $project . '/') !== false) {
+      $base = '/' . $project;
+      break; // Found the project folder, so we can stop looking.
+    }
   }
 }
 
@@ -314,12 +313,11 @@ if (!empty($_SESSION)) {
       // Build a stable link to the site's index page.
       // If $base is set (e.g. '/dental-clinic'), use that. Otherwise fall back to the known project
       // folder so links don't point to the server root (XAMPP welcome page).
-      $project = 'DC_System';
       if (!empty($base)) {
         $index_url = rtrim($base, '/') . '/index.php';
       } else {
-        // ensure we point to the project folder on the server
-        $index_url = '/' . trim($project, '/') . '/index.php';
+        // Fallback for webroot or if base detection fails. Assumes a default project folder.
+        $index_url = '/dental-clinic/index.php';
       }
       ?>
       <nav class="desktop-nav">
