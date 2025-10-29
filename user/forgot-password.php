@@ -1,32 +1,66 @@
 <?php
 session_start();
-error_reporting(0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 include('includes/dbconnection.php');
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+// Make sure this path is correct for your project structure
+require '../vendor/autoload.php';
 
 // Message variable for feedback
 $message = '';
 if(isset($_POST['submit'])) {
   $email = $_POST['email'];
   // Check if email exists in the database
-  $sql = "SELECT id, username FROM tblpatient WHERE email=:email";
+  $sql = "SELECT number, username FROM tblpatient WHERE email=:email";
   $query = $dbh->prepare($sql);
   $query->bindParam(':email', $email, PDO::PARAM_STR);
   $query->execute();
   if($query->rowCount() > 0) {
-    // Generate a temporary password
-    $temp_password = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 10);
-    $hashed_password = md5($temp_password);
+    // Generate a 6-digit OTP
+    $otp = rand(100000, 999999);
+    // Store OTP, email, and timestamp in session
+    $_SESSION['otp'] = $otp;
+    $_SESSION['otp_email'] = $email;
+    $_SESSION['otp_timestamp'] = time();
 
-    // Update the password in the database
-    $update_sql = "UPDATE tblpatient SET password=:password WHERE email=:email";
-    $update_query = $dbh->prepare($update_sql);
-    $update_query->bindParam(':password', $hashed_password, PDO::PARAM_STR);
-    $update_query->bindParam(':email', $email, PDO::PARAM_STR);
+    // Send OTP to user's email
+    $mail = new PHPMailer(true);
+    try {
+        //Server settings - Update with your SMTP details
+        $mail->SMTPDebug = 2; // Enable verbose debug output
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com'; // Set the SMTP server to send through
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'canonio.jezrahfaith.mcc@gmail.com'; // SMTP username
+        $mail->Password   = 'hevm yhzs rnbh shqj'; // SMTP password or App Password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
 
-    if($update_query->execute()) {
-      $message = '<div class="alert alert-success text-center">A temporary password has been generated: <strong>' . $temp_password . '</strong><br>Please login with this password and change it immediately.</div>';
-    } else {
-      $message = '<div class="alert alert-danger text-center">Something went wrong. Please try again.</div>';
+        //Recipients
+        $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
+        $mail->addAddress($email);
+
+        //Content
+        $mail->isHTML(true);
+        $mail->Subject = 'Your OTP for Password Reset';
+        $mail->Body    = 'Your One-Time Password (OTP) for resetting your password is: <b>' . $otp . '</b>. It is valid for 5 minutes.';
+
+        $mail->send();
+        header('location:verify-otp.php');
+        exit(); // Stop script execution after redirect
+    } catch (Exception $e) {
+        $message = "<div class='alert alert-danger text-center'>The OTP email could not be sent. Please check your mail server configuration. Mailer Error: {$mail->ErrorInfo}</div>";
     }
   } else {
     $message = '<div class="alert alert-warning text-center">Email address not found in our records.</div>';
@@ -103,15 +137,15 @@ if(isset($_POST['submit'])) {
 
             <div class="form-container">
                 <h1>Reset Password</h1>
-                <p class="subtitle">Enter your email to receive a temporary password.</p>
+                <p class="subtitle">Enter your email to receive a One-Time Password (OTP).</p>
                 <?php if(!empty($message)) echo $message; ?>
                 <form method="post">
                 <div class="form-group">
                     <label for="email">Email Address</label>
                     <input type="email" id="email" class="form-control" placeholder="Enter your email" required name="email">
                 </div>
-                <button type="submit" name="submit" class="login-btn">Send Temporary Password</button>
-                </form>
+                <button type="submit" name="submit" class="login-btn">Send OTP</button>
+                </form> 
             </div>
         </div>
     </div>
