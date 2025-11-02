@@ -630,7 +630,7 @@ if (isset($_POST['submit_feedback'])) {
                   <div class="section-title">Women</div>
                   <div class="form-group"><label>Pregnancy (No. of month)</label><input type="checkbox"
                       name="health_conditions[women][]" value="Pregnancy"></div>
-                  <div class="input-group"><input type="number" placeholder="Number of months"
+                  <div class="input-group"><input type="number" placeholder="No."
                       name="health_conditions[pregnancy_months]" min="1" max="9"></div>
                   <div class="form-group"><label>Breast feed</label><input type="checkbox"
                       name="health_conditions[women][]" value="Breast feed"></div>
