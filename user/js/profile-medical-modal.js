@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     const editMedicalBtn = document.getElementById('editMedicalHistoryBtn');
     const medicalModal = document.getElementById('medicalHistoryModal');
-    // Select all elements that can close the modal (the 'x' and the 'Cancel' button)
-    const closeModalBtns = document.querySelectorAll('.modal .close, .modal [data-dismiss="modal"]');
+    // Select all elements that can close THIS modal (the 'x' and the 'Cancel' button)
+    const closeModalBtns = medicalModal ? medicalModal.querySelectorAll('.close, [data-dismiss="modal"]') : [];
 
     if (editMedicalBtn && medicalModal) {
         // Show the modal when the edit button is clicked

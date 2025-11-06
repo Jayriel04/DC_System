@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const editProfileBtn = document.getElementById('editProfileBtn');
     const profileModal = document.getElementById('editProfileModal');
-    const closeModalBtns = document.querySelectorAll('#editProfileModal .close, #editProfileModal [data-dismiss="modal"]');
+    const closeModalBtns = profileModal ? profileModal.querySelectorAll('.close, [data-dismiss="modal"]') : [];
 
     if (editProfileBtn && profileModal) {
         // Show the modal when the edit button is clicked
