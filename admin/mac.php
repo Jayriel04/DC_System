@@ -159,7 +159,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Appointments & Patients</title>
+    <title>Consultation Appointment</title>
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
@@ -188,7 +188,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 
                         <div class="filter-section">
                             <div class="search-box">
-                                <input type="text" placeholder="Search appointments by patient name or service..." aria-label="Search appointments">
+                                <input type="text" placeholder="Search appointments by patient name" aria-label="Search appointments">
                             </div>
                             <div class="filter-buttons">
                                 <a href="mac.php?filter=all" class="filter-btn <?php if ($filter === 'all') echo 'active'; ?>" data-filter="all">
@@ -313,7 +313,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         <label for="date">Date</label>
                         <div class="input-with-icon">
                             <input type="date" id="date" name="date" required>
-                            <i class="fas fa-calendar-alt input-icon"></i>
+                            
                         </div>
                     </div>
                 </div>
@@ -322,14 +322,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         <label for="start_time">Start Time</label>
                         <div class="input-with-icon">
                             <input type="time" id="start_time" name="start_time" required>
-                            <i class="fas fa-clock input-icon"></i>
+                            
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="end_time">End Time</label>
                         <div class="input-with-icon">
                             <input type="time" id="end_time" name="end_time" required>
-                            <i class="fas fa-clock input-icon"></i>
+                            
                         </div>
                     </div>
                 </div>

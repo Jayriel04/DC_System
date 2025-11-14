@@ -170,6 +170,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     <link rel="stylesheet" href="vendors/chartist/chartist.min.css">
     <!-- End plugin css for this page -->
     <!-- inject:css -->
+     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="./css/sidebar.css">
     <!-- endinject -->
@@ -190,7 +191,8 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                             <p>View and manage schedule </p>
                         </div>
                             <a href="#" class="add-btn" id="addScheduleBtn">
-                                <span>+</span> Add Schedule
+                                <i class="fas fa-calendar"></i>
+                             Add Schedule
                             </a>
                     </div>
                 <div class="calendar-container">

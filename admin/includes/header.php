@@ -3,6 +3,50 @@
 
 <header class="admin-header">
     <?php
+    // Determine the page title and description based on the current script
+    $currentPage = basename($_SERVER['PHP_SELF']);
+    $pageTitle = 'Dashboard'; // Default title
+    $pageDescription = 'Welcome back, manage your dental practice'; // Default description
+    
+    switch ($currentPage) {
+        case 'dashboard.php':
+            $pageTitle = 'Dashboard';
+            $pageDescription = 'Welcome back, manage your dental practice';
+            break;
+        case 'mac.php':
+        case 'mas.php':
+            $pageTitle = 'Appointments';
+            $pageDescription = 'Manage consultation and service appointments';
+            break;
+        case 'manage-patient.php':
+        case 'add-patient.php':
+        case 'edit-patient-detail.php':
+        case 'view-ph.php':
+        case 'view-er.php':
+            $pageTitle = 'Patients';
+            $pageDescription = 'Manage your patient records and information';
+            break;
+        case 'manage-service.php':
+        case 'add-service.php':
+        case 'edit-service.php':
+            $pageTitle = 'Services';
+            $pageDescription = 'Manage your dental services';
+            break;
+        case 'manage-inventory.php':
+            $pageTitle = 'Inventory';
+            $pageDescription = 'Track and manage your product inventory';
+            break;
+        case 'calendar.php':
+            $pageTitle = 'Calendar';
+            $pageDescription = 'View and manage schedule availability';
+            break;
+        case 'profile.php':
+        case 'change-password.php':
+            $pageTitle = 'Settings';
+            $pageDescription = 'Manage your administrator profile and settings';
+            break;
+    }
+
     $aid = $_SESSION['sturecmsaid'];
     $sql = "SELECT * from tbladmin where ID=:aid";
 
@@ -28,8 +72,8 @@
             </div>
         </div>
         <div class="dashboard-info">
-            <h1>Dashboard</h1>
-            <p>Welcome back, manage your dental practice</p>
+            <h1><?php echo htmlentities($pageTitle); ?></h1>
+            <p><?php echo htmlentities($pageDescription); ?></p>
         </div>
     </div>
 
@@ -41,7 +85,7 @@
 
         <div class="user-profile nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
-                    <img class="user-avatar" src="images/faces/face8.jpg" alt="Profile image">
+                    <img class="user-avatar" src="images/faces/profile.png" alt="Profile image">
                     <div class="user-info">
                         <span class="name"><?php echo htmlentities($adminName); ?></span>
                         <span class="role">Administrator</span>
@@ -49,11 +93,7 @@
                     <i class="fas fa-chevron-down dropdown-arrow"></i>
             </a>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
-                <div class="dropdown-header text-center">
-                    <img class="img-md rounded-circle" src="images/faces/face8.jpg" alt="Profile image">
-                    <p class="mb-1 mt-3"><?php echo htmlentities($adminName); ?></p>
-                    <p class="font-weight-light text-muted mb-0"><?php echo htmlentities($adminEmail); ?></p>
-                </div>
+
                 <a class="dropdown-item" href="profile.php"><i class="dropdown-item-icon icon-user text-primary"></i> My Profile</a>
                 <a class="dropdown-item" href="change-password.php"><i class="dropdown-item-icon icon-energy text-primary"></i> Setting</a>
                 <a class="dropdown-item" href="logout.php"><i class="dropdown-item-icon icon-power text-primary"></i>Sign Out</a>

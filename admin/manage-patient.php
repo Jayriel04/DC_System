@@ -5,7 +5,7 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
-    // Handle new patient creation from modal
+    // Handle patient update from edit modal
     if (isset($_POST['update_patient'])) {
         $patient_id = $_POST['patient_id'];
         $firstname = $_POST['firstname'];
@@ -17,6 +17,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $contact_number = $_POST['contact_number'];
         $address = $_POST['address'];
         $email = $_POST['email'];
+        $dbh->beginTransaction();
 
         $age = '';
         if (!empty($dob)) {
@@ -25,21 +26,49 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             $age = $today->diff($birthDate)->y;
         }
 
-        $sql_update = "UPDATE tblpatient SET firstname=:fname, surname=:sname, date_of_birth=:dob, sex=:sex, status=:status, occupation=:occupation, age=:age, contact_number=:contact, address=:address, email=:email WHERE number=:pid";
-        $query_update = $dbh->prepare($sql_update);
-        $query_update->execute([
-            ':fname' => $firstname, ':sname' => $surname, ':dob' => $dob, ':sex' => $sex, ':status' => $civil_status, 
-            ':occupation' => $occupation, ':age' => $age, ':contact' => $contact_number, ':address' => $address, 
-            ':email' => $email, ':pid' => $patient_id
-        ]);
+        try {
+            $sql_update = "UPDATE tblpatient SET firstname=:fname, surname=:sname, date_of_birth=:dob, sex=:sex, status=:status, occupation=:occupation, age=:age, contact_number=:contact, address=:address, email=:email WHERE number=:pid";
+            $query_update = $dbh->prepare($sql_update);
+            $query_update->execute([
+                ':fname' => $firstname, ':sname' => $surname, ':dob' => $dob, ':sex' => $sex, ':status' => $civil_status, 
+                ':occupation' => $occupation, ':age' => $age, ':contact' => $contact_number, ':address' => $address, 
+                ':email' => $email, ':pid' => $patient_id
+            ]);
 
-        if ($query_update) {
-            echo "<script>alert('Patient details updated successfully.'); window.location.href='manage-patient.php';</script>";
-        } else {
-            echo "<script>alert('An error occurred while updating patient details.');</script>";
+            // Check for and create new appointment if details are provided
+            $service_id = $_POST['service_id'];
+            $app_date = $_POST['app_date'];
+            $start_time = $_POST['start_time'];
+            $duration = $_POST['duration'];
+
+            if (!empty($service_id) && !empty($app_date) && !empty($start_time)) {
+                $app_status = 'Ongoing'; // Default status for service schedules
+
+                $sql_schedule = "INSERT INTO tblschedule (patient_number, firstname, surname, service_id, date, time, duration, status) VALUES (:pnum, :fname, :sname, :service_id, :app_date, :start_time, :duration, :status)";
+                $query_schedule = $dbh->prepare($sql_schedule);
+                $query_schedule->execute([
+                    ':pnum' => $patient_id, 
+                    ':fname' => $firstname, 
+                    ':sname' => $surname, 
+                    ':service_id' => $service_id,
+                    ':app_date' => $app_date, 
+                    ':start_time' => $start_time, 
+                    ':duration' => $duration,
+                    ':status' => $app_status
+                ]);
+                $alert_message = 'Patient details updated and new service appointment scheduled successfully.';
+            } else {
+                $alert_message = 'Patient details updated successfully.';
+            }
+            $dbh->commit();
+            echo "<script>alert('{$alert_message}'); window.location.href='manage-patient.php';</script>";
+        } catch (Exception $e) {
+            $dbh->rollBack();
+            echo "<script>alert('An error occurred: " . addslashes($e->getMessage()) . "');</script>";
         }
         exit();
     }
+    // Handle new patient creation from modal
     if (isset($_POST['add_patient'])) {
         $dbh->beginTransaction();
         try {
@@ -361,7 +390,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             <form id="editPatientForm" method="POST">
                 <input type="hidden" name="patient_id" id="edit_patient_id">
                 <div class="modal-body">
-                    <h3 class="form-section-title">View Patient Details</h3>
+                    <h3 class="form-section-title">Patient Details</h3>
                     <div class="form-row">
                         <div class="form-group"><label for="edit_firstname">First Name</label><input type="text" id="edit_firstname" name="firstname" readonly></div>
                         <div class="form-group"><label for="edit_surname">Surname</label><input type="text" id="edit_surname" name="surname" readonly></div>
@@ -370,7 +399,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         <div class="form-group"><label for="edit_date_of_birth">Date of Birth</label><input type="date" id="edit_date_of_birth" name="date_of_birth" readonly></div>
                         <div class="form-group">
                             <label for="edit_sex">Sex</label>
-                            <select id="edit_sex" name="sex" disabled>
+                            <select id="edit_sex" name="sex" readonly>
                                 <option value="">Select Sex</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -386,9 +415,45 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         <div class="form-group"><label for="edit_email">Email Address</label><input type="email" id="edit_email" name="email" readonly></div>
                     </div>
                     <div class="form-group"><label for="edit_address">Address</label><textarea id="edit_address" name="address" rows="2" readonly></textarea></div>
+
+                    <hr class="form-divider" style="margin: 20px 0; border-top: 1px solid #ccc;">
+
+                    <h3 class="form-section-title">Schedule Service</h3>
+                    <div class="form-group">
+                        <label for="edit_service_id">Service</label>
+                        <select id="edit_service_id" name="service_id">
+                            <option value="">Select a Service</option>
+                            <?php
+                            // Fetch services for the dropdown
+                            $svcs = $dbh->query("SELECT number, name FROM tblservice ORDER BY name")->fetchAll(PDO::FETCH_OBJ);
+                            foreach ($svcs as $s) {
+                                echo "<option value='{$s->number}'>" . htmlentities($s->name) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit_app_date">Date</label>
+                            <input type="date" id="edit_app_date" name="app_date">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit_start_time">Start Time</label>
+                            <input type="time" id="edit_start_time" name="start_time">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_duration">Duration (minutes)</label>
+                            <input type="number" id="edit_duration" name="duration" min="1" placeholder="e.g., 30">
+                        </div>
+                    </div>
                 </div>
+
+                
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel">Cancel</button>
+                    <button type="submit" name="update_patient" class="btn btn-schedule">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -444,7 +509,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 document.getElementById('edit_contact_number').value = dataset.contact;
                 document.getElementById('edit_address').value = dataset.address;
                 document.getElementById('edit_email').value = dataset.email;
-                document.getElementById('edit_sex').disabled = true; // Ensure select is disabled
+                
+                // Clear appointment fields
+                document.getElementById('edit_service_id').value = '';
+                document.getElementById('edit_app_date').value = '';
+                document.getElementById('edit_start_time').value = '';
 
                 editModal.style.display = 'flex';
             });

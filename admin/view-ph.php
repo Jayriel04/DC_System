@@ -4,7 +4,7 @@ error_reporting(0);
 include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid']) == 0) {
   header('location:logout.php');
-  exit();
+  exit(); // It's good practice to exit after a header redirect
 }
 
 // Determine patient id (accept either stid or number from manage-patient.php)
@@ -22,11 +22,11 @@ if (empty($stdid)) {
 }
 
 // Lookup patient from tblpatient (include number)
-$sql = "SELECT number, firstname, surname, contact_number, address, username FROM tblpatient WHERE number = :stdid";
+$sql = "SELECT number, firstname, surname FROM tblpatient WHERE number = :stdid";
 $query = $dbh->prepare($sql);
 $query->bindParam(':stdid', $stdid, PDO::PARAM_INT);
 $query->execute();
-$results = $query->fetchAll(PDO::FETCH_OBJ);
+$patient = $query->fetch(PDO::FETCH_OBJ);
 
 // Fetch consultation appointments for this patient
 $appointments = [];
@@ -37,7 +37,7 @@ try {
     $qryApp->execute();
     $appointments = $qryApp->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
-    // ignore
+    // You might want to log this error in a real application
 }
 
 // Fetch service schedules for this patient
@@ -49,7 +49,7 @@ try {
     $qrySch->execute();
     $serviceSchedules = $qrySch->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
-    // ignore
+    // You might want to log this error in a real application
 }
 
 // Helper to convert 24-hour time to 12-hour am/pm
@@ -75,6 +75,10 @@ function time12_viewph($t) {
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/view-ph.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+    
   </head>
   <body>
     <div class="container-scroller">
@@ -83,98 +87,97 @@ function time12_viewph($t) {
         <?php include_once('includes/sidebar.php');?>
         <div class="main-panel">
           <div class="content-wrapper">
-            <div class="page-header">
-              <h3 class="page-title"> View Schedule </h3>
-              <nav aria-label="breadcrumb">
-                
-              </nav>
-            </div>
+            <?php if ($patient): ?>
+              <h2 class="patient-name-header">Patient History:           <?php echo htmlentities($patient->firstname . ' ' . $patient->surname); ?></h2>
+            <?php else: ?>
+              <h2 class="patient-name-header">Patient History</h2>
+              <div class="alert alert-danger">Patient not found.</div>
+            <?php endif; ?>
 
-            <div class="row">
-              <div class="col-12 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-
-                    <!-- Consultation Appointments Card -->
-                    <div class="card mt-4">
-                      <div class="card-header bg-primary text-white">Consultation Appointments</div>
-                      <div class="card-body">
-                        <?php if (!empty($appointments)) { ?>
-                          <div class="table-responsive">
-                            <table class="table table-striped table-bordered">
-                              <thead>
-                                <tr>
-                                  <th>#</th>
-                                  <th>Appointment ID</th>
-                                  <th>Date</th>
-                                  <th>Time</th>
-                                  <th>Status</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <?php $i = 1; foreach ($appointments as $app) { ?>
-                                  <tr>
-                                    <td><?php echo $i++; ?></td>
-                                    <td><?php echo htmlentities($app['id']); ?></td>
-                                    <td><?php echo htmlentities($app['date']); ?></td>
-                                    <td><?php echo htmlentities(time12_viewph($app['time'])); ?></td>
-                                    <td><?php echo htmlentities($app['status']); ?></td>
-                                  </tr>
-                                <?php } ?>
-                              </tbody>
-                            </table>
-                          </div>
-                        <?php } else { ?>
-                          <p>No consultation appointments found for this patient.</p>
-                        <?php } ?>
-                      </div>
-                    </div>
-
-                    <!-- Service Appointments Card -->
-                    <div class="card mt-4">
-                      <div class="card-header bg-success text-white">Service Appointments</div>
-                      <div class="card-body">
-                        <?php if (!empty($serviceSchedules)) { ?>
-                          <div class="table-responsive">
-                            <table class="table table-striped table-bordered">
-                              <thead>
-                                <tr>
-                                  <th>#</th>
-                                  <th>Schedule ID</th>
-                                  <th>Appointment ID</th>
-                                  <th>Date</th>
-                                  <th>Time</th>
-                                  <th>Duration (mins)</th>
-                                  <th>Service</th>
-                                  <th>Status</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <?php $j = 1; foreach ($serviceSchedules as $s) { ?>
-                                  <tr>
-                                    <td><?php echo $j++; ?></td>
-                                    <td><?php echo htmlentities($s['schedule_id']); ?></td>
-                                    <td><?php echo htmlentities($s['appointment_id']); ?></td>
-                                    <td><?php echo htmlentities($s['date']); ?></td>
-                                    <td><?php echo htmlentities(time12_viewph($s['time'])); ?></td>
-                                    <td><?php echo !empty($s['duration']) ? htmlentities($s['duration']) : '-'; ?></td>
-                                    <td><?php echo !empty($s['service_name']) ? htmlentities($s['service_name']) : '-'; ?></td>
-                                    <td><?php echo htmlentities($s['sched_status']); ?></td>
-                                  </tr>
-                                <?php } ?>
-                              </tbody>
-                            </table>
-                          </div>
-                        <?php } else { ?>
-                          <p>No service appointments found for this patient.</p>
-                        <?php } ?>
-                      </div>
-                    </div>
-
+            <div class="history-container">
+              <!-- Consultation Card -->
+              <div class="history-card consultation">
+                <div class="history-header">
+                  <div class="history-icon consultation-icon" style="font-size: 24px;">
+                    <i class="fas fa-notes-medical"></i>
                   </div>
+                  <div class="history-title-section">
+                    <h3 class="history-title">Consultation History</h3>
+                    <p class="history-count"><?php echo count($appointments); ?> records</p>
+                  </div>
+                </div>
+                <div class="history-content">
+                  <?php if (!empty($appointments)): ?>
+                    <div class="table-responsive">
+                      <table class="history-table">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <?php foreach ($appointments as $app): ?>
+                            <tr>
+                              <td>#<?php echo htmlentities($app['id']); ?></td>
+                              <td><?php echo htmlentities(date('M d, Y', strtotime($app['date']))); ?></td>
+                              <td><?php echo htmlentities(time12_viewph($app['time'])); ?></td>
+                              <td><span class="status-badge status-<?php echo strtolower(htmlentities($app['status'])); ?>"><?php echo htmlentities($app['status']); ?></span></td>
+                            </tr>
+                          <?php endforeach; ?>
+                        </tbody>
+                      </table>
+                    </div>
+                  <?php else: ?>
+                    <p class="no-history">No consultation history found.</p>
+                  <?php endif; ?>
+                </div>
+              </div>
+
+              <!-- Service Card -->
+              <div class="history-card service">
+                <div class="history-header">
+                  <div class="history-icon service-icon" style="font-size: 24px;">
+                    <i class="fas fa-briefcase-medical"></i>
+                  </div>
+                  <div class="history-title-section">
+                    <h3 class="history-title">Service History</h3>
+                    <p class="history-count"><?php echo count($serviceSchedules); ?> records</p>
+                  </div>
+                </div>
+                <div class="history-content">
+                  <?php if (!empty($serviceSchedules)): ?>
+                    <div class="table-responsive">
+                      <table class="history-table">
+                        <thead>
+                          <tr>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <?php foreach ($serviceSchedules as $s): ?>
+                            <tr>
+                              <td><?php echo !empty($s['service_name']) ? htmlentities($s['service_name']) : 'N/A'; ?></td>
+                              <td><?php echo htmlentities(date('M d, Y', strtotime($s['date']))); ?></td>
+                              <td><?php echo htmlentities(time12_viewph($s['time'])); ?></td>
+                              <td><span class="status-badge status-<?php echo strtolower(htmlentities($s['sched_status'])); ?>"><?php echo htmlentities($s['sched_status']); ?></span></td>
+                            </tr>
+                          <?php endforeach; ?>
+                        </tbody>
+                      </table>
+                    </div>
+                  <?php else: ?>
+                    <p class="no-history">No service history found.</p>
+                  <?php endif; ?>
                 </div>
               </div>
             </div>
+
           </div>
           <!-- content-wrapper ends -->
           <?php include_once('includes/footer.php');?>
@@ -189,5 +192,6 @@ function time12_viewph($t) {
     <script src="vendors/typeahead.js/typeahead.bundle.min.js"></script>
     <script src="js/off-canvas.js"></script>
     <script src="js/misc.js"></script>
+    <script src="js/view-ph.js"></script>
   </body>
 </html>

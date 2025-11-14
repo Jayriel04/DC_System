@@ -159,7 +159,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 <html lang="en">
 
 <head>
-    <title>Dashboard | Service Appointments</title>
+    <title>Service Appointments</title>
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
@@ -185,7 +185,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <h1>Manage Service Appointments</h1>
                                     <p>Schedule and track patient appointments for services</p>
                                 </div>
-                                <button type="button" class="new-appointment-btn" id="newAppointmentBtn">New Service Appointment</button>
+                                
                             </div>
 
                             <div class="filter-section">

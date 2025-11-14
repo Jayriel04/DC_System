@@ -82,7 +82,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                 <p>Track and manage your product inventory</p>
                             </div>
                             <button class="btn-add" id="addProductBtn">
-                                <span>+</span>
+                                <i class="fas fa-pills"></i>
                                 Add Product
                             </button>
                         </div>

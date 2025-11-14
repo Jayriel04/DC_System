@@ -6,15 +6,14 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Determine web root path for assets. This tries to detect if the project is hosted under a folder like /DC_System.
 // If not found, $base will be empty (site assumed at webroot). Adjust $project if your folder name differs.
-$base = '';
+$base = ''; // Initialize $base
 if (isset($_SERVER['SCRIPT_NAME'])) {
-  $project = 'dental-clinic';
-  if (strpos($_SERVER['SCRIPT_NAME'], '/' . $project . '/') !== false || substr($_SERVER['SCRIPT_NAME'], -strlen('/' . $project)) === '/' . $project) {
-    // set base to "/DC_System" (or to the matched project folder)
-    $base = '/' . $project;
-  } else {
-    // leave $base empty so links resolve from webroot
-    $base = '';
+  $project_folders = ['dental-clinic', 'DC_System']; // Use an array for flexibility
+  foreach ($project_folders as $project) {
+    if (strpos($_SERVER['SCRIPT_NAME'], '/' . $project . '/') !== false) {
+      $base = '/' . $project;
+      break; // Found the project folder, so we can stop looking.
+    }
   }
 }
 
@@ -365,11 +364,11 @@ if (!empty($_SESSION)) {
               </a>
 
               <div class="profile-dropdown-menu" id="profileDropdownMenu" role="menu">
-                <a href="<?php echo $base; ?>./user/profile.php" role="menuitem"><i class="ri-user-line"></i>My Profile</a>
-                <a href="<?php echo $base; ?>./user/change-password.php" role="menuitem"><i
+                <a href="<?php echo $base; ?>/user/profile.php" role="menuitem"><i class="ri-user-line"></i>My Profile</a>
+                <a href="<?php echo $base; ?>/user/change-password.php" role="menuitem"><i
                     class="ri-lock-password-line"></i>Change Password</a>
                 <div style="height:1px; background:#eee; margin: 6px 0;"></div>
-                <a href="<?php echo $base; ?>./user/logout.php" role="menuitem" style="color: #c0392b;"><i
+                <a href="<?php echo $base; ?>/user/logout.php" role="menuitem" style="color: #c0392b;"><i
                     class="ri-logout-box-r-line"></i>Sign Out</a>
               </div>
             </div>

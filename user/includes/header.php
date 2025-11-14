@@ -365,11 +365,11 @@ if (!empty($_SESSION)) {
               </a>
 
               <div class="profile-dropdown-menu" id="profileDropdownMenu" role="menu">
-                <a href="<?php echo $base; ?>./profile.php" role="menuitem"><i class="ri-user-line"></i>My Profile</a>
-                <a href="<?php echo $base; ?>./change-password.php" role="menuitem"><i
+                <a href="<?php echo $base; ?>/user/profile.php" role="menuitem"><i class="ri-user-line"></i>My Profile</a>
+                <a href="<?php echo $base; ?>/user/change-password.php" role="menuitem"><i
                     class="ri-lock-password-line"></i>Change Password</a>
                 <div style="height:1px; background:#eee; margin: 6px 0;"></div>
-                <a href="<?php echo $base; ?>./logout.php" role="menuitem" style="color: #c0392b;"><i
+                <a href="<?php echo $base; ?>/user/logout.php" role="menuitem" style="color: #c0392b;"><i
                     class="ri-logout-box-r-line"></i>Sign Out</a>
               </div>
             </div>

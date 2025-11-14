@@ -13,6 +13,7 @@ if (isset($_SESSION['sturecmsnumber'])) {
   $query_health_check->execute();
   $health_data = $query_health_check->fetch(PDO::FETCH_OBJ);
 
+  // Check if health conditions are not empty, null, or an empty JSON array/object
   if ($health_data && !empty($health_data->health_conditions) && $health_data->health_conditions !== 'null' && $health_data->health_conditions !== '[]') {
     $user_has_health_conditions = true;
   }
@@ -684,6 +685,11 @@ if (isset($_POST['submit_feedback'])) {
               <div class="form-group"><label>Allergic reaction to local anesthesia</label><input type="checkbox"
                   name="health_conditions[extraction][]" value="Allergic reaction to local anesthesia"></div>
             </div>
+            <?php
+            // This form is for a new patient, so health_arr is empty.
+            $health_arr = [];
+            include_once('admin/includes/health-questionnaire-form.php');
+            ?>
             <button type="submit" name="book_appointment" class="submit-btn">Submit Form</button>
           </div>
       </div>

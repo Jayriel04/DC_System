@@ -82,6 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/dashboard.css">
 </head>
 
 <body>

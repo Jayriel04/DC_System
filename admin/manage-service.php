@@ -31,9 +31,10 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
     <link rel="stylesheet" href="vendors/daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="./css/sidebar.css">
-    <link rel="stylesheet" href="./css/manage-service.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/manage-service.css">
         
     
 </head>
@@ -47,10 +48,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     <div class="header">
                         <div class="header-content">
                             <h1>Services</h1>
-                            <p>Manage your dental services and pricing</p>
+                            <p>Manage your dental services</p>
                         </div>
                         <a href="add-service.php" class="add-btn" id="addServiceBtn">
-                            <span>+</span> Add New Service
+                            <i class="fas fa-heartbeat"></i>
+                             Add New Service
                         </a>
                     </div>
 
