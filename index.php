@@ -1,6 +1,9 @@
 <?php
 session_start();
-error_reporting(0);
+// DEBUG: show all errors while debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 include('includes/dbconnection.php');
 
 // Check if a logged-in user already has health conditions on file
@@ -164,6 +167,15 @@ if (isset($_POST['submit_feedback'])) {
 <html>
 
 <head>
+  <?php
+  // Compute base href to always point to DC_System root (e.g. "/DC_System/")
+  // This works for scripts in any subfolder
+  $scriptPath = $_SERVER['SCRIPT_NAME']; // e.g. "/DC_System/index.php"
+  $appRoot = dirname($scriptPath); // Go up one level to /DC_System
+  $baseHref = rtrim($appRoot, '/\\') . '/';
+  ?>
+  <base href="<?php echo htmlspecialchars($baseHref, ENT_QUOTES, 'UTF-8'); ?>">
+  <meta charset="utf-8">
   <title>JF Dental Care</title>
   <script
     type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
@@ -461,7 +473,7 @@ if (isset($_POST['submit_feedback'])) {
       width="100%" height="320" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
   </div>
 
-  <!-- Health Condition Modal -->
+  <!-- Health Condition Modal (cleaned up structure) -->
   <div class="modal fade health-questionnaire-modal" id="healthModal" tabindex="-1" role="dialog"
     aria-labelledby="healthModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -472,7 +484,7 @@ if (isset($_POST['submit_feedback'])) {
               style="font-size: 1.5rem; background: none; border: none;">
               <span aria-hidden="true">X</span>
             </button>
-            <h3 class="modal-title" id="healthModalLabel"><b>Health Condition Form</h3>
+            <h3 class="modal-title" id="healthModalLabel"><b>Health Condition Form</b></h3>
           </div>
           <div class="modal-body">
             <!-- Appointment fields -->
@@ -690,19 +702,13 @@ if (isset($_POST['submit_feedback'])) {
             $health_arr = [];
             include_once('admin/includes/health-questionnaire-form.php');
             ?>
-            <button type="submit" name="book_appointment" class="submit-btn">Submit Form</button>
+            <div style="text-align: center; margin-top: 16px;">
+              <button type="submit" name="book_appointment" class="submit-btn">Submit Form</button>
+            </div>
           </div>
+        </form>
       </div>
     </div>
-
-  </div>
-  </div>
-  </div>
-  </div>
-
-  </form>
-  </div>
-  </div>
   </div>
 
   <?php include_once('includes/footer.php'); ?>

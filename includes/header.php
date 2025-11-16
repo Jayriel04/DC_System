@@ -328,7 +328,7 @@ if (!empty($_SESSION)) {
       <div class="action-buttons">
         <?php if (!$logged_in): ?>
           <!-- Not logged in: show Login / Sign up -->
-          <a href="<?php echo $base; ?>./user/login.php" class="login-btn">LOGIN</a>
+          <a href="<?php echo $base; ?>/user/login.php" class="login-btn">LOGIN</a>
           <a href="<?php echo $base; ?>./user/create_account.php" class="signup-btn">SIGN UP</a>
         <?php else: ?>
           <!-- Logged in: bell with badge (activity) + profile avatar/name + logout -->
