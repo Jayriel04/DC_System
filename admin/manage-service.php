@@ -5,6 +5,61 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
+    // Handle new service creation from modal
+    if (isset($_POST['add_service'])) {
+        $sname = $_POST['sname'];
+        $sdesc = $_POST['sdesc'];
+        $image_path = '';
+
+        if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+            $image = $_FILES['image']['name'];
+            $image_path = 'images/' . basename($image);
+            $target_dir = __DIR__ . '/images/';
+            if (!file_exists($target_dir)) {
+                mkdir($target_dir, 0777, true);
+            }
+            $target_file = $target_dir . basename($image);
+            move_uploaded_file($_FILES['image']['tmp_name'], $target_file);
+        }
+
+        $sql = "INSERT INTO tblservice (name, description, image) VALUES (:sname, :sdesc, :image)";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':sname', $sname, PDO::PARAM_STR);
+        $query->bindParam(':sdesc', $sdesc, PDO::PARAM_STR);
+        $query->bindParam(':image', $image_path, PDO::PARAM_STR);
+        $query->execute();
+
+        echo "<script>alert('Service added successfully');</script>";
+        echo "<script>window.location.href = 'manage-service.php'</script>";
+        exit();
+    }
+
+    // Handle service update from modal
+    if (isset($_POST['update_service'])) {
+        $sid = $_POST['id'];
+        $sname = $_POST['sname'];
+        $sdesc = $_POST['sdesc'];
+        $image_path = $_POST['existing_image']; // Keep existing image by default
+
+        if (isset($_FILES['image']) && $_FILES['image']['error'] == 0 && !empty($_FILES['image']['name'])) {
+            $image = $_FILES['image']['name'];
+            $image_path = 'images/' . basename($image);
+            $target_file = __DIR__ . '/images/' . basename($image);
+            move_uploaded_file($_FILES['image']['tmp_name'], $target_file);
+        }
+
+        $sql = "UPDATE tblservice SET name=:sname, description=:sdesc, image=:image WHERE number=:sid";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':sname', $sname, PDO::PARAM_STR);
+        $query->bindParam(':sdesc', $sdesc, PDO::PARAM_STR);
+        $query->bindParam(':image', $image_path, PDO::PARAM_STR);
+        $query->bindParam(':sid', $sid, PDO::PARAM_INT);
+        $query->execute();
+
+        echo "<script>alert('Service updated successfully');</script>";
+        echo "<script>window.location.href = 'manage-service.php'</script>";
+        exit();
+    }
     // Code for deletion
     if (isset($_GET['delid'])) {
         $rid = intval($_GET['delid']);
@@ -50,7 +105,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             <h1>Services</h1>
                             <p>Manage your dental services</p>
                         </div>
-                        <a href="add-service.php" class="add-btn" id="addServiceBtn">
+                        <a href="#" class="add-btn" id="addServiceBtn">
                             <i class="fas fa-heartbeat"></i>
                              Add New Service
                         </a>
@@ -110,11 +165,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             <div class="service-header">
                                 <h3 class="service-title"><?php echo htmlentities($row->name); ?></h3>
                                 <div class="service-actions">
-                                    <a href="edit-service.php?editid=<?php echo htmlentities($row->number); ?>" class="action-btn edit-btn" title="Edit"
+                                    <button class="action-btn edit-btn" title="Edit"
                                         data-id="<?php echo htmlentities($row->number); ?>"
                                         data-name="<?php echo htmlentities($row->name); ?>"
                                         data-description="<?php echo htmlentities($row->description); ?>"
-                                    >✏️</a>
+                                        data-image="<?php echo htmlentities($row->image); ?>"
+                                    >✏️</button>
                                     <a href="manage-service.php?delid=<?php echo ($row->number); ?>" class="action-btn" title="Delete" onclick="return confirm('Do you really want to Delete?');">🗑️</a>
                                 </div>
                             </div>
@@ -142,7 +198,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 <a href="<?php if ($pageno <= 1) echo '#'; else echo "?pageno=" . ($pageno - 1) . (http_build_query($query_params) ? '&' . http_build_query($query_params) : ''); ?>"><strong>Prev</strong></a>
                             </li>
                             <li class="<?php if ($pageno >= $total_pages) echo 'disabled'; ?>">
-                                <a href="<?php if ($pageno >= $total_pages) echo '#'; else echo "?pageno=" . ($pageno + 1) . (http_build_query($query_params) ? '&' . http_build_query($swap_params) : ''); ?>"><strong>Next</strong></a>
+                                <a href="<?php if ($pageno >= $total_pages) echo '#'; else echo "?pageno=" . ($pageno + 1) . (http_build_query($query_params) ? '&' . http_build_query($query_params) : ''); ?>"><strong>Next</strong></a>
                             </li>
                             <li><a href="?pageno=<?php echo $total_pages; ?><?php echo http_build_query($query_params) ? '&' . http_build_query($query_params) : ''; ?>"><strong>Last</strong></a></li>
                         </ul>
@@ -153,31 +209,61 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         </div>
     </div>
 
-    <!-- Modal for Add/Edit Service -->
-    <div class="modal" id="serviceModal">
+    <!-- Add Service Modal -->
+    <div class="modal" id="addServiceModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Add New Service</h2>
-                <button class="close-btn">&times;</button>
+            <div class="modal-header">  
+                <h2>Add New Service</h2>
+                <button class="close-button">&times;</button>
             </div>
-            <!-- The form will be submitted to either add-service.php or edit-service.php -->
-            <form id="serviceForm" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="id" id="serviceId">
+            <form id="addServiceForm" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="serviceName">Service Name</label>
-                    <input type="text" name="sname" id="serviceName" required>
+                    <input type="text" name="sname" required>
                 </div>
                 <div class="form-group">
                     <label for="serviceDescription">Description</label>
-                    <textarea name="sdesc" id="serviceDescription" required></textarea>
+                    <textarea name="sdesc" required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="serviceImage">Service Image</label>
-                    <input type="file" name="image" id="serviceImage" accept="image/*">
+                    <input type="file" name="image" accept="image/*">
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-danger">Cancel</button>
-                    <button type="submit" name="submit" class="btn-success">Save Service</button>
+                    <button type="button" class="btn-danger btn-cancel">Cancel</button>
+                    <button type="submit" name="add_service" class="btn-success">Add Service</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Service Modal -->
+    <div class="modal" id="editServiceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Service</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <form id="editServiceForm" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="id" id="edit_service_id">
+                <input type="hidden" name="existing_image" id="edit_existing_image">
+                <div class="form-group">
+                    <label for="edit_service_name">Service Name</label>
+                    <input type="text" name="sname" id="edit_service_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_service_description">Description</label>
+                    <textarea name="sdesc" id="edit_service_description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit_service_image">Service Image</label>
+                    <input type="file" name="image" id="edit_service_image" accept="image/*">
+                    <small>Leave blank to keep the current image.</small>
+                    <img id="edit_image_preview" src="" alt="Current Image" style="max-width: 100px; margin-top: 10px; display: none;">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-danger btn-cancel">Cancel</button>
+                    <button type="submit" name="update_service" class="btn-success">Update Service</button>
                 </div>
             </form>
         </div>
@@ -186,7 +272,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <script src="vendors/js/vendor.bundle.base.js"></script>
     <script src="js/off-canvas.js"></script>
     <script src="js/misc.js"></script>
-    <script src="js/manage-service.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.getElementById('searchInput');
@@ -199,9 +284,56 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 // Set a new timeout
                 debounceTimeout = setTimeout(() => {
                     const form = document.getElementById('searchForm');
-                    // Programmatically submit the form which now uses GET
+                    
                     form.submit();
-                }, 500); // Wait for 500ms after the user stops typing
+                }, 500); 
+            });
+
+            // --- Add Service Modal ---
+            const addModal = document.getElementById('addServiceModal');
+            const addBtn = document.getElementById('addServiceBtn');
+            const addCloseBtn = addModal.querySelector('.close-button');
+            const addCancelBtn = addModal.querySelector('.btn-cancel');
+
+            addBtn.addEventListener('click', (e) => { e.preventDefault(); addModal.style.display = 'flex'; });
+            addCloseBtn.addEventListener('click', () => { addModal.style.display = 'none'; });
+            addCancelBtn.addEventListener('click', () => { addModal.style.display = 'none'; });
+            window.addEventListener('click', (e) => { if (e.target === addModal) addModal.style.display = 'none'; });
+
+            // --- Edit Service Modal ---
+            const editModal = document.getElementById('editServiceModal');
+            const editCloseBtn = editModal.querySelector('.close-button');
+            const editCancelBtn = editModal.querySelector('.btn-cancel');
+
+            function closeEditModal() {
+                editModal.style.display = 'none';
+            }
+
+            editCloseBtn.addEventListener('click', closeEditModal);
+            editCancelBtn.addEventListener('click', closeEditModal);
+            window.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
+
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const dataset = this.dataset;
+                    document.getElementById('edit_service_id').value = dataset.id;
+                    document.getElementById('edit_service_name').value = dataset.name;
+                    document.getElementById('edit_service_description').value = dataset.description;
+                    document.getElementById('edit_existing_image').value = dataset.image;
+
+                    const imagePreview = document.getElementById('edit_image_preview');
+                    if (dataset.image) {
+                        imagePreview.src = dataset.image;
+                        imagePreview.style.display = 'block';
+                    } else {
+                        imagePreview.style.display = 'none';
+                    }
+
+                    // Clear the file input
+                    document.getElementById('edit_service_image').value = '';
+
+                    editModal.style.display = 'flex';
+                });
             });
         });
     </script>

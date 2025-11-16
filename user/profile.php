@@ -628,7 +628,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <div id="medicalHistoryModal" class="modal">
         <div class="modal-content health-questionnaire-modal" style="max-width: 1200px; margin: 2rem auto;">
             <div class="modal-header">
-                <h4 class="modal-title">Edit Medical History</h4>
+                <h4 class="modal-title">Edit Examination Records</h4>
                 <span class="close" data-dismiss="modal">&times;</span>
             </div>
             <div class="modal-body">
