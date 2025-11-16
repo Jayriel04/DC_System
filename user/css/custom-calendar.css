@@ -1,0 +1,13 @@
+.day.available {
+    background-color: #e8f5e9; /* Light green */
+    color: #2e7d32; /* Dark green text */
+    font-weight: bold;
+    border-radius: 50%;
+}
+
+.day.unavailable {
+    background-color: #ffebee; /* Light red */
+    color: #c62828; /* Dark red text */
+    cursor: not-allowed;
+    border-radius: 50%;
+}

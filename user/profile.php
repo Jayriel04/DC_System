@@ -165,17 +165,25 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         if ((int) $qryChk->fetchColumn() > 0) {
             $_SESSION['modal_error'] = 'You already have an appointment at that date and time.';
         } else {
+            // Fetch the end_time from tblcalendar
+            $sql_get_end_time = "SELECT end_time FROM tblcalendar WHERE `date` = :dt AND `start_time` = :tm LIMIT 1";
+            $query_get_end_time = $dbh->prepare($sql_get_end_time);
+            $query_get_end_time->execute([':dt' => $appointment_date, ':tm' => $appointment_time]);
+            $end_time_result = $query_get_end_time->fetch(PDO::FETCH_ASSOC);
+            $appointment_end_time = ($end_time_result && !empty($end_time_result['end_time'])) ? $end_time_result['end_time'] : null;
+
             $firstname = $_SESSION['sturecmsfirstname'] ?? '';
             $surname = $_SESSION['sturecmssurname'] ?? '';
             $status_default = 'Pending';
 
-            $sqlIns = "INSERT INTO tblappointment (firstname, surname, date, start_time, patient_number, status) VALUES (:fn, :sn, :dt, :tm, :pn, :st)";
+            $sqlIns = "INSERT INTO tblappointment (firstname, surname, date, start_time, end_time, patient_number, status) VALUES (:fn, :sn, :dt, :tm, :et, :pn, :st)";
             $qryIns = $dbh->prepare($sqlIns);
             $qryIns->execute([
                 ':fn' => $firstname,
                 ':sn' => $surname,
                 ':dt' => $appointment_date,
                 ':tm' => $appointment_time,
+                ':et' => $appointment_end_time,
                 ':pn' => $patient_number,
                 ':st' => $status_default
             ]);
@@ -189,6 +197,39 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         exit();
     }
 
+    // Handle appointment cancellation
+    if (isset($_POST['cancel_appointment'])) {
+        $appointment_id_to_cancel = $_POST['cancel_appointment_id'];
+
+        // Verify the appointment belongs to the current patient before cancelling
+        $sql_cancel = "UPDATE tblappointment SET status = 'Cancelled' WHERE id = :appointment_id AND patient_number = :patient_number";
+        $query_cancel = $dbh->prepare($sql_cancel);
+        $query_cancel->bindParam(':appointment_id', $appointment_id_to_cancel, PDO::PARAM_INT);
+        $query_cancel->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
+        $query_cancel->execute();
+
+        $_SESSION['profile_message'] = 'Your appointment has been cancelled.';
+        header('Location: profile.php?tab=appointments');
+        exit();
+    }
+
+    // Handle service schedule cancellation
+    if (isset($_POST['request_service_cancellation'])) {
+        $schedule_id_to_cancel = $_POST['schedule_id_to_cancel'];
+        $cancel_reason = trim($_POST['cancel_reason']);
+
+        // Verify the schedule belongs to the current patient before cancelling
+        $sql_cancel_service = "UPDATE tblschedule SET status = 'Cancelled', cancel_reason = :cancel_reason, cancelled_at = NOW() WHERE id = :schedule_id AND patient_number = :patient_number";
+        $query_cancel_service = $dbh->prepare($sql_cancel_service);
+        $query_cancel_service->bindParam(':schedule_id', $schedule_id_to_cancel, PDO::PARAM_INT);
+        $query_cancel_service->bindParam(':cancel_reason', $cancel_reason, PDO::PARAM_STR);
+        $query_cancel_service->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
+        $query_cancel_service->execute();
+
+        $_SESSION['profile_message'] = 'Your service appointment has been cancelled.';
+        header('Location: profile.php?tab=appointments');
+        exit();
+    }
 
     $patient_number = $_SESSION['sturecmsnumber'];
 
@@ -262,6 +303,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <link rel="stylesheet" href="./vendors/chartist/chartist.min.css">
     <link href="./css/profile.css" rel="stylesheet">
     <link href="./css/header.css" rel="stylesheet">
+    <link href="css/custom-calendar.css" rel="stylesheet">
     <link href="./css/edit.css" rel="stylesheet">
     <link href="../css/style.v2.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -412,6 +454,16 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                                                         <?php echo date("F j, Y", strtotime($appt['date'])) . ' at ' . format_time_12hr($appt['start_time']); ?>
                                                     </div>
                                                 </div>
+                                                <?php if (in_array($appt['status'], ['Pending', 'Approved'])): ?>
+                                                    <form method="post" action="profile.php"
+                                                        onsubmit="return confirm('Are you sure you want to cancel this appointment?');"
+                                                        style="margin-left: auto;">
+                                                        <input type="hidden" name="cancel_appointment_id"
+                                                            value="<?php echo $appt['id']; ?>">
+                                                        <button type="submit" name="cancel_appointment" class="btn btn-danger btn-sm"
+                                                            style="padding: 2px 8px; font-size: 12px; background-color: red; color: white;">Cancel</button>
+                                                    </form>
+                                                <?php endif; ?>
                                             </div>
                                             <div class="appointment-title">Consultation</div>
                                         </div>
@@ -439,6 +491,13 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                                                         📅
                                                         <?php echo date("F j, Y", strtotime($schedule['date'])) . ' at ' . format_time_12hr($schedule['time']); ?>
                                                     </div>
+                                                </div>
+                                                <div class="appointment-actions">
+                                                    <?php if ($schedule['sched_status'] === 'Ongoing'): ?>
+                                                        <button type="button" class="btn btn-danger btn-sm request-cancel-btn"
+                                                            data-schedule-id="<?php echo $schedule['id']; ?>"
+                                                            style="padding: 2px 8px; font-size: 12px; background-color: red; color: white;">Request Cancel</button>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
                                             <div class="appointment-title">
@@ -834,6 +893,30 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         </div>
     </div>
 
+    <!-- Cancel Service Appointment Modal -->
+    <div id="cancelServiceModal" class="modal" tabindex="-1" role="dialog" style="display: none !important; display: flex; align-items: center; justify-content: center;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style=" width: 500px; left: 300px;">
+                <div class="modal-header">
+                    <h4 class="modal-title">Request Cancellation</h4>
+                    <span class="close" data-dismiss="modal">&times;</span>
+                </div>
+                <div class="modal-body" style="padding: 20px;">
+                    <form method="post" action="profile.php">
+                        <input type="hidden" name="schedule_id_to_cancel" id="schedule_id_to_cancel">
+                        <div class="form-group">
+                            <label for="cancel_reason" style="font-weight: bold; margin-bottom: 8px;">Reason for cancellation:</label>
+                            <textarea name="cancel_reason" id="cancel_reason" class="form-control" rows="4" required placeholder="Please provide a reason for cancelling..."></textarea>
+                        </div>
+                        <div class="modal-footer" style="padding: 15px 0 0 0; border-top: 1px solid #e5e5e5; margin-top: 15px;">
+                            <button type="submit" name="request_service_cancellation" class="btn btn-danger">Submit Cancellation</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script src="../js/jquery-1.11.0.min.js"></script>
     <script src="vendors/js/vendor.bundle.base.js"></script>
@@ -930,6 +1013,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     </script>
     <!-- Calendar and Appointment Scripts -->
     <script src="../js/interactive-calendar.js"></script>
+    <script src="js/calendar-availability.js"></script>
     <script src="js/profile-booking-modal.js"></script>
 
     <!-- Other Profile Scripts -->
@@ -960,6 +1044,26 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 reader.readAsDataURL(file);
             }
         }
+    </script>
+
+    <script>
+        // Service Cancellation Modal
+        document.addEventListener('DOMContentLoaded', function () {
+            const cancelServiceModal = document.getElementById('cancelServiceModal');
+            const cancelScheduleIdInput = document.getElementById('schedule_id_to_cancel');
+            
+            document.querySelectorAll('.request-cancel-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const scheduleId = this.getAttribute('data-schedule-id');
+                    cancelScheduleIdInput.value = scheduleId;
+                    cancelServiceModal.style.display = 'flex';
+                });
+            });
+
+            cancelServiceModal.querySelector('[data-dismiss="modal"]').addEventListener('click', function() {
+                cancelServiceModal.style.display = 'none';
+            });
+        });
     </script>
 
 </body>

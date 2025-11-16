@@ -56,7 +56,12 @@ document.addEventListener('DOMContentLoaded', function () {
             if (thisDate < today) {
                 day.classList.add('disabled');
             } else {
-                day.addEventListener('click', () => selectDate(dateStr, day));
+                day.addEventListener('click', (e) => {
+                    // Prevent selection if the day is marked as unavailable
+                    if (e.target.classList.contains('unavailable')) return;
+
+                    selectDate(dateStr, day);
+                });
             }
 
             if (today.getTime() === thisDate.getTime()) {
@@ -80,6 +85,10 @@ document.addEventListener('DOMContentLoaded', function () {
             day.textContent = i;
             daysContainer.appendChild(day);
         }
+
+        // Dispatch a custom event so other scripts know the calendar has updated
+        const event = new CustomEvent('calendarUpdated', { detail: { year: year, month: month + 1 } });
+        document.dispatchEvent(event);
     }
 
     function selectDate(dateStr, dayElement) {

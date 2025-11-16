@@ -51,35 +51,35 @@ if (isset($_GET['get_calendar_times']) && !empty($_GET['date'])) {
 }
 
 if (isset($_GET['get_month_availability']) && !empty($_GET['month']) && !empty($_GET['year'])) {
-    $month = $_GET['month'];
-    $year = $_GET['year'];
+  $month = $_GET['month'];
+  $year = $_GET['year'];
 
-    try {
-        // Subquery to get all slots in the month from tblcalendar
-        $all_slots_sql = "SELECT `date`, `start_time` FROM `tblcalendar` WHERE YEAR(`date`) = :year1 AND MONTH(`date`) = :month1";
+  try {
+    // Subquery to get all slots in the month from tblcalendar
+    $all_slots_sql = "SELECT `date`, `start_time` FROM `tblcalendar` WHERE YEAR(`date`) = :year1 AND MONTH(`date`) = :month1";
 
-        // Subquery to get all booked slots in the month from tblappointment
-        $booked_slots_sql = "SELECT `date`, `start_time` FROM `tblappointment` WHERE YEAR(`date`) = :year2 AND MONTH(`date`) = :month2 AND `status` != 'Declined' AND `status` != 'Cancelled'";
+    // Subquery to get all booked slots in the month from tblappointment
+    $booked_slots_sql = "SELECT `date`, `start_time` FROM `tblappointment` WHERE YEAR(`date`) = :year2 AND MONTH(`date`) = :month2 AND `status` != 'Declined' AND `status` != 'Cancelled'";
 
-        // Main query to find dates with at least one available slot
-        $sql = "SELECT DISTINCT T1.`date`
+    // Main query to find dates with at least one available slot
+    $sql = "SELECT DISTINCT T1.`date`
                 FROM ($all_slots_sql) AS T1
                 LEFT JOIN ($booked_slots_sql) AS T2 
                 ON T1.`date` = T2.`date` AND T1.`start_time` = T2.`start_time`
                 WHERE T2.`start_time` IS NULL";
 
-        $query = $dbh->prepare($sql);
-        $query->execute([':year1' => $year, ':month1' => $month, ':year2' => $year, ':month2' => $month]);
-        $available_dates = $query->fetchAll(PDO::FETCH_COLUMN, 0);
+    $query = $dbh->prepare($sql);
+    $query->execute([':year1' => $year, ':month1' => $month, ':year2' => $year, ':month2' => $month]);
+    $available_dates = $query->fetchAll(PDO::FETCH_COLUMN, 0);
 
-        header('Content-Type: application/json');
-        echo json_encode(['available' => $available_dates]);
+    header('Content-Type: application/json');
+    echo json_encode(['available' => $available_dates]);
 
-    } catch (Exception $e) {
-        header('Content-Type: application/json', true, 500);
-        echo json_encode(['error' => $e->getMessage()]);
-    }
-    exit();
+  } catch (Exception $e) {
+    header('Content-Type: application/json', true, 500);
+    echo json_encode(['error' => $e->getMessage()]);
+  }
+  exit();
 }
 
 
@@ -175,6 +175,7 @@ if (isset($_POST['submit_feedback'])) {
   $baseHref = rtrim($appRoot, '/\\') . '/';
   ?>
   <base href="<?php echo htmlspecialchars($baseHref, ENT_QUOTES, 'UTF-8'); ?>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="utf-8">
   <title>JF Dental Care</title>
   <script
@@ -233,37 +234,37 @@ if (isset($_POST['submit_feedback'])) {
   <div id="home"></div>
   <?php include_once('includes/header.php'); ?>
   <div class="banner">
-      <div class="slider">
-        <div class="callbacks_container">
-          <ul class="rslides" id="slider">
-            <li>
-              <h2>Where beautiful</h2>
-              <h2> Smiles come to life</h2>
-              <p class="hero-description">
-                Experience comprehensive dental care with our advanced patient management system.
-                We provide personalized treatment plans and state of the art dental services
-                for your optimal oral health.
-              </p>
-              <div class="readmore">
-                <?php
-                // Check for multiple possible session variables
-                if (isset($_SESSION['sturecmsnumber'])) {
-                  // Only show the button if the user does NOT have health conditions on file
-                  if (!$user_has_health_conditions) { ?>
-                    <a href="#" data-toggle="modal" data-target="#healthModal">
-                      Book appointment <i class="ri-arrow-right-line"></i>
-                    </a>
-                  <?php }
-                } else { ?>
-                  <a href="user/create_account.php">
+    <div class="slider">
+      <div class="callbacks_container">
+        <ul class="rslides" id="slider">
+          <li>
+            <h2>Where beautiful</h2>
+            <h2> Smiles come to life</h2>
+            <p class="hero-description">
+              Experience comprehensive dental care with our advanced patient management system.
+              We provide personalized treatment plans and state of the art dental services
+              for your optimal oral health.
+            </p>
+            <div class="readmore">
+              <?php
+              // Check for multiple possible session variables
+              if (isset($_SESSION['sturecmsnumber'])) {
+                // Only show the button if the user does NOT have health conditions on file
+                if (!$user_has_health_conditions) { ?>
+                  <a href="#" data-toggle="modal" data-target="#healthModal">
                     Book appointment <i class="ri-arrow-right-line"></i>
                   </a>
-                <?php } ?>
-              </div>
-            </li>
-          </ul>
-        </div>
+                <?php }
+              } else { ?>
+                <a href="user/create_account.php">
+                  Book appointment <i class="ri-arrow-right-line"></i>
+                </a>
+              <?php } ?>
+            </div>
+          </li>
+        </ul>
       </div>
+    </div>
   </div>
 
   <!--About -->
@@ -697,11 +698,6 @@ if (isset($_POST['submit_feedback'])) {
               <div class="form-group"><label>Allergic reaction to local anesthesia</label><input type="checkbox"
                   name="health_conditions[extraction][]" value="Allergic reaction to local anesthesia"></div>
             </div>
-            <?php
-            // This form is for a new patient, so health_arr is empty.
-            $health_arr = [];
-            include_once('admin/includes/health-questionnaire-form.php');
-            ?>
             <div style="text-align: center; margin-top: 16px;">
               <button type="submit" name="book_appointment" class="submit-btn">Submit Form</button>
             </div>
