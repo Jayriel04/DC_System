@@ -82,8 +82,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/view-er-modal.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/view-er.css">
 </head>
 
 <body>
@@ -93,251 +95,239 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
         <?php include_once('includes/sidebar.php');?>
         <div class="main-panel">
           <div class="content-wrapper">
-            <div class="page-header">
-              <h3 class="page-title"> Examination Record</h3>
-              <nav aria-label="breadcrumb">
-                
-              </nav>
-            </div>
- 
-<div class="container mt-4">
-    <?php if (isset($_SESSION['modal_success'])) { ?>
-        <div class="container px-3 mt-3">
-            <div class="alert alert-success" role="alert"><?php echo htmlspecialchars($_SESSION['modal_success']); ?></div>
-        </div>
-        <?php unset($_SESSION['modal_success']);
-    } ?> 
-    
-
-
-                <!-- Health Conditions Table -->
-                <div class="card mb-4">
-                    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                        <span>Health Conditions</span>
-                    </div>
-                    <div class="card-body">
-                        <?php if (!empty($health_arr)) { ?>
-                            <div class="table-responsive">
-                                <table class="table table-striped table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Category</th>
-                                            <th>Values</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($health_arr as $cat => $vals) {
-                                            if (is_array($vals)) {
-                                                $vals_disp = implode(', ', $vals);
-                                            } else {
-                                                $vals_disp = (string) $vals;
-                                            }
-                                            ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars($cat); ?></td>
-                                                <td><?php echo htmlspecialchars($vals_disp); ?></td>
-                                            </tr>
-                                        <?php } ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <?php } else { ?>
-                            <p>No health information on file for this patient.</p>
-                        <?php } ?>
-                    </div>
+            <div class="er-container">
+                <div class="er-header">
+                    <h1>Examination Records</h1>
+                    <button class="edit-btn" id="btnEditHealth">
+                        <span class="edit-icon">✏️</span>
+                        Edit
+                    </button>
                 </div>
-                <button id="btnEditHealth" class="btn btn-primary btn-sm" type="button">Edit</button>
 
+                <?php if (isset($_SESSION['modal_success'])) { ?>
+                    <div class="alert alert-success" role="alert"><?php echo htmlspecialchars($_SESSION['modal_success']); ?></div>
+                    <?php unset($_SESSION['modal_success']);
+                } ?>
+
+                <table class="er-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($health_arr)) { ?>
+                            <?php foreach ($health_arr as $cat => $vals) {
+                                if (is_array($vals)) {
+                                    $vals_disp = implode(', ', $vals);
+                                } else {
+                                    $vals_disp = (string) $vals;
+                                }
+                                // Skip empty values
+                                if (empty(trim($vals_disp))) continue;
+                                ?>
+                                <tr>
+                                    <td class="category-cell"><?php echo htmlspecialchars(str_replace('_', ' ', $cat)); ?></td>
+                                    <td><?php echo htmlspecialchars($vals_disp); ?></td>
+                                </tr>
+                            <?php } ?>
+                        <?php } else { ?>
+                            <tr>
+                                <td colspan="2" style="text-align: center;">No health information on file for this patient.</td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+          </div>
+          <?php include_once('includes/footer.php');?>
 
                 <!-- Admin Health Modal -->
-                <div class="modal fade" id="adminHealthModal" tabindex="-1" role="dialog"
-                    aria-labelledby="adminHealthModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg" role="document">
-                        <div class="modal-content">
-                            <form method="post" action="view-er.php?stid=<?php echo intval($stdid); ?>">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="adminHealthModalLabel">Health Condition Form -
-                                        <?php echo htmlspecialchars($row->firstname . ' ' . $row->surname); ?></h5>
-                                    <button type="button" class="close" aria-label="Close" data-dismiss="modal"
-                                        data-bs-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                    <div id="medicalHistoryModal" class="modal">
+        <div class="modal-content health-questionnaire-modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Examination Records</h2>
+                <span class="close" data-dismiss="modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="view-er.php?stid=<?php echo $stdid; ?>" id="medicalHistoryForm">
+                    <p class="instruction">Please check all conditions that apply to the patient.</p>
+                    <div class="form-container">
+                        <!-- Left Column -->
+                        <div>
+                            <div class="section general">
+                                <div class="section-title">General</div>
+                                <div class="checkbox-item"><label for="hc-general-1">Marked weight change</label><input type="checkbox" id="hc-general-1"
+                                        name="health_conditions[general][]" value="Marked weight change" <?php echo hc_checked('general', 'Marked weight change'); ?>></div>
+                            </div>
+                            <div class="section ear">
+                                <div class="section-title">Ear</div>
+                                <div class="checkbox-item"><label for="hc-ear-1">Loss of hearing, ringing of ears</label><input
+                                        type="checkbox" id="hc-ear-1" name="health_conditions[ear][]"
+                                        value="Loss of hearing, ringing of ears" <?php echo hc_checked('ear', 'Loss of hearing, ringing of ears'); ?>></div>
+                            </div>
+                            <div class="section nervous">
+                                <div class="section-title">Nervous System</div>
+                                <div class="checkbox-item"><label for="hc-nervous-1">Headache</label><input type="checkbox" id="hc-nervous-1"
+                                        name="health_conditions[nervous][]" value="Headache" <?php echo hc_checked('nervous', 'Headache'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-nervous-2">Convulsion / epilepsy</label><input type="checkbox" id="hc-nervous-2"
+                                        name="health_conditions[nervous][]" value="Convulsion/epilepsy" <?php echo hc_checked('nervous', 'Convulsion/epilepsy'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-nervous-3">Numbness / Tingling</label><input type="checkbox" id="hc-nervous-3"
+                                        name="health_conditions[nervous][]" value="Numbness/Tingling" <?php echo hc_checked('nervous', 'Numbness/Tingling'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-nervous-4">Dizziness / Fainting</label><input type="checkbox" id="hc-nervous-4"
+                                        name="health_conditions[nervous][]" value="Dizziness/Fainting" <?php echo hc_checked('nervous', 'Dizziness/Fainting'); ?>></div>
+                            </div>
+                            <div class="section blood">
+                                <div class="section-title">Blood</div>
+                                <div class="checkbox-item"><label for="hc-blood-1">Bruise easily</label><input type="checkbox" id="hc-blood-1"
+                                        name="health_conditions[blood][]" value="Bruise easily" <?php echo hc_checked('blood', 'Bruise easily'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-blood-2">Anemia</label><input type="checkbox" id="hc-blood-2"
+                                        name="health_conditions[blood][]" value="Anemia" <?php echo hc_checked('blood', 'Anemia'); ?>></div>
+                            </div>
+                            <div class="section respiratory">
+                                <div class="section-title">Respiratory</div>
+                                <div class="checkbox-item"><label for="hc-respiratory-1">Persistent cough</label><input type="checkbox" id="hc-respiratory-1"
+                                        name="health_conditions[respiratory][]" value="Persistent cough" <?php echo hc_checked('respiratory', 'Persistent cough'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-respiratory-2">Difficulty in breathing</label><input type="checkbox" id="hc-respiratory-2"
+                                        name="health_conditions[respiratory][]" value="Difficulty in breathing" <?php echo hc_checked('respiratory', 'Difficulty in breathing'); ?>>
                                 </div>
-                                <div class="modal-body">
-                                    <!-- appointment fields removed: admin modal only edits health conditions -->
-
-                                    <?php if (!empty($modal_error)) {
-                                        echo '<div class="alert alert-danger">' . htmlspecialchars($modal_error) . '</div>';
-                                    } ?>
-                                    <p>Please check all conditions that apply to the patient.</p>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h6>GENERAL</h6>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[general][]" value="Marked weight change"
-                                                    id="hc_general_1" <?php echo hc_checked('general', 'Marked weight change'); ?>><label class="form-check-label"
-                                                    for="hc_general_1">Marked weight change</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[general][]"
-                                                    value="Increase frequency of urination" id="hc_general_2" <?php echo hc_checked('general', 'Increase frequency of urination'); ?>><label
-                                                    class="form-check-label" for="hc_general_2">Increase frequency of
-                                                    urination</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[general][]"
-                                                    value="Burning sensation on urination" id="hc_general_3" <?php echo hc_checked('general', 'Burning sensation on urination'); ?>><label
-                                                    class="form-check-label" for="hc_general_3">Burning sensation on
-                                                    urination</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[general][]"
-                                                    value="Loss of hearing, ringing of ears" id="hc_general_4" <?php echo hc_checked('general', 'Loss of hearing, ringing of ears'); ?>><label class="form-check-label" for="hc_general_4">Loss of
-                                                    hearing, ringing of ears</label></div>
-
-                                            <h6 class="mt-3">LIVER</h6>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[liver][]" value="History of liver ailment"
-                                                    id="hc_liver_1" <?php echo hc_checked('liver', 'History of liver ailment'); ?>><label class="form-check-label"
-                                                    for="hc_liver_1">History of liver ailment</label></div>
-                                            <div class="form-group mt-2"><label
-                                                    for="liver_specify">Specify:</label><input type="text"
-                                                    class="form-control" name="health_conditions[liver_specify]"
-                                                    id="liver_specify" value="<?php echo hc_text('liver_specify'); ?>">
-                                            </div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[liver][]" value="Jaundice" id="hc_liver_2"
-                                                    <?php echo hc_checked('liver', 'Jaundice'); ?>><label
-                                                    class="form-check-label" for="hc_liver_2">Jaundice</label></div>
-
-                                            <h6 class="mt-3">DIABETES</h6>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[diabetes][]"
-                                                    value="Delayed healing of wounds" id="hc_diab_1" <?php echo hc_checked('diabetes', 'Delayed healing of wounds'); ?>><label
-                                                    class="form-check-label" for="hc_diab_1">Delayed healing of
-                                                    wounds</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[diabetes][]"
-                                                    value="Increase intake of food or water" id="hc_diab_2" <?php echo hc_checked('diabetes', 'Increase intake of food or water'); ?>><label
-                                                    class="form-check-label" for="hc_diab_2">Increase intake of food or
-                                                    water</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[diabetes][]"
-                                                    value="Family history of diabetes" id="hc_diab_3" <?php echo hc_checked('diabetes', 'Family history of diabetes'); ?>><label
-                                                    class="form-check-label" for="hc_diab_3">Family history of
-                                                    diabetes</label></div>
-
-                                            <h6 class="mt-3">THYROID</h6>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[thyroid][]" value="Perspire easily"
-                                                    id="hc_thy_1" <?php echo hc_checked('thyroid', 'Perspire easily'); ?>><label class="form-check-label" for="hc_thy_1">Perspire
-                                                    easily</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[thyroid][]" value="Apprehension"
-                                                    id="hc_thy_2" <?php echo hc_checked('thyroid', 'Apprehension'); ?>><label class="form-check-label"
-                                                    for="hc_thy_2">Apprehension</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[thyroid][]"
-                                                    value="Palpation/rapid heart beat" id="hc_thy_3" <?php echo hc_checked('thyroid', 'Palpation/rapid heart beat'); ?>><label
-                                                    class="form-check-label" for="hc_thy_3">Palpation/rapid heart
-                                                    beat</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[thyroid][]" value="Goiter" id="hc_thy_4"
-                                                    <?php echo hc_checked('thyroid', 'Goiter'); ?>><label
-                                                    class="form-check-label" for="hc_thy_4">Goiter</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[thyroid][]" value="Bulging of eyes"
-                                                    id="hc_thy_5" <?php echo hc_checked('thyroid', 'Bulging of eyes'); ?>><label class="form-check-label" for="hc_thy_5">Bulging of
-                                                    eyes</label></div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h6>URINARY</h6>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[urinary][]"
-                                                    value="Increase frequency of urination" id="hc_ur_1" <?php echo hc_checked('urinary', 'Increase frequency of urination'); ?>><label
-                                                    class="form-check-label" for="hc_ur_1">Increase frequency of
-                                                    urination</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[urinary][]"
-                                                    value="Burning sensation on urination" id="hc_ur_2" <?php echo hc_checked('urinary', 'Burning sensation on urination'); ?>><label
-                                                    class="form-check-label" for="hc_ur_2">Burning sensation on
-                                                    urination</label></div>
-
-                                            <h6 class="mt-3">NERVOUS SYSTEM</h6>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[nervous][]" value="Headache" id="hc_nerv_1"
-                                                    <?php echo hc_checked('nervous', 'Headache'); ?>><label
-                                                    class="form-check-label" for="hc_nerv_1">Headache</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[nervous][]" value="Convulsion/epilepsy"
-                                                    id="hc_nerv_2" <?php echo hc_checked('nervous', 'Convulsion/epilepsy'); ?>><label
-                                                    class="form-check-label" for="hc_nerv_2">Convulsion/epilepsy</label>
-                                            </div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[nervous][]" value="Numbness/Tingling"
-                                                    id="hc_nerv_3" <?php echo hc_checked('nervous', 'Numbness/Tingling'); ?>><label class="form-check-label"
-                                                    for="hc_nerv_3">Numbness/Tingling</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[nervous][]" value="Dizziness/Fainting"
-                                                    id="hc_nerv_4" <?php echo hc_checked('nervous', 'Dizziness/Fainting'); ?>><label
-                                                    class="form-check-label" for="hc_nerv_4">Dizziness/Fainting</label>
-                                            </div>
-
-                                            <h6 class="mt-3">BLOOD</h6>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[blood][]" value="Bruise easily"
-                                                    id="hc_blood_1" <?php echo hc_checked('blood', 'Bruise easily'); ?>><label class="form-check-label" for="hc_blood_1">Bruise
-                                                    easily</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[blood][]" value="Anemia" id="hc_blood_2"
-                                                    <?php echo hc_checked('blood', 'Anemia'); ?>><label
-                                                    class="form-check-label" for="hc_blood_2">Anemia</label></div>
-
-                                            <h6 class="mt-3">RESPIRATORY</h6>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[respiratory][]" value="Persistent cough"
-                                                    id="hc_resp_1" <?php echo hc_checked('respiratory', 'Persistent cough'); ?>><label class="form-check-label"
-                                                    for="hc_resp_1">Persistent cough</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[respiratory][]"
-                                                    value="Difficulty in breathing" id="hc_resp_2" <?php echo hc_checked('respiratory', 'Difficulty in breathing'); ?>><label
-                                                    class="form-check-label" for="hc_resp_2">Difficulty in
-                                                    breathing</label></div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox"
-                                                    name="health_conditions[respiratory][]" value="Asthma"
-                                                    id="hc_resp_3" <?php echo hc_checked('respiratory', 'Asthma'); ?>><label class="form-check-label" for="hc_resp_3">Asthma</label>
-                                            </div>
-                                        </div>
-                                    </div>
-
+                                <div class="checkbox-item"><label for="hc-respiratory-3">Asthma</label><input type="checkbox" id="hc-respiratory-3"
+                                        name="health_conditions[respiratory][]" value="Asthma" <?php echo hc_checked('respiratory', 'Asthma'); ?>></div>
+                            </div>
+                            <div class="section heart">
+                                <div class="section-title">Heart</div>
+                                <div class="checkbox-item"><label for="hc-heart-1">Chest pain/discomfort</label><input type="checkbox" id="hc-heart-1"
+                                        name="health_conditions[heart][]" value="Chest pain/discomfort" <?php echo hc_checked('heart', 'Chest pain/discomfort'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-heart-2">Shortness of breath</label><input type="checkbox" id="hc-heart-2"
+                                        name="health_conditions[heart][]" value="Shortness of breath" <?php echo hc_checked('heart', 'Shortness of breath'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-heart-3">Hypertension</label><input type="checkbox" id="hc-heart-3"
+                                        name="health_conditions[heart][]" value="Hypertension" <?php echo hc_checked('heart', 'Hypertension'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-heart-4">Ankle edema</label><input type="checkbox" id="hc-heart-4"
+                                        name="health_conditions[heart][]" value="Ankle edema" <?php echo hc_checked('heart', 'Ankle edema'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-heart-5">Rheumatic fever (age)</label><input type="checkbox" id="hc-heart-5"
+                                        name="health_conditions[heart][]" value="Rheumatic fever" <?php echo hc_checked('heart', 'Rheumatic fever'); ?>></div>
+                                <input type="text" class="specify-input" placeholder="Specify age" name="health_conditions[rheumatic_age]" value="<?php echo hc_text('rheumatic_age'); ?>">
+                                <div class="checkbox-item"><label for="hc-heart-6">History of stroke (When)</label><input type="checkbox" id="hc-heart-6"
+                                        name="health_conditions[heart][]" value="History of stroke" <?php echo hc_checked('heart', 'History of stroke'); ?>></div>
+                                <input type="text" class="specify-input" placeholder="When" name="health_conditions[stroke_when]" value="<?php echo hc_text('stroke_when'); ?>">
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
-                                        data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" name="save_health" class="btn btn-primary">Update</button>
+                            </div>
+                        <!-- Right Column -->
+                        <div>
+                            <div class="section urinary">
+                                <div class="section-title">Urinary</div>
+                                <div class="checkbox-item"><label for="hc-urinary-1">Increase frequency of urination</label><input
+                                        type="checkbox" id="hc-urinary-1" name="health_conditions[urinary][]"
+                                        value="Increase frequency of urination" <?php echo hc_checked('urinary', 'Increase frequency of urination'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-urinary-2">Burning sensation on urination</label><input
+                                        type="checkbox" id="hc-urinary-2" name="health_conditions[urinary][]"
+                                        value="Burning sensation on urination" <?php echo hc_checked('urinary', 'Burning sensation on urination'); ?>></div>
+                            </div>
+                            <div class="section liver">
+                                <div class="section-title">Liver</div>
+                                <div class="checkbox-item"><label for="hc-liver-1">History of liver ailment</label><input type="checkbox" id="hc-liver-1"
+                                        name="health_conditions[liver][]" value="History of liver ailment" <?php echo hc_checked('liver', 'History of liver ailment'); ?>></div>
+                                <input type="text" class="specify-input" placeholder="Specify" name="health_conditions[liver_specify]" value="<?php echo hc_text('liver_specify'); ?>">
+                                <div class="checkbox-item"><label for="hc-liver-2">Jaundice</label><input type="checkbox" id="hc-liver-2"
+                                        name="health_conditions[liver][]" value="Jaundice" <?php echo hc_checked('liver', 'Jaundice'); ?>></div>
+                            </div>
+                            <div class="section diabetes">
+                                <div class="section-title">Diabetes</div>
+                                <div class="checkbox-item"><label for="hc-diabetes-1">Delayed healing of wounds</label><input type="checkbox" id="hc-diabetes-1"
+                                        name="health_conditions[diabetes][]" value="Delayed healing of wounds" <?php echo hc_checked('diabetes', 'Delayed healing of wounds'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-diabetes-2">Increase intake of food or water</label><input
+                                        type="checkbox" id="hc-diabetes-2" name="health_conditions[diabetes][]"
+                                        value="Increase intake of food or water" <?php echo hc_checked('diabetes', 'Increase intake of food or water'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-diabetes-3">Family history of diabetes</label><input type="checkbox" id="hc-diabetes-3"
+                                        name="health_conditions[diabetes][]" value="Family history of diabetes" <?php echo hc_checked('diabetes', 'Family history of diabetes'); ?>>
                                 </div>
-                            </form>
+                            </div>
+                            <div class="section thyroid">
+                                <div class="section-title">Thyroid</div>
+                                <div class="checkbox-item"><label for="hc-thyroid-1">Perspire easily</label><input type="checkbox" id="hc-thyroid-1"
+                                        name="health_conditions[thyroid][]" value="Perspire easily" <?php echo hc_checked('thyroid', 'Perspire easily'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-thyroid-2">Apprehension</label><input type="checkbox" id="hc-thyroid-2"
+                                        name="health_conditions[thyroid][]" value="Apprehension" <?php echo hc_checked('thyroid', 'Apprehension'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-thyroid-3">Palpitation/rapid heart beat</label><input
+                                        type="checkbox" id="hc-thyroid-3" name="health_conditions[thyroid][]"
+                                        value="Palpation/rapid heart beat" <?php echo hc_checked('thyroid', 'Palpation/rapid heart beat'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-thyroid-4">Goiter</label><input type="checkbox" id="hc-thyroid-4"
+                                        name="health_conditions[thyroid][]" value="Goiter" <?php echo hc_checked('thyroid', 'Goiter'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-thyroid-5">Bulging of eyes</label><input type="checkbox" id="hc-thyroid-5"
+                                        name="health_conditions[thyroid][]" value="Bulging of eyes" <?php echo hc_checked('thyroid', 'Bulging of eyes'); ?>></div>
+                            </div>
+                            <div class="section arthritis">
+                                <div class="section-title">Arthritis</div>
+                                <div class="checkbox-item"><label for="hc-arthritis-1">Joint pain</label><input type="checkbox" id="hc-arthritis-1"
+                                        name="health_conditions[arthritis][]" value="Joint pain" <?php echo hc_checked('arthritis', 'Joint pain'); ?>></div>
+                                <div class="checkbox-item"><label for="hc-arthritis-2">Joint Swelling</label><input type="checkbox" id="hc-arthritis-2"
+                                        name="health_conditions[arthritis][]" value="Joint Swelling" <?php echo hc_checked('arthritis', 'Joint Swelling'); ?>></div>
+                            </div>
+                            <div class="section radiograph">
+                                <div class="section-title">Radiograph</div>
+                                <div class="checkbox-item"><label for="hc-radiograph-1">Undergo radiation therapy</label><input type="checkbox" id="hc-radiograph-1"
+                                        name="health_conditions[radiograph][]" value="Undergo radiation therapy" <?php echo hc_checked('radiograph', 'Undergo radiation therapy'); ?>>
+                                </div>
+                            </div>
+                            <div class="section women">
+                                <div class="section-title">Women</div>
+                                <div class="checkbox-item"><label for="hc-women-1">Pregnancy (No. of month)</label><input type="checkbox" id="hc-women-1"
+                                        name="health_conditions[women][]" value="Pregnancy" <?php echo hc_checked('women', 'Pregnancy'); ?>></div>
+                                <input type="number" class="specify-input" placeholder="Number of months" name="health_conditions[pregnancy_months]" min="1" max="9" value="<?php echo hc_text('pregnancy_months'); ?>">
+                                <div class="checkbox-item"><label for="hc-women-2">Breast feed</label><input type="checkbox" id="hc-women-2"
+                                        name="health_conditions[women][]" value="Breast feed" <?php echo hc_checked('women', 'Breast feed'); ?>></div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    <!-- Other Sections -->
+                    <div class="section hospitalization">
+                        <div class="section-title">Hospitalization</div>
+                        <div class="checkbox-item"><label for="hc-hosp-1">Have you been hospitalized</label><input type="checkbox" id="hc-hosp-1"
+                                name="health_conditions[hospitalization][]" value="Hospitalized" <?php echo hc_checked('hospitalization', 'Hospitalized'); ?>></div>
+                        <label>Date:</label><input type="date" class="specify-input" name="health_conditions[hospitalization_date]" value="<?php echo hc_text('hospitalization_date'); ?>">
+                        <label>Specify:</label><input type="text" class="specify-input" name="health_conditions[hospitalization_specify]" placeholder="Please specify reason" value="<?php echo hc_text('hospitalization_specify'); ?>">
+                    </div>
 
-                <script src="vendors/js/vendor.bundle.base.js"></script>
-                <script src="js/off-canvas.js"></script>
-                <script src="js/misc.js"></script>
-                <script>
-                    (function () {
-                        var btn = document.getElementById('btnEditHealth');
-                        if (!btn) return;
-                        btn.addEventListener('click', function () {
-                            if (typeof $ !== 'undefined' && typeof $.fn.modal === 'function') {
-                                $('#adminHealthModal').modal('show');
-                            } else if (typeof bootstrap !== 'undefined') {
-                                var myModal = new bootstrap.Modal(document.getElementById('adminHealthModal'));
-                                myModal.show();
-                            } else {
-                                // fallback: toggle class to show (minimal)
-                                var el = document.getElementById('adminHealthModal');
-                                if (el) el.style.display = 'block';
-                            }
-                        });
-                    })();
-                </script>
+                    <div class="section allergy">
+                        <div class="allergy-title">Are you allergic or have ever experienced any reaction to the ff?
+                        </div>
+                        <div class="checkbox-item"><label for="hc-allergy-1">Sleeping pills</label><input type="checkbox" id="hc-allergy-1" name="health_conditions[allergies][]" value="Sleeping pills" <?php echo hc_checked('allergies', 'Sleeping pills'); ?>></div>
+                        <div class="checkbox-item"><label for="hc-allergy-2">Aspirin</label><input type="checkbox" id="hc-allergy-2" name="health_conditions[allergies][]" value="Aspirin" <?php echo hc_checked('allergies', 'Aspirin'); ?>></div>
+                        <div class="checkbox-item"><label for="hc-allergy-3">Food</label><input type="checkbox" id="hc-allergy-3" name="health_conditions[allergies][]" value="Food" <?php echo hc_checked('allergies', 'Food'); ?>></div>
+                        <div class="checkbox-item"><label for="hc-allergy-4">Penicillin/other antibiotics</label><input type="checkbox" id="hc-allergy-4" name="health_conditions[allergies][]" value="Penicillin/other antibiotics" <?php echo hc_checked('allergies', 'Penicillin/other antibiotics'); ?>></div>
+                        <div class="checkbox-item"><label for="hc-allergy-5">Sulfa Drugs</label><input type="checkbox" id="hc-allergy-5" name="health_conditions[allergies][]" value="Sulfa Drugs" <?php echo hc_checked('allergies', 'Sulfa Drugs'); ?>></div>
+                        <div class="checkbox-item"><label for="hc-allergy-6">Others</label><input type="checkbox" id="hc-allergy-6" name="health_conditions[allergies][]" value="Others" <?php echo hc_checked('allergies', 'Others'); ?>></div>
+                        <input type="text" class="specify-input" name="health_conditions[allergy_specify]" placeholder="Please specify other allergies" value="<?php echo hc_text('allergy_specify'); ?>">
+                    </div>
+
+                    <div class="section extraction">
+                        <div class="section-title">Previous Extraction History</div>
+                        <div class="checkbox-item"><label for="hc-ext-1">Have you had any previous extraction</label><input
+                                type="checkbox" id="hc-ext-1" name="health_conditions[extraction][]" value="Previous extraction" <?php echo hc_checked('extraction', 'Previous extraction'); ?>></div>
+                        <label>Date of last extraction:</label><input type="date" class="specify-input" name="health_conditions[extraction_date]" value="<?php echo hc_text('extraction_date'); ?>">
+                        <label>Specify:</label><textarea class="specify-input" name="health_conditions[extraction_specify]" rows="2" placeholder="Please provide details"><?php echo hc_text('extraction_specify'); ?></textarea>
+                        <div class="checkbox-item"><label for="hc-ext-2">Untoward reaction to extraction</label><input type="checkbox" id="hc-ext-2"
+                                name="health_conditions[extraction][]" value="Untoward reaction to extraction" <?php echo hc_checked('extraction', 'Untoward reaction to extraction'); ?>></div>
+                        <input type="text" class="specify-input" name="health_conditions[extraction_reaction_specify]" placeholder="Please specify reaction" value="<?php echo hc_text('extraction_reaction_specify'); ?>">
+                        <div class="checkbox-item"><label for="hc-ext-3">Were you under local anesthesia</label><input type="checkbox" id="hc-ext-3"
+                                name="health_conditions[extraction][]" value="Under local anesthesia" <?php echo hc_checked('extraction', 'Under local anesthesia'); ?>></div>
+                        <div class="checkbox-item"><label for="hc-ext-4">Allergic reaction to local anesthesia</label><input
+                                type="checkbox" id="hc-ext-4" name="health_conditions[extraction][]"
+                                value="Allergic reaction to local anesthesia" <?php echo hc_checked('extraction', 'Allergic reaction to local anesthesia'); ?>></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" name="save_health" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
             </div>
+        </div>
+    </div>
+ </div>
+    <script src="vendors/js/vendor.bundle.base.js"></script>
+    <script src="js/off-canvas.js"></script>
+    <script src="js/misc.js"></script>
+    <script src="js/view-er-modal.js"></script>
 </body>
 
 </html>
