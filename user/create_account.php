@@ -25,6 +25,10 @@ if (isset($_POST['register'])) {
         echo "<script>alert('Please fill in required fields.');</script>";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         echo "<script>alert('Please provide a valid email address.');</script>";
+    } elseif (substr(strtolower($email), -10) !== '@gmail.com') {
+        echo "<script>alert('Only @gmail.com addresses are allowed.');</script>";
+    } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password_raw)) {
+        echo "<script>alert('Password is not strong enough. It must be at least 8 characters and include uppercase, lowercase, a number, and a special character.');</script>";
     } elseif ($password_raw !== $confirm_password) {
         echo "<script>alert('Passwords do not match.');</script>";
     } else {
@@ -126,6 +130,11 @@ if (isset($_POST['register'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .input-invalid { border-color: #e74c3c !important; }
+        .input-valid { border-color: #2ecc71 !important; }
+        .password-strength-msg { font-size: 12px; color: #777; margin-top: 5px; }
+    </style>
     <title>Create Account</title>    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/login.css">
@@ -181,7 +190,8 @@ if (isset($_POST['register'])) {
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" class="form-control" placeholder="your.email@example.com" required name="email">
+                        <input type="email" id="email" class="form-control" placeholder="your.email@gmail.com" required name="email">
+                        <p id="email-msg" class="password-strength-msg">Only @gmail.com addresses are allowed.</p>
                     </div>
                     <div class="form-group">
                         <label for="username">Username</label>
@@ -193,6 +203,7 @@ if (isset($_POST['register'])) {
                             <input type="password" id="password" class="form-control" placeholder="Create a password" required name="password">
                             <i class="fas fa-eye toggle-password" id="togglePassword"></i>
                         </div>
+                        <p id="password-strength-msg" class="password-strength-msg">Use 8+ characters with a mix of letters, numbers & symbols.</p>
                     </div>
                     <div class="form-group">
                         <label for="confirm_password">Confirm Password</label>
@@ -210,6 +221,42 @@ if (isset($_POST['register'])) {
     </div>
 
     <script>
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        const passwordMsg = document.getElementById('password-strength-msg');
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function() {
+                if (passwordRegex.test(this.value)) {
+                    this.classList.add('input-valid');
+                    this.classList.remove('input-invalid');
+                    passwordMsg.style.color = '#2ecc71'; // Green
+                } else {
+                    this.classList.add('input-invalid');
+                    this.classList.remove('input-valid');
+                    passwordMsg.style.color = '#e74c3c'; // Red
+                }
+                // Trigger validation on the confirm password field as well
+                if (confirmPasswordInput) {
+                    confirmPasswordInput.dispatchEvent(new Event('input'));
+                }
+            });
+        }
+
+        if (confirmPasswordInput) {
+            confirmPasswordInput.addEventListener('input', function() {
+                if (this.value === passwordInput.value && this.value.length > 0) {
+                    this.classList.add('input-valid');
+                    this.classList.remove('input-invalid');
+                } else {
+                    this.classList.add('input-invalid');
+                    this.classList.remove('input-valid');
+                }
+            });
+        }
+
         function setupPasswordToggle(toggleId, inputId) {
             const toggle = document.getElementById(toggleId);
             const input = document.getElementById(inputId);
@@ -239,6 +286,24 @@ if (isset($_POST['register'])) {
         }
         capitalizeFirstLetter('firstname');
         capitalizeFirstLetter('surname');
+
+        if (emailInput) {
+            const emailMsg = document.getElementById('email-msg');
+            emailInput.addEventListener('input', function() {
+                const emailValue = this.value.trim();
+                const isGmail = emailValue.toLowerCase().endsWith('@gmail.com');
+                const isValidFormat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
+
+                if (emailValue === '' || (isValidFormat && isGmail)) {
+                    this.classList.remove('input-invalid');
+                    emailMsg.style.color = '#777';
+                } else {
+                    this.classList.add('input-invalid');
+                    this.classList.remove('input-valid'); // In case it was valid before
+                    emailMsg.style.color = '#e74c3c'; // Red
+                }
+            });
+        }
     </script>
 </body>
 </html>
