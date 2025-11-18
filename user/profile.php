@@ -34,16 +34,16 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
     // Handle form submission for updating profile from modal
     if (isset($_POST['update_profile'])) {
-        $firstname = $_POST['firstname'];
-        $surname = $_POST['surname'];
+        $firstname = ucfirst(trim($_POST['firstname']));
+        $surname = ucfirst(trim($_POST['surname']));
         $date_of_birth = $_POST['date_of_birth'];
         $contact_number = $_POST['contact_number'];
-        $address = $_POST['address'];
+        $address = ucfirst(trim($_POST['address']));
         $username = $_POST['username'];
         $email = $_POST['email'];
         $sex = isset($_POST['sex']) ? $_POST['sex'] : '';
         $status = isset($_POST['status']) ? $_POST['status'] : '';
-        $occupation = isset($_POST['occupation']) ? $_POST['occupation'] : '';
+        $occupation = isset($_POST['occupation']) ? ucfirst(trim($_POST['occupation'])) : '';
         $image = $_FILES['image']['name'];
 
         $age = '';
@@ -601,31 +601,31 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                             <div class="name-row">
                                 <div class="form-group">
                                     <label>First Name</label>
-                                    <input type="text" name="firstname"
+                                    <input type="text" id="edit_firstname" name="firstname"
                                         value="<?php echo htmlentities($patient->firstname); ?>" required>
                                 </div>
                                 <br>
                                 <div class="form-group">
                                     <label>Last Name</label>
-                                    <input type="text" name="surname" value="<?php echo htmlentities($patient->surname); ?>"
+                                    <input type="text" id="edit_surname" name="surname" value="<?php echo htmlentities($patient->surname); ?>"
                                         required>
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label>Email</label>
-                                <input type="email" name="email" value="<?php echo htmlentities($patient->email); ?>">
+                                <input type="email" id="edit_email" name="email" value="<?php echo htmlentities($patient->email); ?>">
                             </div>
 
                             <div class="form-group">
                                 <label>Phone</label>
-                                <input type="tel" name="contact_number"
+                                <input type="tel" id="edit_contact_number" name="contact_number"
                                     value="<?php echo htmlentities($patient->contact_number); ?>">
                             </div>
 
                             <div class="form-group">
                                 <label>Address</label>
-                                <textarea name="address" rows="2"><?php echo htmlentities($patient->address); ?></textarea>
+                                <textarea id="edit_address" name="address" rows="2"><?php echo htmlentities($patient->address); ?></textarea>
                             </div>
                         </div>
 
@@ -671,7 +671,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                             </div>
                             <div class="form-group">
                                 <label>Occupation</label>
-                                <input type="text" name="occupation"
+                                <input type="text" id="edit_occupation" name="occupation"
                                     value="<?php echo htmlentities($patient->occupation); ?>">
                             </div>
                         </div>
@@ -1063,6 +1063,21 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
             cancelServiceModal.querySelector('[data-dismiss="modal"]').addEventListener('click', function() {
                 cancelServiceModal.style.display = 'none';
             });
+
+            // Auto-capitalize first letter for profile edit fields
+            function capitalizeFirstLetter(inputId) {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.addEventListener('input', function() {
+                        if (this.value.length > 0) {
+                            this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+                        }
+                    });
+                }
+            }
+            capitalizeFirstLetter('edit_firstname');
+            capitalizeFirstLetter('edit_surname');
+            capitalizeFirstLetter('edit_occupation');
         });
     </script>
 

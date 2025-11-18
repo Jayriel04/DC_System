@@ -5,12 +5,33 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid'])==0) {
     header('location:logout.php');
 } else { // Add a closing brace for this else at the end of the file
+    // Handle new inventory creation from modal
+    if (isset($_POST['add_inventory'])) {
+        $name = ucfirst(trim($_POST['name']));
+        $brand = ucfirst(trim($_POST['brand']));
+        $category = ucfirst(trim($_POST['category']));
+        $quantity = $_POST['quantity'];
+        $expiration_date = $_POST['expiration_date'];
+
+        $sql_insert = "INSERT INTO tblinventory (name, brand, category, quantity, expiration_date) VALUES (:name, :brand, :category, :quantity, :exp_date)";
+        $query_insert = $dbh->prepare($sql_insert);
+        $query_insert->execute([
+            ':name' => $name, ':brand' => $brand, ':category' => $category, ':quantity' => $quantity, ':exp_date' => $expiration_date
+        ]);
+
+        if ($query_insert) {
+            echo "<script>alert('New product added successfully.'); window.location.href='manage-inventory.php';</script>";
+        } else {
+            echo "<script>alert('An error occurred while adding the product.');</script>";
+        }
+        exit();
+    }
     // Handle inventory update from modal
     if (isset($_POST['update_inventory'])) {
         $inventory_id = $_POST['inventory_id'];
-        $name = $_POST['name'];
-        $brand = $_POST['brand'];
-        $category = $_POST['category'];
+        $name = ucfirst(trim($_POST['name']));
+        $brand = ucfirst(trim($_POST['brand']));
+        $category = ucfirst(trim($_POST['category']));
         $quantity = $_POST['quantity'];
         $expiration_date = $_POST['expiration_date'];
 
@@ -408,6 +429,24 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                 alertBanner.style.display = 'none';
             });
         }
+
+        // Auto-capitalize first letter for inventory fields
+        function capitalizeFirstLetter(inputId) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.addEventListener('input', function() {
+                    if (this.value.length > 0) {
+                        this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+                    }
+                });
+            }
+        }
+        capitalizeFirstLetter('add_name');
+        capitalizeFirstLetter('add_brand');
+        capitalizeFirstLetter('add_category');
+        capitalizeFirstLetter('edit_name');
+        capitalizeFirstLetter('edit_brand');
+        capitalizeFirstLetter('edit_category');
     });
     </script>
 </body>

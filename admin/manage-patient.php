@@ -73,14 +73,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $dbh->beginTransaction();
         try {
             // 1. Create new patient
-            $firstname = $_POST['firstname'];
-            $surname = $_POST['surname'];
+            $firstname = ucfirst(trim($_POST['firstname']));
+            $surname = ucfirst(trim($_POST['surname']));
             $dob = $_POST['date_of_birth'];
             $sex = $_POST['sex'];
             $civil_status = $_POST['civil_status'];
-            $occupation = $_POST['occupation'];
+            $occupation = ucfirst(trim($_POST['occupation']));
             $contact_number = $_POST['contact_number'];
-            $address = $_POST['address'];
+            $address = ucfirst(trim($_POST['address']));
             $email = $_POST['email'];
             $password = md5('password'); // Default password
 
@@ -343,10 +343,27 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group"><label for="civil_status">Civil Status</label><input type="text" id="civil_status" name="civil_status"></div>
+                        <div class="form-group">
+                                <label>Civil Status</label>
+                                <select name="status">
+                                    <option value="">Select Status</option>
+                                    <option value="Single" <?php if ($patient->status == 'Single')
+                                        echo 'selected'; ?>>Single
+                                    </option>
+                                    <option value="Married" <?php if ($patient->status == 'Married')
+                                        echo 'selected'; ?>>
+                                        Married</option>
+                                    <option value="Widowed" <?php if ($patient->status == 'Widowed')
+                                        echo 'selected'; ?>>
+                                        Widowed</option>
+                                    <option value="Separated" <?php if ($patient->status == 'Separated')
+                                        echo 'selected'; ?>>
+                                        Separated</option>
+                                </select>
+                            </div>
                         <div class="form-group"><label for="occupation">Occupation</label><input type="text" id="occupation" name="occupation"></div>
                     </div>
-                    <div class="form-row">
+                <div class="form-row"> 
                         <div class="form-group"><label for="contact_number">Phone Number</label><input type="tel" id="contact_number" name="contact_number" required></div>
                         <div class="form-group"><label for="email">Email Address</label><input type="email" id="email" name="email"></div>
                     </div>
@@ -518,6 +535,22 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 editModal.style.display = 'flex';
             });
         });
+
+        // Auto-capitalize first letter for new patient fields
+        function capitalizeFirstLetter(inputId) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.addEventListener('input', function() {
+                    if (this.value.length > 0) {
+                        this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+                    }
+                });
+            }
+        }
+        capitalizeFirstLetter('firstname');
+        capitalizeFirstLetter('surname');
+        capitalizeFirstLetter('occupation');
+        capitalizeFirstLetter('address');
 
     });
     </script>

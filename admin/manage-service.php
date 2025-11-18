@@ -7,8 +7,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 } else {
     // Handle new service creation from modal
     if (isset($_POST['add_service'])) {
-        $sname = $_POST['sname'];
-        $sdesc = $_POST['sdesc'];
+        $sname = ucfirst(trim($_POST['sname']));
+        $sdesc = ucfirst(trim($_POST['sdesc']));
         $image_path = '';
 
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
@@ -37,8 +37,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     // Handle service update from modal
     if (isset($_POST['update_service'])) {
         $sid = $_POST['id'];
-        $sname = $_POST['sname'];
-        $sdesc = $_POST['sdesc'];
+        $sname = ucfirst(trim($_POST['sname']));
+        $sdesc = ucfirst(trim($_POST['sdesc']));
         $image_path = $_POST['existing_image']; // Keep existing image by default
 
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0 && !empty($_FILES['image']['name'])) {
@@ -219,11 +219,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             <form id="addServiceForm" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="serviceName">Service Name</label>
-                    <input type="text" name="sname" required>
+                    <input type="text" id="serviceName" name="sname" required>
                 </div>
                 <div class="form-group">
                     <label for="serviceDescription">Description</label>
-                    <textarea name="sdesc" required></textarea>
+                    <textarea id="serviceDescription" name="sdesc" required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="serviceImage">Service Image</label>
@@ -335,6 +335,23 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     editModal.style.display = 'flex';
                 });
             });
+
+            // Auto-capitalize first letter for new service fields
+            function capitalizeFirstLetter(inputId) {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.addEventListener('input', function() {
+                        if (this.value.length > 0) {
+                            this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+                        }
+                    });
+                }
+            }
+            capitalizeFirstLetter('serviceName');
+            capitalizeFirstLetter('serviceDescription');
+            capitalizeFirstLetter('edit_service_name');
+            capitalizeFirstLetter('edit_service_description');
+
         });
     </script>
 </body>

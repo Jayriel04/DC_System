@@ -13,8 +13,8 @@ if (isset($_POST['register'])) {
     $confirm_password = isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '';
 
     // Required fields from form
-    $firstname = isset($_POST['firstname']) ? trim($_POST['firstname']) : '';
-    $surname = isset($_POST['surname']) ? trim($_POST['surname']) : '';
+    $firstname = isset($_POST['firstname']) ? ucfirst(trim($_POST['firstname'])) : '';
+    $surname = isset($_POST['surname']) ? ucfirst(trim($_POST['surname'])) : '';
     $date_of_birth = !empty($_POST['date_of_birth']) ? $_POST['date_of_birth'] : null; // YYYY-MM-DD or null
     $sex = !empty($_POST['sex']) ? $_POST['sex'] : null;
     $contact_number = !empty($_POST['contact_number']) ? trim($_POST['contact_number']) : null;
@@ -226,6 +226,19 @@ if (isset($_POST['register'])) {
 
         setupPasswordToggle('togglePassword', 'password');
         setupPasswordToggle('toggleConfirmPassword', 'confirm_password');
+
+        function capitalizeFirstLetter(inputId) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.addEventListener('input', function() {
+                    if (this.value.length > 0) {
+                        this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+                    }
+                });
+            }
+        }
+        capitalizeFirstLetter('firstname');
+        capitalizeFirstLetter('surname');
     </script>
 </body>
 </html>
