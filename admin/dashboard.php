@@ -210,7 +210,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <div class="stat-content">
                                         <h3>Total Patients</h3>
                                         <div class="stat-number"><?php echo number_format($total_patients); ?></div>
-                                        <div class="stat-change">↑ +12% vs last month</div>
+                                        
                                     </div>
                                     <div class="stat-icon icon-blue">👤</div>
                                 </div>
@@ -219,7 +219,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <div class="stat-content">
                                         <h3>Total Services Available</h3>
                                         <div class="stat-number"><?php echo number_format($total_services); ?></div>
-                                        <div class="stat-change">↑ +3 vs last month</div>
+                                        
                                     </div>
                                     <div class="stat-icon icon-green">❤️</div>
                                 </div>
@@ -228,7 +228,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <div class="stat-content">
                                         <h3>Total Appointments</h3>
                                         <div class="stat-number"><?php echo number_format($total_appointments); ?></div>
-                                        <div class="stat-change">↑ +8% vs last month</div>
+                                        
                                     </div>
                                     <div class="stat-icon icon-purple">📅</div>
                                 </div>
@@ -239,7 +239,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                         <div class="stat-number" style="font-size: 28px;">
                                             <?php echo number_format($avg_rating, 1); ?><span class="stars"><?php echo str_repeat('★', round($avg_rating)) . str_repeat('☆', 5 - round($avg_rating)); ?></span>
                                         </div>
-                                        <div class="stat-change">↑ +0.2 vs last month</div>
+                                        
                                     </div>
                                     <div class="stat-icon icon-yellow">⭐</div>
                                 </div>
