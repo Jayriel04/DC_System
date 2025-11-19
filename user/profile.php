@@ -219,14 +219,14 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $cancel_reason = trim($_POST['cancel_reason']);
 
         // Verify the schedule belongs to the current patient before cancelling
-        $sql_cancel_service = "UPDATE tblschedule SET status = 'Cancelled', cancel_reason = :cancel_reason, cancelled_at = NOW() WHERE id = :schedule_id AND patient_number = :patient_number";
+        $sql_cancel_service = "UPDATE tblschedule SET status = 'For Cancellation', cancel_reason = :cancel_reason, cancelled_at = NOW() WHERE id = :schedule_id AND patient_number = :patient_number";
         $query_cancel_service = $dbh->prepare($sql_cancel_service);
         $query_cancel_service->bindParam(':schedule_id', $schedule_id_to_cancel, PDO::PARAM_INT);
         $query_cancel_service->bindParam(':cancel_reason', $cancel_reason, PDO::PARAM_STR);
         $query_cancel_service->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
         $query_cancel_service->execute();
 
-        $_SESSION['profile_message'] = 'Your service appointment has been cancelled.';
+        $_SESSION['profile_message'] = 'Your cancellation request has been submitted for review.';
         header('Location: profile.php?tab=appointments');
         exit();
     }

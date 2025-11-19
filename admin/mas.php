@@ -10,12 +10,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     if (isset($_POST['update_schedule'])) {
         $schedule_id = $_POST['schedule_id'];
         $status = $_POST['status'];
+        $cancel_reason = ($status === 'Cancelled') ? $_POST['cancel_reason'] : NULL;
 
-        $sql_update = "UPDATE tblschedule SET status = :status WHERE id = :id";
+        $sql_update = "UPDATE tblschedule SET status = :status, cancel_reason = :cancel_reason WHERE id = :id";
         $query_update = $dbh->prepare($sql_update);
         $query_update->bindParam(':status', $status, PDO::PARAM_STR);
+        $query_update->bindParam(':cancel_reason', $cancel_reason, PDO::PARAM_STR);
         $query_update->bindParam(':id', $schedule_id, PDO::PARAM_INT);
-
+        
         if ($query_update->execute()) {
             echo "<script>alert('Schedule status updated successfully.'); window.location.href='mas.php';</script>";
         } else {
@@ -97,17 +99,17 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     $query_all->execute();
     $count_all = $query_all->fetchColumn();
 
-    $sql_today = "SELECT COUNT(*) FROM tblschedule WHERE date = CURDATE()";
+    $sql_today = "SELECT COUNT(*) FROM tblschedule WHERE date = CURDATE() AND status != 'Cancelled'";
     $query_today = $dbh->prepare($sql_today);
     $query_today->execute();
     $count_today = $query_today->fetchColumn();
 
-    $sql_upcoming = "SELECT COUNT(*) FROM tblschedule WHERE date > CURDATE()";
+    $sql_upcoming = "SELECT COUNT(*) FROM tblschedule WHERE date > CURDATE() AND status != 'Cancelled'";
     $query_upcoming = $dbh->prepare($sql_upcoming);
     $query_upcoming->execute();
     $count_upcoming = $query_upcoming->fetchColumn();
 
-    $sql_pending = "SELECT COUNT(*) FROM tblschedule WHERE status = 'Ongoing'"; // 'Ongoing' is like 'Pending' for services
+    $sql_pending = "SELECT COUNT(*) FROM tblschedule WHERE status = 'Ongoing' AND date >= CURDATE()"; // 'Ongoing' is like 'Pending' for services
     $query_pending = $dbh->prepare($sql_pending);
     $query_pending->execute();
     $count_pending = $query_pending->fetchColumn();
@@ -116,6 +118,16 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     $query_completed = $dbh->prepare($sql_completed);
     $query_completed->execute();
     $count_completed = $query_completed->fetchColumn();
+
+    $sql_cancelled = "SELECT COUNT(*) FROM tblschedule WHERE status = 'Cancelled'";
+    $query_cancelled = $dbh->prepare($sql_cancelled);
+    $query_cancelled->execute();
+    $count_cancelled = $query_cancelled->fetchColumn();
+
+    $sql_for_cancellation = "SELECT COUNT(*) FROM tblschedule WHERE status = 'For Cancellation'";
+    $query_for_cancellation = $dbh->prepare($sql_for_cancellation);
+    $query_for_cancellation->execute();
+    $count_for_cancellation = $query_for_cancellation->fetchColumn();
 
     // --- SERVICE APPOINTMENT LIST ---
     $sql_schedules = "SELECT s.*, svc.name as service_name FROM tblschedule s LEFT JOIN tblservice svc ON s.service_id = svc.number";
@@ -133,6 +145,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             break;
         case 'completed':
             $where_clauses[] = "s.status = 'Done'";
+            break;
+        case 'cancelled':
+            $where_clauses[] = "s.status = 'Cancelled'";
+            break;
+        case 'for_cancellation':
+            $where_clauses[] = "s.status = 'For Cancellation'";
             break;
     }
 
@@ -167,6 +185,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/mas-modal.css">
+    <style>
+        
+    </style>
 </head>
 
 <body>
@@ -208,6 +229,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <a href="mas.php?filter=completed" class="filter-btn <?php if ($filter === 'completed') echo 'active'; ?>" data-filter="completed">
                                         Completed <span class="filter-count"><?php echo $count_completed; ?></span>
                                     </a>
+                                    <a href="mas.php?filter=cancelled" class="filter-btn <?php if ($filter === 'cancelled') echo 'active'; ?>" data-filter="cancelled">
+                                        Cancelled <span class="filter-count"><?php echo $count_cancelled; ?></span>
+                                    </a>
+                                    <a href="mas.php?filter=for_cancellation" class="filter-btn <?php if ($filter === 'for_cancellation') echo 'active'; ?>" data-filter="for_cancellation">
+                                        For Cancellation <span class="filter-count"><?php echo $count_for_cancellation; ?></span>
+                                    </a>
                                 </div>
                             </div>
 
@@ -227,6 +254,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                         <th>Date</th>
                                         <th>Time</th>
                                         <th>Duration</th>
+                                        <th>Cancel Reason</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -242,6 +270,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                 <td><?php echo htmlentities($schedule->date); ?></td>
                                                 <td><?php echo format_time_12hr($schedule->time); ?></td>
                                                 <td><?php echo htmlentities($schedule->duration ? $schedule->duration . ' mins' : 'N/A'); ?></td>
+                                                <td class="cancel-reason-cell"><?php echo htmlentities($schedule->cancel_reason); ?></td>
                                                 <td><span class="status-badge status-<?php echo strtolower(htmlentities($schedule->status)); ?>"><?php echo htmlentities($schedule->status); ?></span></td>
                                                 <td class="actions-icons">
                                                     <button class="edit-schedule-btn" title="Edit"
@@ -253,14 +282,23 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                         data-time="<?php echo htmlentities($schedule->time); ?>"
                                                         data-duration="<?php echo htmlentities($schedule->duration ? $schedule->duration . ' mins' : 'N/A'); ?>"
                                                         data-status="<?php echo htmlentities($schedule->status); ?>"
+                                                        data-cancel-reason="<?php echo htmlentities($schedule->cancel_reason); ?>"
                                                         style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0;">✏️</button>
+                                                    <button class="cancel-schedule-btn" title="Cancel"
+                                                        data-id="<?php echo htmlentities($schedule->id); ?>"
+                                                        data-firstname="<?php echo htmlentities($schedule->firstname); ?>"
+                                                        data-surname="<?php echo htmlentities($schedule->surname); ?>"
+                                                        data-service="<?php echo htmlentities($schedule->service_name ?: 'N/A'); ?>"
+                                                        data-date="<?php echo htmlentities($schedule->date); ?>"
+                                                        data-time="<?php echo htmlentities($schedule->time); ?>"
+                                                        style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0 8px;">🚫</button>
                                                     <a href="mas.php?delid=<?php echo $schedule->id; ?>" title="Delete" onclick="return confirm('Do you really want to Delete this service schedule?');" style="font-size: 1.25rem; color: #a0aec0; text-decoration: none;">🗑️</a>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else : ?>
                                         <tr>
-                                            <td colspan="9" style="text-align: center;">No service appointments found.</td>
+                                            <td colspan="10" style="text-align: center;">No service appointments found.</td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
@@ -389,8 +427,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         <label for="edit_status">Status</label>
                         <select id="edit_status" name="status" class="form-control" required>
                             <option value="Ongoing">Ongoing</option>
+                            <option value="For Cancellation">For Cancellation</option>
+                            <option value="Cancelled">Cancelled</option>
                             <option value="Done">Done</option>
                         </select>
+                    </div>
+                    <div class="form-group" id="cancel_reason_group" style="display: none;">
+                        <label for="edit_cancel_reason">Reason for Cancellation</label>
+                        <textarea id="edit_cancel_reason" name="cancel_reason" class="form-control" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -442,6 +486,21 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     }
                 });
             }
+
+            // Show/hide cancellation reason field in edit modal
+            const editStatusSelect = document.getElementById('edit_status');
+            const cancelReasonGroup = document.getElementById('cancel_reason_group');
+
+            if(editStatusSelect) {
+                editStatusSelect.addEventListener('change', function() {
+                    if (this.value === 'Cancelled') {
+                        cancelReasonGroup.style.display = 'block';
+                    } else {
+                        cancelReasonGroup.style.display = 'none';
+                    }
+                });
+            }
+
         });
     </script>
     <script src="js/mas-modal.js"></script>

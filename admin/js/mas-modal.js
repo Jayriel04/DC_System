@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Event delegation for edit buttons
     document.getElementById('appointment-table-container').addEventListener('click', function(e) {
-        if (e.target.classList.contains('edit-schedule-btn')) {
-            const button = e.target;
+        const button = e.target.closest('.edit-schedule-btn, .cancel-schedule-btn');
+        if (button) {
             // Populate modal fields
             document.getElementById('edit_schedule_id').value = button.dataset.id;
             document.getElementById('edit_firstname').value = button.dataset.firstname;
@@ -24,13 +24,31 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('edit_service').value = button.dataset.service;
             document.getElementById('edit_date').value = button.dataset.date;
             document.getElementById('edit_time').value = button.dataset.time;
-            document.getElementById('edit_duration').value = button.dataset.duration;
             
             const statusSelect = document.getElementById('edit_status');
-            // Clear previous selections and select the correct option
-            Array.from(statusSelect.options).forEach(option => {
-                option.selected = (option.value === button.dataset.status);
-            });
+            const cancelReasonGroup = document.getElementById('cancel_reason_group');
+            const cancelReasonTextarea = document.getElementById('edit_cancel_reason');
+
+            if (button.classList.contains('cancel-schedule-btn')) {
+                // If cancel button is clicked
+                statusSelect.value = 'Cancelled';
+                cancelReasonGroup.style.display = 'block';
+                cancelReasonTextarea.value = ''; // Clear previous reason
+                cancelReasonTextarea.focus();
+            } else {
+                // If edit button is clicked
+                document.getElementById('edit_duration').value = button.dataset.duration;
+                const currentStatus = button.dataset.status;
+                statusSelect.value = currentStatus;
+
+                if (currentStatus === 'Cancelled' || currentStatus === 'For Cancellation') {
+                    cancelReasonGroup.style.display = 'block';
+                    cancelReasonTextarea.value = button.dataset.cancelReason;
+                } else {
+                    cancelReasonGroup.style.display = 'none';
+                    cancelReasonTextarea.value = '';
+                }
+            }
 
             openModal();
         }

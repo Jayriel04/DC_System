@@ -16159,6 +16159,15 @@ code {
   border-color: #1bdbe0;
 }
 
+.patient-table .cancel-reason-cell {
+            max-width: 250px;
+            min-width: 150px;
+            white-space: normal; 
+            word-wrap: break-word;
+            text-align: left;
+            vertical-align: top;
+        }
+
 .btn-outline-primary:hover,
 .btn-outline-primary:focus,
 .btn-outline-primary:active {
