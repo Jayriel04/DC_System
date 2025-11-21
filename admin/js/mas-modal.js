@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Event delegation for edit buttons
     document.getElementById('appointment-table-container').addEventListener('click', function(e) {
-        const button = e.target.closest('.edit-schedule-btn, .cancel-schedule-btn');
-        if (button) {
+        const button = e.target.closest('.edit-schedule-btn');
+        if (button && button.classList.contains('edit-schedule-btn')) {
             // Populate modal fields
             document.getElementById('edit_schedule_id').value = button.dataset.id;
             document.getElementById('edit_firstname').value = button.dataset.firstname;
@@ -29,14 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const cancelReasonGroup = document.getElementById('cancel_reason_group');
             const cancelReasonTextarea = document.getElementById('edit_cancel_reason');
 
-            if (button.classList.contains('cancel-schedule-btn')) {
-                // If cancel button is clicked
-                statusSelect.value = 'Cancelled';
-                cancelReasonGroup.style.display = 'block';
-                cancelReasonTextarea.value = ''; // Clear previous reason
-                cancelReasonTextarea.focus();
-            } else {
-                // If edit button is clicked
+            // If edit button is clicked
                 document.getElementById('edit_duration').value = button.dataset.duration;
                 const currentStatus = button.dataset.status;
                 statusSelect.value = currentStatus;
@@ -48,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     cancelReasonGroup.style.display = 'none';
                     cancelReasonTextarea.value = '';
                 }
-            }
 
             openModal();
         }

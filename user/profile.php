@@ -200,15 +200,17 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     // Handle appointment cancellation
     if (isset($_POST['cancel_appointment'])) {
         $appointment_id_to_cancel = $_POST['cancel_appointment_id'];
-
+        $cancel_reason = trim($_POST['cancel_reason']);
+        
         // Verify the appointment belongs to the current patient before cancelling
-        $sql_cancel = "UPDATE tblappointment SET status = 'Cancelled' WHERE id = :appointment_id AND patient_number = :patient_number";
+        $sql_cancel = "UPDATE tblappointment SET status = 'Cancelled', cancel_reason = :cancel_reason, cancelled_at = NOW() WHERE id = :appointment_id AND patient_number = :patient_number";
         $query_cancel = $dbh->prepare($sql_cancel);
         $query_cancel->bindParam(':appointment_id', $appointment_id_to_cancel, PDO::PARAM_INT);
+        $query_cancel->bindParam(':cancel_reason', $cancel_reason, PDO::PARAM_STR);
         $query_cancel->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
         $query_cancel->execute();
-
-        $_SESSION['profile_message'] = 'Your appointment has been cancelled.';
+        
+        $_SESSION['profile_message'] = 'Your appointment has been successfully cancelled.';
         header('Location: profile.php?tab=appointments');
         exit();
     }
@@ -219,7 +221,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $cancel_reason = trim($_POST['cancel_reason']);
 
         // Verify the schedule belongs to the current patient before cancelling
-        $sql_cancel_service = "UPDATE tblschedule SET status = 'For Cancellation', cancel_reason = :cancel_reason, cancelled_at = NOW() WHERE id = :schedule_id AND patient_number = :patient_number";
+        $sql_cancel_service = "UPDATE tblschedule SET status = 'Request Cancel', cancel_reason = :cancel_reason, cancelled_at = NOW() WHERE id = :schedule_id AND patient_number = :patient_number";
         $query_cancel_service = $dbh->prepare($sql_cancel_service);
         $query_cancel_service->bindParam(':schedule_id', $schedule_id_to_cancel, PDO::PARAM_INT);
         $query_cancel_service->bindParam(':cancel_reason', $cancel_reason, PDO::PARAM_STR);
@@ -455,14 +457,11 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                                                     </div>
                                                 </div>
                                                 <?php if (in_array($appt['status'], ['Pending', 'Approved'])): ?>
-                                                    <form method="post" action="profile.php"
-                                                        onsubmit="return confirm('Are you sure you want to cancel this appointment?');"
-                                                        style="margin-left: auto;">
-                                                        <input type="hidden" name="cancel_appointment_id"
-                                                            value="<?php echo $appt['id']; ?>">
-                                                        <button type="submit" name="cancel_appointment" class="btn btn-danger btn-sm"
-                                                            style="padding: 2px 8px; font-size: 12px; background-color: red; color: white;">Cancel</button>
-                                                    </form>
+                                                    <button type="button" class="btn btn-danger btn-sm cancel-consultation-btn"
+                                                        data-appointment-id="<?php echo $appt['id']; ?>"
+                                                        style="margin-left: auto; padding: 2px 8px; font-size: 12px; background-color: red; color: white;">
+                                                        Cancel
+                                                    </button>
                                                 <?php endif; ?>
                                             </div>
                                             <div class="appointment-title">Consultation</div>
@@ -518,6 +517,30 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 Could not load patient profile. Please try logging in again.
             </div>
         <?php endif; ?>
+    </div>
+
+    <!-- Cancel Consultation Modal -->
+    <div id="cancelConsultationModal" class="modal" tabindex="-1" role="dialog" style="display: none !important; display: flex; align-items: center; justify-content: center;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style=" width: 500px; left: 300px;">
+                <div class="modal-header">
+                    <h4 class="modal-title">Cancel Appointment</h4>
+                    <span class="close" data-dismiss="modal">&times;</span>
+                </div>
+                <div class="modal-body" style="padding: 20px;">
+                    <form method="post" action="profile.php">
+                        <input type="hidden" name="cancel_appointment_id" id="cancel_appointment_id">
+                        <div class="form-group">
+                            <label for="consultation_cancel_reason" style="font-weight: bold; margin-bottom: 8px;">Reason for cancellation:</label>
+                            <textarea name="cancel_reason" id="consultation_cancel_reason" class="form-control" rows="4" required placeholder="Please provide a reason for cancelling..."></textarea>
+                        </div>
+                        <div class="modal-footer" style="padding: 15px 0 0 0; border-top: 1px solid #e5e5e5; margin-top: 15px;">
+                            <button type="submit" name="cancel_appointment" class="btn btn-danger">Confirm Cancellation</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Book Appointment Modal -->
@@ -1078,6 +1101,22 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
             capitalizeFirstLetter('edit_firstname');
             capitalizeFirstLetter('edit_surname');
             capitalizeFirstLetter('edit_occupation');
+
+            // Consultation Cancellation Modal
+            const cancelConsultationModal = document.getElementById('cancelConsultationModal');
+            const cancelAppointmentIdInput = document.getElementById('cancel_appointment_id');
+
+            document.querySelectorAll('.cancel-consultation-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const appointmentId = this.getAttribute('data-appointment-id');
+                    cancelAppointmentIdInput.value = appointmentId;
+                    cancelConsultationModal.style.display = 'flex';
+                });
+            });
+
+            cancelConsultationModal.querySelector('[data-dismiss="modal"]').addEventListener('click', function() {
+                cancelConsultationModal.style.display = 'none';
+            });
         });
     </script>
 

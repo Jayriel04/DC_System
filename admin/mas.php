@@ -26,6 +26,25 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         exit();
     }
 
+    // Handle service schedule cancellation from admin modal
+    if (isset($_POST['confirm_cancel_service'])) {
+        $schedule_id = $_POST['schedule_id'];
+        $cancel_reason = $_POST['cancel_reason'];
+        $status = 'Cancelled'; // Set status to Cancelled
+
+        $sql_cancel = "UPDATE tblschedule SET status = :status, cancel_reason = :cancel_reason WHERE id = :id";
+        $query_cancel = $dbh->prepare($sql_cancel);
+        $query_cancel->bindParam(':status', $status, PDO::PARAM_STR);
+        $query_cancel->bindParam(':cancel_reason', $cancel_reason, PDO::PARAM_STR);
+        $query_cancel->bindParam(':id', $schedule_id, PDO::PARAM_INT);
+
+        if ($query_cancel->execute()) {
+            echo "<script>alert('Service schedule cancelled successfully.'); window.location.href='mas.php';</script>";
+        } else {
+            echo "<script>alert('An error occurred while cancelling the service schedule.');</script>";
+        }
+        exit();
+    }
     // Handle new service appointment and patient creation from modal
     if (isset($_POST['schedule_service_appointment'])) {
         $dbh->beginTransaction();
@@ -233,7 +252,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                         Cancelled <span class="filter-count"><?php echo $count_cancelled; ?></span>
                                     </a>
                                     <a href="mas.php?filter=for_cancellation" class="filter-btn <?php if ($filter === 'for_cancellation') echo 'active'; ?>" data-filter="for_cancellation">
-                                        For Cancellation <span class="filter-count"><?php echo $count_for_cancellation; ?></span>
+                                        Request Cancellation <span class="filter-count"><?php echo $count_for_cancellation; ?></span>
                                     </a>
                                 </div>
                             </div>
@@ -445,6 +464,32 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         </div>
     </div>
 
+    <!-- Cancel Service Schedule Admin Modal -->
+    <div id="cancelScheduleAdminModal" class="modal-container" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cancel Service Schedule</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <form id="cancelScheduleAdminForm" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="schedule_id" id="cancel_admin_schedule_id">
+                    <p>Are you sure you want to cancel the service schedule for <strong
+                            id="cancel_admin_patient_name"></strong> for the service <strong
+                            id="cancel_admin_service_name"></strong> on <strong
+                            id="cancel_admin_schedule_date_time"></strong>?</p>
+                    <div class="form-group">
+                        <label for="cancel_admin_reason">Reason for Cancellation (Optional)</label>
+                        <textarea id="cancel_admin_reason" name="cancel_reason" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel">Close</button>
+                    <button type="submit" name="confirm_cancel_service" class="btn btn-danger">Confirm Cancellation</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <script src="vendors/js/vendor.bundle.base.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -501,6 +546,37 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 });
             }
 
+            // --- Cancel Service Schedule Admin Modal ---
+            const cancelAdminModal = document.getElementById('cancelScheduleAdminModal');
+            if (cancelAdminModal) {
+                const cancelAdminCloseBtn = cancelAdminModal.querySelector('.close-button');
+                const cancelAdminCancelBtn = cancelAdminModal.querySelector('.btn-cancel');
+
+                function closeCancelAdminModal() {
+                    cancelAdminModal.style.display = 'none';
+                }
+
+                cancelAdminCloseBtn.addEventListener('click', closeCancelAdminModal);
+                cancelAdminCancelBtn.addEventListener('click', closeCancelAdminModal);
+
+                window.addEventListener('click', function(event) {
+                    if (event.target === cancelAdminModal) {
+                        closeCancelAdminModal();
+                    }
+                });
+
+                document.querySelectorAll('.cancel-schedule-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const dataset = this.dataset;
+                        document.getElementById('cancel_admin_schedule_id').value = dataset.id;
+                        document.getElementById('cancel_admin_patient_name').textContent = dataset.firstname + ' ' + dataset.surname;
+                        document.getElementById('cancel_admin_service_name').textContent = dataset.service;
+                        document.getElementById('cancel_admin_schedule_date_time').textContent = dataset.date + ' at ' + dataset.time;
+                        document.getElementById('cancel_admin_reason').value = dataset.cancelReason || '';
+                        cancelAdminModal.style.display = 'flex';
+                    });
+                });
+            }
         });
     </script>
     <script src="js/mas-modal.js"></script>

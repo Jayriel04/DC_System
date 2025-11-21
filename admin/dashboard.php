@@ -358,7 +358,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             <div class="card">
                                 <div class="card-header">
                                     <h2 class="card-title">Recent Reviews</h2>
-                                    <a href="#" class="view-link">View All Reviews</a>
+                                    <a href="manage-reviews.php" class="view-link">View All Reviews</a>
                                 </div>
                                 <?php if (!empty($recent_reviews)): ?>
                                     <?php foreach ($recent_reviews as $review): ?>

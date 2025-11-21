@@ -47,6 +47,13 @@
                 <span class="menu-title">Calendar</span>
             </a>
         </li>
+
+        <li class="nav-item" data-page="manage-reviews.php">
+            <a class="nav-link" href="manage-reviews.php">
+                <span class="nav-icon"><i class="fas fa-star"></i></span>
+                <span class="menu-title">Feedback</span>
+            </a>
+        </li>
     </ul>
 </aside>
 

@@ -121,7 +121,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                   </div>
               </div>
 
-              <div id="editProfileModal" class="modal-container">
+              <div id="editProfileModal" class="modal-contai    ner" style="display: none;">
                   <div class="modal-content">
                       <div class="modal-header">
                           <h2>Edit Profile</h2>
