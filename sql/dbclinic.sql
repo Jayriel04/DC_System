@@ -59,7 +59,9 @@ CREATE TABLE `tblappointment` (
   `end_time` time DEFAULT NULL,
   `patient_number` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `status` varchar(20) DEFAULT NULL
+  `status` varchar(20) DEFAULT NULL,
+  `cancel_reason` text DEFAULT NULL,
+  `cancelled_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
