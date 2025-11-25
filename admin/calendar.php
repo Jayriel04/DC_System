@@ -197,10 +197,10 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                     </div>
                 <div class="calendar-container">
                     <div class="calendar-header">
+                      <div class="header-controls">
+                        <a href="?month=<?php echo ($currentMonth == 1) ? 12 : $currentMonth - 1; ?>&year=<?php echo ($currentMonth == 1) ? $currentYear - 1 : $currentYear; ?>" class="btn btn-outline-dark btn-sm">&gt;</a>
                         <h2><?php echo $months[$currentMonth - 1] . " " . $currentYear; ?></h2>
-                        <div class="header-controls">
-                            <a href="?month=<?php echo ($currentMonth == 1) ? 12 : $currentMonth - 1; ?>&year=<?php echo ($currentMonth == 1) ? $currentYear - 1 : $currentYear; ?>" class="btn btn-outline-primary btn-sm">&gt;</a>
-                            <a href="?month=<?php echo ($currentMonth == 12) ? 1 : $currentMonth + 1; ?>&year=<?php echo ($currentMonth == 12) ? $currentYear + 1 : $currentYear; ?>" class="btn btn-outline-primary btn-sm">&gt;</a>
+                            <a href="?month=<?php echo ($currentMonth == 12) ? 1 : $currentMonth + 1; ?>&year=<?php echo ($currentMonth == 12) ? $currentYear + 1 : $currentYear; ?>" class="btn btn-outline-dark btn-sm">&gt;</a>
                         </div>
                     </div>
 

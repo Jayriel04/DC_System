@@ -40,6 +40,10 @@
             $pageTitle = 'Calendar';
             $pageDescription = 'View and manage schedule availability';
             break;
+        case 'manage-reviews.php':
+            $pageTitle = 'Feedback';
+            $pageDescription = 'Review patient feedback and ratings';
+            break;
         case 'profile.php':
         case 'change-password.php':
             $pageTitle = 'Settings';

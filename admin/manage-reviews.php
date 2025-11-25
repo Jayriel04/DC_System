@@ -23,51 +23,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/dashboard.css">
     <link rel="stylesheet" href="./css/sidebar.css">
-    <style>
-        .review-card {
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            padding: 24px;
-            margin-bottom: 20px;
-        }
-        .review-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        .review-info {
-            line-height: 1.3;
-        }
-        .review-name {
-            font-weight: 600;
-            color: #333;
-            font-size: 1rem;
-        }
-        .review-service {
-            font-size: 0.8rem;
-            color: #888;
-        }
-        .review-meta {
-            text-align: right;
-        }
-        .review-stars {
-            color: #f39c12;
-            font-size: 1rem;
-        }
-        .review-date {
-            font-size: 0.75rem;
-            color: #999;
-            margin-top: 4px;
-        }
-        .review-text {
-            color: #555;
-            font-style: italic;
-            line-height: 1.6;
-        }
-    </style>
 </head>
 
 <body>
@@ -77,11 +32,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             <?php include_once('includes/sidebar.php'); ?>
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <div class="container">
-                        <div class="page-header">
-                            <h3 class="page-title">Patient Reviews</h3>
+                    <div class="header">
+                        <div class="header-text">
+                            <h2>Patients Reviews</h2>
+                            <p>Review patient feedback and ratings</p>
                         </div>
-
+                        <br>
                         <?php if (!empty($all_reviews)): ?>
                             <?php foreach ($all_reviews as $review): ?>
                                 <?php

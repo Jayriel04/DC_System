@@ -34,7 +34,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         exit();
     }
 
-    // Handle service update from modal
+    
     if (isset($_POST['update_service'])) {
         $sid = $_POST['id'];
         $sname = ucfirst(trim($_POST['sname']));
@@ -222,6 +222,26 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     <input type="text" id="serviceName" name="sname" required>
                 </div>
                 <div class="form-group">
+                            <label for="serviceCAtegory">Category</label>
+                            <select id="sex" name="sex" required>
+                                <option value="">Select Dental Service</option>
+                                <option value="Preventive">Preventive Dentistry</option>
+                                <option value="Restorative">Restorative Dentistry</option>
+                                <option value="Veneers">All Porcelain Crowns/Veneers</option>
+                                <option value="Fused">Porcelain-Fused To Metal Crowns</option>
+                                <option value="Full">Full-Metal Crowns</option>
+                                <option value="Plastic">Plastic Crowns</option>
+                                <option value="Dentures">Complete Dentures</option>
+                                <option value="Removable">Removable Patial Dentures</option>
+                                <option value="Provisional">Provisional Dentures</option>
+                                <option value="Cosmetic">Esthetic/Cosmetic Dentistry</option>
+                                <option value="Orthodontic">Orthodontics</option>
+                                <option value="Oral">Oral Surgery</option>
+                                <option value="Root">Root Canal Treatment</option>
+                                <option value="Pediatric">Prediatric Dentistry</option>
+                            </select>
+                        </div>
+                <div class="form-group">
                     <label for="serviceDescription">Description</label>
                     <textarea id="serviceDescription" name="sdesc" required></textarea>
                 </div>
@@ -251,6 +271,27 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     <label for="edit_service_name">Service Name</label>
                     <input type="text" name="sname" id="edit_service_name" required>
                 </div>
+                <div class="form-group">
+                            <label for="serviceCAtegory">Category</label>
+                            <select id="sex" name="sex" required>
+                                <option value="">Select Dental Service</option>
+                                <option value="Preventive">Preventive Dentistry</option>
+                                <option value="Restorative">Restorative Dentistry</option>
+                                <option value="Veneers">All Porcelain Crowns/Veneers</option>
+                                <option value="Fused">Porcelain-Fused To Metal Crowns</option>
+                                <option value="Full">Full-Metal Crowns</option>
+                                <option value="Plastic">Plastic Crowns</option>
+                                <option value="Dentures">Complete Dentures</option>
+                                <option value="Removable">Removable Patial Dentures</option>
+                                <option value="Provisional">Provisional Dentures</option>
+                                <option value="Cosmetic">Esthetic/Cosmetic Dentistry</option>
+                                <option value="Orthodontic">Orthodontics</option>
+                                <option value="Oral">Oral Surgery</option>
+                                <option value="Root">Root Canal Treatment</option>
+                                <option value="Pediatric">Prediatric Dentistry</option>
+                            </select>
+                </div>
+
                 <div class="form-group">
                     <label for="edit_service_description">Description</label>
                     <textarea name="sdesc" id="edit_service_description" required></textarea>
