@@ -207,7 +207,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 <div class="content-wrapper">
                     <div class="container">
 
-                        <div class="appointment-management-card">
+                        
                             <div class="header-section">
                                 <div class="header-text">
                                     <h1>Manage Appointments</h1>
@@ -216,7 +216,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 <button type="button" class="new-appointment-btn" id="newAppointmentBtn">New
                                     Appointment</button>
                             </div>
-
+                        <div class="appointment-management-card">
                             <div class="filter-section">
                                 <div class="search-box">
                                     <input type="text" placeholder="Search appointments by patient name"
@@ -260,7 +260,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     </a>
                                 </div>
                             </div>
-
                         </div>
 
                         <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 0;">
