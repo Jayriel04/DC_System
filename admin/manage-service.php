@@ -75,11 +75,15 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         echo "<script>window.location.href = 'manage-service.php'</script>";
     }
 
-    // Initialize search variable
+    // Initialize search and category variables
     $search = '';
+    $category = '';
 
     if (isset($_GET['search_query'])) {
         $search = trim($_GET['search_query']);
+    }
+    if (isset($_GET['category'])) {
+        $category = trim($_GET['category']);
     }
 ?>
 <!DOCTYPE html>
@@ -116,9 +120,28 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     </div>
 
                     <div class="search-filter-section">
-                        <form method="GET" class="search-form" id="searchForm">
+                        <form method="GET" class="search-form" id="searchForm" style="display: flex; gap: 10px; align-items: center;">
                             <div class="search-box">
                                 <input type="text" id="searchInput" name="search_query" placeholder="Search for services..." value="<?php echo htmlentities($search); ?>">
+                            </div>
+                            <div class="category-box">
+                                <select name="category" id="categoryDropdown">
+                                    <option value="">All Categories</option>
+                                    <option value="Preventive" <?php if($category=="Preventive") echo "selected"; ?>>Preventive Dentistry</option>
+                                    <option value="Restorative" <?php if($category=="Restorative") echo "selected"; ?>>Restorative Dentistry</option>
+                                    <option value="Veneers" <?php if($category=="Veneers") echo "selected"; ?>>All Porcelain Crowns/Veneers</option>
+                                    <option value="Fused" <?php if($category=="Fused") echo "selected"; ?>>Porcelain-Fused To Metal Crowns</option>
+                                    <option value="Full" <?php if($category=="Full") echo "selected"; ?>>Full-Metal Crowns</option>
+                                    <option value="Plastic" <?php if($category=="Plastic") echo "selected"; ?>>Plastic Crowns</option>
+                                    <option value="Dentures" <?php if($category=="Dentures") echo "selected"; ?>>Complete Dentures</option>
+                                    <option value="Removable" <?php if($category=="Removable") echo "selected"; ?>>Removable Patial Dentures</option>
+                                    <option value="Provisional" <?php if($category=="Provisional") echo "selected"; ?>>Provisional Dentures</option>
+                                    <option value="Cosmetic" <?php if($category=="Cosmetic") echo "selected"; ?>>Esthetic/Cosmetic Dentistry</option>
+                                    <option value="Orthodontic" <?php if($category=="Orthodontic") echo "selected"; ?>>Orthodontics</option>
+                                    <option value="Oral" <?php if($category=="Oral") echo "selected"; ?>>Oral Surgery</option>
+                                    <option value="Root" <?php if($category=="Root") echo "selected"; ?>>Root Canal Treatment</option>
+                                    <option value="Pediatric" <?php if($category=="Pediatric") echo "selected"; ?>>Prediatric Dentistry</option>
+                                </select>
                             </div>
                         </form>
                     </div>
@@ -136,8 +159,13 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         $count_sql = "SELECT COUNT(*) FROM tblservice WHERE 1=1";
                         $params = [];
                         if ($search) {
-                            $count_sql .= " AND (name LIKE :search OR description LIKE :search)";
+                            // also search in the category column (sex)
+                            $count_sql .= " AND (name LIKE :search OR description LIKE :search OR sex LIKE :search)";
                             $params[':search'] = "%$search%";
+                        }
+                        if ($category) {
+                            $count_sql .= " AND sex = :category";
+                            $params[':category'] = $category;
                         }
                         $query1 = $dbh->prepare($count_sql);
                         $query1->execute($params);
@@ -146,14 +174,22 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 
                         $sql = "SELECT * FROM tblservice WHERE 1=1";
                         if ($search) {
-                            $sql .= " AND (name LIKE :search OR description LIKE :search)";
+                            // also search in the category column (sex)
+                            $sql .= " AND (name LIKE :search OR description LIKE :search OR sex LIKE :search)";
+                        }
+                        if ($category) {
+                            $sql .= " AND sex = :category";
                         }
                         $sql .= " ORDER BY name ASC LIMIT :offset, :limit";
                         $query = $dbh->prepare($sql);
                         $query->bindParam(':offset', $offset, PDO::PARAM_INT);
                         $query->bindParam(':limit', $no_of_records_per_page, PDO::PARAM_INT);
                         if ($search) {
-                            $query->bindParam(':search', $params[':search']);
+                            // bindValue so the wildcard string is bound correctly
+                            $query->bindValue(':search', $params[':search'], PDO::PARAM_STR);
+                        }
+                        if ($category) {
+                            $query->bindParam(':category', $params[':category']);
                         }
                         $query1->execute();
                         $query->execute();
@@ -196,6 +232,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             // Build the query string for pagination links
                             $query_params = [];
                             if ($search) $query_params['search_query'] = $search;
+                            if ($category) $query_params['category'] = $category;
                         ?>
                         <ul class="pagination">
                             <li><a href="?pageno=1<?php echo http_build_query($query_params) ? '&' . http_build_query($query_params) : ''; ?>"><strong>First</strong></a></li>
@@ -386,6 +423,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             capitalizeFirstLetter('serviceDescription');
             capitalizeFirstLetter('edit_service_name');
             capitalizeFirstLetter('edit_service_description');
+
+            // Add event listener for category dropdown to auto-submit form
+            document.getElementById('categoryDropdown').addEventListener('change', function() {
+                document.getElementById('searchForm').submit();
+            });
 
         });
     </script>
