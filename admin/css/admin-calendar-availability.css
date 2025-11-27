@@ -1,0 +1,238 @@
+/* Admin Calendar Availability Styles */
+
+/* Calendar wrapper container */
+.admin-calendar-wrapper {
+    position: absolute;
+    z-index: 1051;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    max-width: 380px;
+    width: 100%;
+    display: none;
+    margin-top: 8px;
+}
+
+.admin-calendar-wrapper.show {
+    display: block;
+}
+
+/* Calendar header styling */
+.admin-calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.admin-calendar-header h3 {
+    font-size: 18px;
+    color: #333;
+    font-weight: 600;
+    margin: 0;
+}
+
+.admin-calendar-nav-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #667eea;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-calendar-nav-btn:hover {
+    background: #f0f0f0;
+    transform: scale(1.1);
+}
+
+/* Weekdays styling */
+.admin-calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.admin-calendar-weekday {
+    text-align: center;
+    font-weight: 600;
+    color: #999;
+    font-size: 11px;
+    text-transform: uppercase;
+    padding: 6px 0;
+}
+
+/* Days grid */
+.admin-calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+/* Individual day styling */
+.admin-calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+    transition: all 0.2s ease;
+    position: relative;
+    border: 2px solid transparent;
+    font-weight: 500;
+    background-color: #f9f9f9;
+}
+
+.admin-calendar-day:not(.empty):not(.other-month):hover {
+    background: #f0f0ff;
+    border-color: #667eea;
+}
+
+/* Empty and other month days */
+.admin-calendar-day.empty {
+    cursor: default;
+    background: transparent;
+}
+
+.admin-calendar-day.other-month {
+    color: #ddd;
+    cursor: default;
+    background: transparent;
+}
+
+.admin-calendar-day.other-month:hover {
+    background: none;
+    border-color: transparent;
+}
+
+/* Disabled days (past dates) */
+.admin-calendar-day.disabled {
+    color: #ccc;
+    cursor: not-allowed;
+    text-decoration: line-through;
+    background: #f5f5f5;
+}
+
+.admin-calendar-day.disabled:hover {
+    background: #f5f5f5;
+    border-color: transparent;
+}
+
+/* Selected day styling */
+.admin-calendar-day.selected {
+    background: #667eea;
+    color: white;
+    font-weight: 700;
+    border-color: #667eea;
+}
+
+/* Today styling */
+.admin-calendar-day.today {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+/* Available dates - Green styling */
+.admin-calendar-day.available:not(.other-month) {
+    background-color: #d1fae5;
+    color: #065f46;
+    border-color: #6ee7b7;
+}
+
+.admin-calendar-day.available:not(.other-month):hover {
+    background-color: #a7f3d0;
+    border-color: #065f46;
+}
+
+.admin-calendar-day.available.selected {
+    background: #059669;
+    color: white;
+    border-color: #059669;
+}
+
+/* Unavailable dates - Red styling */
+.admin-calendar-day.unavailable:not(.other-month) {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-color: #fecaca;
+    cursor: pointer;
+}
+
+.admin-calendar-day.unavailable:not(.other-month):hover {
+    background-color: #fecaca;
+    border-color: #991b1b;
+}
+
+.admin-calendar-day.unavailable.selected {
+    background: #dc2626;
+    color: white;
+    border-color: #dc2626;
+}
+
+/* Calendar container wrapper for positioning */
+.admin-calendar-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+/* Legend/Info styles */
+.admin-calendar-legend {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+    padding-top: 12px;
+    border-top: 1px solid #e0e0e0;
+    font-size: 12px;
+}
+
+.admin-calendar-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.admin-calendar-legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.admin-calendar-legend-dot.available {
+    background-color: #10b981;
+}
+
+.admin-calendar-legend-dot.unavailable {
+    background-color: #ef4444;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .admin-calendar-wrapper {
+        max-width: 100%;
+        padding: 15px;
+    }
+
+    .admin-calendar-day {
+        font-size: 12px;
+    }
+
+    .admin-calendar-weekday {
+        font-size: 10px;
+    }
+
+    .admin-calendar-header h3 {
+        font-size: 16px;
+    }
+}

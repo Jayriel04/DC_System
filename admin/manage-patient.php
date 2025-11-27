@@ -18,6 +18,32 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         exit(); // Stop further execution
     }
 
+    // AJAX handler for fetching month availability from tblcalendar
+    if (isset($_GET['get_month_availability']) && !empty($_GET['year']) && !empty($_GET['month'])) {
+        header('Content-Type: application/json');
+        $year = intval($_GET['year']);
+        $month = intval($_GET['month']);
+
+        // Get all dates in the month
+        $firstDay = date('Y-m-d', mktime(0, 0, 0, $month, 1, $year));
+        $lastDay = date('Y-m-t', mktime(0, 0, 0, $month, 1, $year));
+
+        // Query to get AVAILABLE dates from tblcalendar (dates with defined slots)
+        $sql = "SELECT DISTINCT DATE(date) as available_date FROM tblcalendar 
+                WHERE YEAR(date) = :year AND MONTH(date) = :month 
+                ORDER BY date ASC";
+        
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':year', $year, PDO::PARAM_INT);
+        $query->bindParam(':month', $month, PDO::PARAM_INT);
+        $query->execute();
+        
+        $available_dates = $query->fetchAll(PDO::FETCH_COLUMN);
+        
+        echo json_encode(['available' => $available_dates]);
+        exit();
+    }
+
     // Handle patient update from edit modal
     if (isset($_POST['update_patient'])) {
         $patient_id = $_POST['patient_id'];
@@ -183,6 +209,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="css/style.css">
      <link rel="stylesheet" href="css/sidebar.css">
      <link rel="stylesheet" href="css/mas-modal.css">   
+    <link rel="stylesheet" href="css/admin-calendar-availability.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
@@ -471,9 +498,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="edit_app_date">Date</label>
-                            <input type="date" id="edit_app_date" name="app_date">
+                        <div class="form-group admin-calendar-container">
+                            <label for="edit_appointment_date">Date</label>
+                            <input type="text" id="edit_appointment_date" name="app_date" placeholder="Click to select date" readonly style="cursor: pointer; background-color: #f9f9f9;">
                         </div>
                     </div>
                     <div class="form-row">
@@ -550,7 +577,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 
                 // Clear appointment fields
                 document.getElementById('edit_service_id').value = '';
-                document.getElementById('edit_app_date').value = '';
+                document.getElementById('edit_appointment_date').value = '';
                 document.getElementById('edit_start_time').value = '';
                 document.getElementById('edit_duration').value = '';
                 document.getElementById('edit_service_category').value = '';
@@ -618,6 +645,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         });
     });
     </script>
+    <script src="js/admin-calendar-availability.js"></script>
 </body>
 </html>
 <?php } ?>
