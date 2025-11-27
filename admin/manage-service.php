@@ -9,6 +9,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     if (isset($_POST['add_service'])) {
         $sname = ucfirst(trim($_POST['sname']));
         $sdesc = ucfirst(trim($_POST['sdesc']));
+        $category = $_POST['category'];
         $image_path = '';
 
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
@@ -22,10 +23,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             move_uploaded_file($_FILES['image']['tmp_name'], $target_file);
         }
 
-        $sql = "INSERT INTO tblservice (name, description, image) VALUES (:sname, :sdesc, :image)";
+        $sql = "INSERT INTO tblservice (name, description, image, category) VALUES (:sname, :sdesc, :image, :category)";
         $query = $dbh->prepare($sql);
         $query->bindParam(':sname', $sname, PDO::PARAM_STR);
         $query->bindParam(':sdesc', $sdesc, PDO::PARAM_STR);
+        $query->bindParam(':category', $category, PDO::PARAM_STR);
         $query->bindParam(':image', $image_path, PDO::PARAM_STR);
         $query->execute();
 
@@ -39,6 +41,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $sid = $_POST['id'];
         $sname = ucfirst(trim($_POST['sname']));
         $sdesc = ucfirst(trim($_POST['sdesc']));
+        $category = $_POST['category'];
         $image_path = $_POST['existing_image']; // Keep existing image by default
 
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0 && !empty($_FILES['image']['name'])) {
@@ -48,10 +51,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             move_uploaded_file($_FILES['image']['tmp_name'], $target_file);
         }
 
-        $sql = "UPDATE tblservice SET name=:sname, description=:sdesc, image=:image WHERE number=:sid";
+        $sql = "UPDATE tblservice SET name=:sname, description=:sdesc, image=:image, category=:category WHERE number=:sid";
         $query = $dbh->prepare($sql);
         $query->bindParam(':sname', $sname, PDO::PARAM_STR);
         $query->bindParam(':sdesc', $sdesc, PDO::PARAM_STR);
+        $query->bindParam(':category', $category, PDO::PARAM_STR);
         $query->bindParam(':image', $image_path, PDO::PARAM_STR);
         $query->bindParam(':sid', $sid, PDO::PARAM_INT);
         $query->execute();
@@ -168,6 +172,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <button class="action-btn edit-btn" title="Edit"
                                         data-id="<?php echo htmlentities($row->number); ?>"
                                         data-name="<?php echo htmlentities($row->name); ?>"
+                                        data-category="<?php echo htmlentities($row->category); ?>"
                                         data-description="<?php echo htmlentities($row->description); ?>"
                                         data-image="<?php echo htmlentities($row->image); ?>"
                                     >✏️</button>
@@ -222,23 +227,17 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     <input type="text" id="serviceName" name="sname" required>
                 </div>
                 <div class="form-group">
-                            <label for="serviceCAtegory">Category</label>
-                            <select id="sex" name="sex" required>
+                            <label for="serviceCategory">Category</label>
+                            <select id="serviceCategory" name="category" required>
                                 <option value="">Select Dental Service</option>
                                 <option value="Preventive">Preventive Dentistry</option>
                                 <option value="Restorative">Restorative Dentistry</option>
-                                <option value="Veneers">All Porcelain Crowns/Veneers</option>
-                                <option value="Fused">Porcelain-Fused To Metal Crowns</option>
-                                <option value="Full">Full-Metal Crowns</option>
-                                <option value="Plastic">Plastic Crowns</option>
-                                <option value="Dentures">Complete Dentures</option>
-                                <option value="Removable">Removable Patial Dentures</option>
-                                <option value="Provisional">Provisional Dentures</option>
+                                <option value="Prosthodontics">Prosthodontics (Crowns, Bridges, Dentures)</option>
                                 <option value="Cosmetic">Esthetic/Cosmetic Dentistry</option>
                                 <option value="Orthodontic">Orthodontics</option>
                                 <option value="Oral">Oral Surgery</option>
                                 <option value="Root">Root Canal Treatment</option>
-                                <option value="Pediatric">Prediatric Dentistry</option>
+                                <option value="Pediatric">Pediatric Dentistry</option>
                             </select>
                         </div>
                 <div class="form-group">
@@ -272,23 +271,17 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     <input type="text" name="sname" id="edit_service_name" required>
                 </div>
                 <div class="form-group">
-                            <label for="serviceCAtegory">Category</label>
-                            <select id="sex" name="sex" required>
+                            <label for="edit_service_category">Category</label>
+                            <select id="edit_service_category" name="category" required>
                                 <option value="">Select Dental Service</option>
                                 <option value="Preventive">Preventive Dentistry</option>
                                 <option value="Restorative">Restorative Dentistry</option>
-                                <option value="Veneers">All Porcelain Crowns/Veneers</option>
-                                <option value="Fused">Porcelain-Fused To Metal Crowns</option>
-                                <option value="Full">Full-Metal Crowns</option>
-                                <option value="Plastic">Plastic Crowns</option>
-                                <option value="Dentures">Complete Dentures</option>
-                                <option value="Removable">Removable Patial Dentures</option>
-                                <option value="Provisional">Provisional Dentures</option>
+                                <option value="Prosthodontics">Prosthodontics (Crowns, Bridges, Dentures)</option>
                                 <option value="Cosmetic">Esthetic/Cosmetic Dentistry</option>
                                 <option value="Orthodontic">Orthodontics</option>
                                 <option value="Oral">Oral Surgery</option>
                                 <option value="Root">Root Canal Treatment</option>
-                                <option value="Pediatric">Prediatric Dentistry</option>
+                                <option value="Pediatric">Pediatric Dentistry</option>
                             </select>
                 </div>
 
@@ -359,6 +352,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     const dataset = this.dataset;
                     document.getElementById('edit_service_id').value = dataset.id;
                     document.getElementById('edit_service_name').value = dataset.name;
+                    document.getElementById('edit_service_category').value = dataset.category;
                     document.getElementById('edit_service_description').value = dataset.description;
                     document.getElementById('edit_existing_image').value = dataset.image;
 

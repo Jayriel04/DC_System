@@ -5,6 +5,19 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
+    // AJAX handler for fetching services by category
+    if (isset($_GET['get_services_by_category']) && !empty($_GET['category'])) {
+        header('Content-Type: application/json');
+        $category = $_GET['category'];
+        $sql = "SELECT number, name FROM tblservice WHERE category = :category ORDER BY name ASC";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':category', $category, PDO::PARAM_STR);
+        $query->execute();
+        $services = $query->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode($services);
+        exit(); // Stop further execution
+    }
+
     // Handle patient update from edit modal
     if (isset($_POST['update_patient'])) {
         $patient_id = $_POST['patient_id'];
@@ -436,18 +449,26 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     <hr class="form-divider" style="margin: 20px 0; border-top: 1px solid #ccc;">
 
                     <h3 class="form-section-title">Schedule Service</h3>
-                    <div class="form-group">
-                        <label for="edit_service_id">Service</label>
-                        <select id="edit_service_id" name="service_id">
-                            <option value="">Select a Service</option>
-                            <?php
-                            // Fetch services for the dropdown
-                            $svcs = $dbh->query("SELECT number, name FROM tblservice ORDER BY name")->fetchAll(PDO::FETCH_OBJ);
-                            foreach ($svcs as $s) {
-                                echo "<option value='{$s->number}'>" . htmlentities($s->name) . "</option>";
-                            }
-                            ?>
-                        </select>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit_service_category">Service Category</label>
+                            <select id="edit_service_category" name="service_category">
+                                <option value="">Select a Category</option>
+                                <?php
+                                // Fetch distinct categories for the dropdown
+                                $cats = $dbh->query("SELECT DISTINCT category FROM tblservice WHERE category IS NOT NULL ORDER BY category")->fetchAll(PDO::FETCH_OBJ);
+                                foreach ($cats as $c) {
+                                    echo "<option value='" . htmlentities($c->category) . "'>" . htmlentities($c->category) . "</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_service_id">Service</label>
+                            <select id="edit_service_id" name="service_id" disabled>
+                                <option value="">Select a category first</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -531,6 +552,10 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 document.getElementById('edit_service_id').value = '';
                 document.getElementById('edit_app_date').value = '';
                 document.getElementById('edit_start_time').value = '';
+                document.getElementById('edit_duration').value = '';
+                document.getElementById('edit_service_category').value = '';
+                document.getElementById('edit_service_id').innerHTML = '<option value="">Select a category first</option>';
+                document.getElementById('edit_service_id').disabled = true;
 
                 editModal.style.display = 'flex';
             });
@@ -552,6 +577,45 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         capitalizeFirstLetter('occupation');
         capitalizeFirstLetter('address');
 
+        // --- Dependent Dropdown for Edit Modal ---
+        const categorySelect = document.getElementById('edit_service_category');
+        const serviceSelect = document.getElementById('edit_service_id');
+
+        categorySelect.addEventListener('change', function() {
+            const category = this.value;
+            serviceSelect.innerHTML = '<option value="">Loading...</option>';
+            serviceSelect.disabled = true;
+
+            if (!category) {
+                serviceSelect.innerHTML = '<option value="">Select a category first</option>';
+                return;
+            }
+
+            // Fetch services for the selected category via AJAX
+            fetch(`manage-patient.php?get_services_by_category=1&category=${encodeURIComponent(category)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    serviceSelect.innerHTML = '<option value="">Select a Service</option>';
+                    if (data.length > 0) {
+                        data.forEach(service => {
+                            const option = new Option(service.name, service.number);
+                            serviceSelect.appendChild(option);
+                        });
+                        serviceSelect.disabled = false;
+                    } else {
+                        serviceSelect.innerHTML = '<option value="">No services found</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching services:', error);
+                    serviceSelect.innerHTML = '<option value="">Error loading services</option>';
+                });
+        });
     });
     </script>
 </body>
