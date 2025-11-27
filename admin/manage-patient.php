@@ -6,12 +6,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
     // AJAX handler for fetching services by category
-    if (isset($_GET['get_services_by_category']) && !empty($_GET['category'])) {
+    if (isset($_GET['get_services_by_category']) && !empty($_GET['category_id'])) {
         header('Content-Type: application/json');
-        $category = $_GET['category'];
-        $sql = "SELECT number, name FROM tblservice WHERE category = :category ORDER BY name ASC";
+        $category_id = $_GET['category_id']; // Changed to category_id
+        $sql = "SELECT number, name FROM tblservice WHERE category_id = :category_id ORDER BY name ASC"; // Filter by category_id
         $query = $dbh->prepare($sql);
-        $query->bindParam(':category', $category, PDO::PARAM_STR);
+        $query->bindParam(':category_id', $category_id, PDO::PARAM_INT); // Bind as INT
         $query->execute();
         $services = $query->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($services);
@@ -455,10 +455,10 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             <select id="edit_service_category" name="service_category">
                                 <option value="">Select a Category</option>
                                 <?php
-                                // Fetch distinct categories for the dropdown
-                                $cats = $dbh->query("SELECT DISTINCT category FROM tblservice WHERE category IS NOT NULL ORDER BY category")->fetchAll(PDO::FETCH_OBJ);
+                                // Fetch categories from tblcategory
+                                $cats = $dbh->query("SELECT id, name FROM tblcategory ORDER BY id ASC")->fetchAll(PDO::FETCH_OBJ);
                                 foreach ($cats as $c) {
-                                    echo "<option value='" . htmlentities($c->category) . "'>" . htmlentities($c->category) . "</option>";
+                                    echo "<option value='" . htmlentities($c->id) . "'>" . htmlentities($c->name) . "</option>";
                                 }
                                 ?>
                             </select>
@@ -592,7 +592,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             }
 
             // Fetch services for the selected category via AJAX
-            fetch(`manage-patient.php?get_services_by_category=1&category=${encodeURIComponent(category)}`)
+            fetch(`manage-patient.php?get_services_by_category=1&category_id=${encodeURIComponent(category)}`) // Changed parameter name
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');

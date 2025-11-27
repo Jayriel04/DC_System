@@ -8,8 +8,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     // Handle new service creation from modal
     if (isset($_POST['add_service'])) {
         $sname = ucfirst(trim($_POST['sname']));
-        $sdesc = ucfirst(trim($_POST['sdesc']));
-        $category = $_POST['category'];
+        $sdesc = trim($_POST['sdesc']);
+        $category_id = $_POST['category_id']; // Changed from 'category'
         $image_path = '';
 
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
@@ -23,12 +23,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             move_uploaded_file($_FILES['image']['tmp_name'], $target_file);
         }
 
-        $sql = "INSERT INTO tblservice (name, description, image, category) VALUES (:sname, :sdesc, :image, :category)";
+        $sql = "INSERT INTO tblservice (name, description, image, category_id) VALUES (:sname, :sdesc, :image, :category_id)";
         $query = $dbh->prepare($sql);
         $query->bindParam(':sname', $sname, PDO::PARAM_STR);
         $query->bindParam(':sdesc', $sdesc, PDO::PARAM_STR);
-        $query->bindParam(':category', $category, PDO::PARAM_STR);
         $query->bindParam(':image', $image_path, PDO::PARAM_STR);
+        $query->bindParam(':category_id', $category_id, PDO::PARAM_INT);
         $query->execute();
 
         echo "<script>alert('Service added successfully');</script>";
@@ -40,8 +40,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     if (isset($_POST['update_service'])) {
         $sid = $_POST['id'];
         $sname = ucfirst(trim($_POST['sname']));
-        $sdesc = ucfirst(trim($_POST['sdesc']));
-        $category = $_POST['category'];
+        $sdesc = trim($_POST['sdesc']);
+        $category_id = $_POST['category_id']; // Changed from 'category'
         $image_path = $_POST['existing_image']; // Keep existing image by default
 
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0 && !empty($_FILES['image']['name'])) {
@@ -51,12 +51,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             move_uploaded_file($_FILES['image']['tmp_name'], $target_file);
         }
 
-        $sql = "UPDATE tblservice SET name=:sname, description=:sdesc, image=:image, category=:category WHERE number=:sid";
+        $sql = "UPDATE tblservice SET name=:sname, description=:sdesc, image=:image, category_id=:category_id WHERE number=:sid";
         $query = $dbh->prepare($sql);
         $query->bindParam(':sname', $sname, PDO::PARAM_STR);
         $query->bindParam(':sdesc', $sdesc, PDO::PARAM_STR);
-        $query->bindParam(':category', $category, PDO::PARAM_STR);
         $query->bindParam(':image', $image_path, PDO::PARAM_STR);
+        $query->bindParam(':category_id', $category_id, PDO::PARAM_INT);
         $query->bindParam(':sid', $sid, PDO::PARAM_INT);
         $query->execute();
 
@@ -77,14 +77,20 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 
     // Initialize search and category variables
     $search = '';
-    $category = '';
+    $category_id_filter = '';
 
     if (isset($_GET['search_query'])) {
         $search = trim($_GET['search_query']);
     }
-    if (isset($_GET['category'])) {
-        $category = trim($_GET['category']);
+    if (isset($_GET['category_id'])) {
+        $category_id_filter = trim($_GET['category_id']);
     }
+
+    // Fetch all categories for dropdowns
+    $sql_cats = "SELECT id, name FROM tblcategory ORDER BY id ASC";
+    $query_cats = $dbh->prepare($sql_cats);
+    $query_cats->execute();
+    $categories_list = $query_cats->fetchAll(PDO::FETCH_OBJ);
     ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -128,41 +134,16 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <input type="text" id="searchInput" name="search_query"
                                         placeholder="Search for services..." value="<?php echo htmlentities($search); ?>">
                                 </div>
-                                <div class="category-box">
-                                    <select name="category" id="categoryDropdown" style="height: 37px;">
+                                <div class="category-box"> 
+                                    <select name="category_id" id="categoryDropdown" style="height: 37px;">
                                         <option value="">All Categories</option>
-                                        <option value="Preventive Dentistry " <?php if ($category == "Preventive")
-                                            echo "selected"; ?>>Preventive Dentistry</option>
-                                        <option value="Restorative Dentistry" <?php if ($category == "Restorative")
-                                            echo "selected"; ?>>Restorative Dentistry</option>
-                                        <option value="All Porcelain Crowns/Veneers" <?php if ($category == "Veneers")
-                                            echo "selected"; ?>>All Porcelain Crowns/Veneers</option>
-                                        <option value="Porcelain-Fused To Metal Crowns" <?php if ($category == "Fused")
-                                            echo "selected"; ?>>Porcelain-Fused To Metal Crowns</option>
-                                        <option value="Full-Metal Crowns" <?php if ($category == "Full")
-                                            echo "selected"; ?>>
-                                            Full-Metal Crowns</option>
-                                        <option value="Plastic Crowns" <?php if ($category == "Plastic")
-                                            echo "selected"; ?>>
-                                            Plastic Crowns</option>
-                                        <option value="Complete Dentures" <?php if ($category == "Dentures")
-                                            echo "selected"; ?>>Complete Dentures</option>
-                                        <option value="Removable Patial Dentures" <?php if ($category == "Removable")
-                                            echo "selected"; ?>>Removable Patial Dentures</option>
-                                        <option value="Provisional Dentures" <?php if ($category == "Provisional")
-                                            echo "selected"; ?>>Provisional Dentures</option>
-                                        <option value="Esthetic/Cosmetic Dentistry" <?php if ($category == "Cosmetic")
-                                            echo "selected"; ?>>Esthetic/Cosmetic Dentistry</option>
-                                        <option value="Orthodontics" <?php if ($category == "Orthodontic")
-                                            echo "selected"; ?>>
-                                            Orthodontics</option>
-                                        <option value="Oral Surgery" <?php if ($category == "Oral")
-                                            echo "selected"; ?>>Oral
-                                            Surgery</option>
-                                        <option value="Root Canal Treatment" <?php if ($category == "Root")
-                                            echo "selected"; ?>>Root Canal Treatment</option>
-                                        <option value="Pediatric Dentistry" <?php if ($category == "Pediatric")
-                                            echo "selected"; ?>>Prediatric Dentistry</option>
+                                        <?php if (!empty($categories_list)): ?>
+                                            <?php foreach ($categories_list as $cat): ?>
+                                                <option value="<?php echo htmlentities($cat->id); ?>" <?php if ($category_id_filter == $cat->id) echo "selected"; ?>>
+                                                    <?php echo htmlentities($cat->name); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </select>
                                 </div>
                             </form>
@@ -178,31 +159,29 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             $no_of_records_per_page = 10;
                             $offset = ($pageno - 1) * $no_of_records_per_page;
 
-                            $count_sql = "SELECT COUNT(*) FROM tblservice WHERE 1=1";
+                            $count_sql = "SELECT COUNT(*) FROM tblservice s WHERE 1=1";
                             $params = [];
                             if ($search) {
-                                // also search in the category column (sex)
-                                $count_sql .= " AND (name LIKE :search OR description LIKE :search OR category LIKE :search)";
+                                $count_sql .= " AND (s.name LIKE :search OR s.description LIKE :search)";
                                 $params[':search'] = "%$search%";
                             }
-                            if ($category) {
-                                $count_sql .= " AND category = :category";
-                                $params[':category'] = $category;
+                            if ($category_id_filter) {
+                                $count_sql .= " AND s.category_id = :category_id";
+                                $params[':category_id'] = $category_id_filter;
                             }
                             $query1 = $dbh->prepare($count_sql);
                             $query1->execute($params);
                             $total_rows = $query1->fetchColumn();
                             $total_pages = ceil($total_rows / $no_of_records_per_page);
 
-                            $sql = "SELECT * FROM tblservice WHERE 1=1";
+                            $sql = "SELECT s.*, c.name as category_name FROM tblservice s LEFT JOIN tblcategory c ON s.category_id = c.id WHERE 1=1";
                             if ($search) {
-                                // also search in the category column (sex)
-                                $sql .= " AND (name LIKE :search OR description LIKE :search OR category LIKE :search)";
+                                $sql .= " AND (s.name LIKE :search OR s.description LIKE :search)";
                             }
-                            if ($category) {
-                                $sql .= " AND category = :category";
+                            if ($category_id_filter) {
+                                $sql .= " AND s.category_id = :category_id";
                             }
-                            $sql .= " ORDER BY name ASC LIMIT :offset, :limit";
+                            $sql .= " ORDER BY s.name ASC LIMIT :offset, :limit";
                             $query = $dbh->prepare($sql);
                             $query->bindParam(':offset', $offset, PDO::PARAM_INT);
                             $query->bindParam(':limit', $no_of_records_per_page, PDO::PARAM_INT);
@@ -210,8 +189,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 // bindValue so the wildcard string is bound correctly
                                 $query->bindValue(':search', $params[':search'], PDO::PARAM_STR);
                             }
-                            if ($category) {
-                                $query->bindParam(':category', $params[':category']);
+                            if ($category_id_filter) {
+                                $query->bindParam(':category_id', $params[':category_id']);
                             }
                             $query1->execute();
                             $query->execute();
@@ -224,8 +203,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                         <div class="service-actions">
                                             <button class="action-btn edit-btn" title="Edit"
                                                 data-id="<?php echo htmlentities($row->number); ?>"
-                                                data-name="<?php echo htmlentities($row->name); ?>"
-                                                data-category="<?php echo htmlentities($row->category); ?>"
+                                                data-name="<?php echo htmlentities($row->name); ?>" 
+                                                data-category-id="<?php echo htmlentities($row->category_id); ?>"
                                                 data-description="<?php echo htmlentities($row->description); ?>"
                                                 data-image="<?php echo htmlentities($row->image); ?>"><i
                                                     class="fas fa-edit"></i></button>
@@ -242,7 +221,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                         </div>
                                         <p class="service-description"><?php echo htmlentities($row->description); ?></p>
                                         <hr style="margin-top: 1px; margin-bottom: 1px;">
-                                        <p style="padding: 10px;">Category: <?php echo htmlentities($row->category); ?></p>
+                                        <p style="padding: 10px;">Category: <?php echo htmlentities($row->category_name); ?></p>
                                     </div>
                                     <?php
                                 }
@@ -260,8 +239,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             $query_params = [];
                             if ($search)
                                 $query_params['search_query'] = $search;
-                            if ($category)
-                                $query_params['category'] = $category;
+                            if ($category_id_filter)
+                                $query_params['category_id'] = $category_id_filter;
                             ?>
                             <ul class="pagination">
                                 <li><a
@@ -307,23 +286,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         <input type="text" id="serviceName" name="sname" required>
                     </div>
                     <div class="form-group">
-                        <label for="serviceCategory">Category</label>
-                        <select id="serviceCategory" name="category" required>
-                            <option value="">All Categories</option>
-                            <option value="Preventive Dentistry ">Preventive Dentistry</option>
-                            <option value="Restorative Dentistry">Restorative Dentistry</option>
-                            <option value="All Porcelain Crowns/Veneers">All Porcelain Crowns/Veneers</option>
-                            <option value="Porcelain-Fused To Metal Crowns">Porcelain-Fused To Metal Crowns</option>
-                            <option value="Full-Metal Crowns">Full-Metal Crowns</option>
-                            <option value="Plastic Crowns">Plastic Crowns</option>
-                            <option value="Complete Dentures">Complete Dentures</option>
-                            <option value="Removable Patial Dentures">Removable Patial Dentures</option>
-                            <option value="Provisional Dentures">Provisional Dentures</option>
-                            <option value="Esthetic/Cosmetic Dentistry">Esthetic/Cosmetic Dentistry</option>
-                            <option value="Orthodontics">Orthodontics</option>
-                            <option value="Oral Surgery">Oral Surgery</option>
-                            <option value="Root Canal Treatment">Root Canal Treatment</option>
-                            <option value="Pediatric Dentistry">Prediatric Dentistry</option>
+                        <label for="add_category_id">Category</label>
+                        <select id="add_category_id" name="category_id" required>
+                            <option value="">Select a Category</option>
+                            <?php if (!empty($categories_list)): ?>
+                                <?php foreach ($categories_list as $cat): ?>
+                                    <option value="<?php echo htmlentities($cat->id); ?>"><?php echo htmlentities($cat->name); ?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </select>
                     </div>
                     <div class="form-group">
@@ -357,22 +327,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         <input type="text" name="sname" id="edit_service_name" required>
                     </div>
                     <div class="form-group">
-                        <label for="edit_service_category">Category</label>
-                        <select id="edit_service_category" name="category" required>
-                            <option value="Preventive Dentistry ">Preventive Dentistry</option>
-                            <option value="Restorative Dentistry">Restorative Dentistry</option>
-                            <option value="All Porcelain Crowns/Veneers">All Porcelain Crowns/Veneers</option>
-                            <option value="Porcelain-Fused To Metal Crowns">Porcelain-Fused To Metal Crowns</option>
-                            <option value="Full-Metal Crowns">Full-Metal Crowns</option>
-                            <option value="Plastic Crowns">Plastic Crowns</option>
-                            <option value="Complete Dentures">Complete Dentures</option>
-                            <option value="Removable Patial Dentures">Removable Patial Dentures</option>
-                            <option value="Provisional Dentures">Provisional Dentures</option>
-                            <option value="Esthetic/Cosmetic Dentistry">Esthetic/Cosmetic Dentistry</option>
-                            <option value="Orthodontics">Orthodontics</option>
-                            <option value="Oral Surgery">Oral Surgery</option>
-                            <option value="Root Canal Treatment">Root Canal Treatment</option>
-                            <option value="Pediatric Dentistry">Prediatric Dentistry</option>
+                        <label for="edit_category_id">Category</label>
+                        <select id="edit_category_id" name="category_id" required>
+                            <option value="">Select a Category</option>
+                            <?php if (!empty($categories_list)): ?>
+                                <?php foreach ($categories_list as $cat): ?>
+                                    <option value="<?php echo htmlentities($cat->id); ?>"><?php echo htmlentities($cat->name); ?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </select>
                     </div>
 
@@ -444,7 +406,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         const dataset = this.dataset;
                         document.getElementById('edit_service_id').value = dataset.id;
                         document.getElementById('edit_service_name').value = dataset.name;
-                        document.getElementById('edit_service_category').value = dataset.category;
+                        document.getElementById('edit_category_id').value = dataset.categoryId;
                         document.getElementById('edit_service_description').value = dataset.description;
                         document.getElementById('edit_existing_image').value = dataset.image;
 

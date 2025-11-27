@@ -198,8 +198,7 @@ if (isset($_POST['submit_feedback'])) {
     }
 
     .service-card {
-      flex: 1 1 250px;
-      /* Flex properties for responsiveness */
+      flex: 0 0 calc(25% - 15px); /* Forces 4 cards per row with 20px gap */
       max-width: 280px;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       /* Add transition for smooth effect */
@@ -347,40 +346,33 @@ if (isset($_POST['submit_feedback'])) {
       <?php
       // Fetch all services from the database
       try {
-        $sql = "SELECT number, name, description, image FROM tblservice ORDER BY number ASC";
-        $query = $dbh->prepare($sql);
-        $query->execute();
-        $services = $query->fetchAll(PDO::FETCH_OBJ);
-      } catch (Exception $e) {
-        $services = [];
-      }
+        // Fetch all categories to display as cards
+        $sql_cat = "SELECT id, name, description, image FROM tblcategory ORDER BY id ASC";
+        $query_cat = $dbh->prepare($sql_cat);
+        $query_cat->execute();
+        $categories = $query_cat->fetchAll(PDO::FETCH_OBJ);
 
-      if (!empty($services)) {
-        // Chunk services into groups of 4 for each row
-        $service_chunks = array_chunk($services, 4);
-        foreach ($service_chunks as $chunk) {
-          echo '<div class="service-grid" style="margin-bottom: 20px;">'; // Add margin between rows
-          foreach ($chunk as $svc) {
-            $svcName = htmlspecialchars($svc->name ?? 'Service', ENT_QUOTES, 'UTF-8');
-            $svcDesc = htmlspecialchars($svc->description ?? '', ENT_QUOTES, 'UTF-8');
-            $svcImageRaw = $svc->image ?? '';
-            $basename = trim(basename($svcImageRaw));
-            $svcImage = !empty($basename) ? 'admin/images/services/' . rawurlencode($basename) : '';
-            ?>
+        if ($query_cat->rowCount() > 0) {
+          echo '<div class="service-grid">';
+          foreach ($categories as $category) {
+            $catName = htmlspecialchars($category->name ?? 'Category', ENT_QUOTES, 'UTF-8');
+            $catDesc = htmlspecialchars($category->description ?? '', ENT_QUOTES, 'UTF-8');
+            // Assuming category images are stored similarly to service images
+            $catImage = !empty($category->image) ? 'admin/' . htmlspecialchars($category->image, ENT_QUOTES, 'UTF-8') : 'images/default-service.jpg';
+      ?>
             <div class="service-card">
-              <?php if ($svcImage !== ''): ?><img src="<?php echo $svcImage; ?>" alt="<?php echo $svcName; ?>"
-                  class="service-card-img"><?php endif; ?>
+              <img src="<?php echo $catImage; ?>" alt="<?php echo $catName; ?>" class="service-card-img">
               <div class="service-card-body">
-                <div class="service-card-title"><?php echo $svcName; ?></div>
-                <div class="service-card-desc"><?php echo $svcDesc; ?></div>
+                <div class="service-card-title"><?php echo $catName; ?></div>
+                <div class="service-card-desc"><?php echo $catDesc; ?></div>
               </div>
             </div>
-            <?php
+      <?php
           }
           echo '</div>'; // Close service-grid
         }
-      } else {
-        echo '<div class="no-services">No services available at the moment. Please check back later.</div>';
+      } catch (Exception $e) {
+        echo '<div class="no-services">Could not load services due to a database error.</div>';
       }
       ?>
     </div>
