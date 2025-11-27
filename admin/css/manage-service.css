@@ -69,7 +69,7 @@ body {
 .search-box {
     display: flex;
     width: 100%;
-    max-width: 400px; /* Or adjust as needed */
+    max-width: 1000px; /* Or adjust as needed */
     position: relative;
 }
 
@@ -98,19 +98,24 @@ body {
 
 .services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fill, 223.54px);
     gap: 20px;
+    justify-content: center;
 }
 
 .service-card {
     background: white;
-    border-radius: 12px;
-    padding: 24px;
+    width: 223.54px;
+    height: 357px;
+    border-radius: 12px;    
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     transition: transform 0.2s, box-shadow 0.2s;
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* To contain the image within the border-radius */
 }
+
+
 
 .service-card:hover {
     transform: translateY(-4px);
@@ -121,13 +126,12 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 16px;
+    margin-bottom: -8px;
 }
 
 .service-image {
     width: 100%;
-    height: 180px;
-    object-fit: cover;
+    height: 150px;
     border-radius: 8px;
     margin-bottom: 16px;
     background-color: #f0f0f0;
@@ -136,6 +140,7 @@ body {
 .service-actions {
     display: flex;
     gap: 8px;
+    justify-content: flex-end;
 }
 
 .action-btn {
@@ -158,6 +163,7 @@ body {
     font-weight: 600;
     color: #1a1a1a;
     margin-bottom: 8px;
+    padding: 0 24px;
 }
 
 .service-description {
@@ -166,11 +172,16 @@ body {
     line-height: 1.5;
     margin-bottom: 20px;
     flex-grow: 1;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    padding: 0 9px;
 }
 
 .service-details {
     border-top: 1px solid #f0f0f0;
     padding-top: 16px;
+    padding: 16px 24px 0;
 }
 
 .detail-row {
@@ -296,7 +307,3 @@ body {
 .btn-primary:hover {
     background: #047857;
 }
-
-.services-grid {
-            grid-template-columns: repeat(5, 1fr);
-        }

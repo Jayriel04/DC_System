@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 20, 2025 at 03:16 PM
+-- Generation Time: Nov 27, 2025 at 05:42 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -68,15 +68,15 @@ CREATE TABLE `tblappointment` (
 -- Dumping data for table `tblappointment`
 --
 
-INSERT INTO `tblappointment` (`id`, `firstname`, `surname`, `date`, `start_time`, `end_time`, `patient_number`, `created_at`, `status`) VALUES
-(1, 'John Mar', 'Ypil', '2025-09-26', '17:47:00', NULL, 4, '2025-09-26 09:54:12', 'Declined'),
-(2, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:36:00', NULL, 5, '2025-09-27 06:36:43', 'Approved'),
-(3, 'Rodelyn', 'Estrera', '2025-09-27', '16:42:00', NULL, 8, '2025-09-27 08:42:44', 'Approved'),
-(4, 'John Mar', 'Ypil', '2025-09-27', '18:14:00', '19:00:00', 4, '2025-09-27 10:33:00', 'Approved'),
-(5, 'John Mar', 'Ypil', '2025-10-05', '13:47:00', '14:48:00', 4, '2025-10-05 05:49:13', 'Approved'),
-(6, 'John Mar', 'Ypil', '2025-10-05', '15:14:00', '16:14:00', 4, '2025-10-05 06:15:00', 'Approved'),
-(7, 'Nimfa', 'Conde', '2025-10-05', '17:39:00', '18:40:00', 10, '2025-10-05 09:40:49', 'walk-in'),
-(8, 'Sig', 'Canonio', '2025-10-05', '17:29:00', NULL, 13, '2025-10-20 10:36:59', 'Pending');
+INSERT INTO `tblappointment` (`id`, `firstname`, `surname`, `date`, `start_time`, `end_time`, `patient_number`, `created_at`, `status`, `cancel_reason`, `cancelled_at`) VALUES
+(1, 'John Mar', 'Ypil', '2025-09-26', '17:47:00', NULL, 4, '2025-09-26 09:54:12', 'Declined', NULL, NULL),
+(2, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:36:00', NULL, 5, '2025-09-27 06:36:43', 'Cancelled', 'sample cancelation!', '2025-11-21 14:14:21'),
+(3, 'Rodelyn', 'Estrera', '2025-09-27', '16:42:00', NULL, 8, '2025-09-27 08:42:44', 'Approved', NULL, NULL),
+(4, 'John Mar', 'Ypil', '2025-09-27', '18:14:00', '19:00:00', 4, '2025-09-27 10:33:00', 'Approved', NULL, NULL),
+(5, 'John Mar', 'Ypil', '2025-10-05', '13:47:00', '14:48:00', 4, '2025-10-05 05:49:13', 'Approved', NULL, NULL),
+(6, 'John Mar', 'Ypil', '2025-10-05', '15:14:00', '16:14:00', 4, '2025-10-05 06:15:00', 'Approved', NULL, NULL),
+(7, 'Nimfa', 'Conde', '2025-10-05', '17:39:00', '18:40:00', 10, '2025-10-05 09:40:49', 'walk-in', NULL, NULL),
+(8, 'Sig', 'Canonio', '2025-10-05', '17:29:00', NULL, 13, '2025-10-20 10:36:59', 'Cancelled', 'sample cancel!', NULL);
 
 -- --------------------------------------------------------
 
@@ -225,11 +225,11 @@ CREATE TABLE `tblschedule` (
 
 INSERT INTO `tblschedule` (`id`, `appointment_id`, `patient_number`, `firstname`, `surname`, `date`, `time`, `service_id`, `created_at`, `duration`, `status`, `cancel_reason`, `cancelled_at`) VALUES
 (1, 1, 4, 'John Mar', 'Ypil', '2025-09-26', '21:32:00', 4, '2025-09-26 05:32:21', 30, 'Ongoing', 'idk', '2025-10-05 19:05:16'),
-(2, 2, 5, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:39:00', 4, '2025-09-26 22:39:38', 45, 'Ongoing', 'Health issue', '2025-09-27 15:15:00'),
+(2, 2, 5, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:39:00', 4, '2025-09-26 22:39:38', 45, 'Request Cancel', 'sample cancel', '2025-11-21 14:59:03'),
 (3, 3, 8, 'Rodelyn', 'Estrera', '2025-09-27', '18:44:00', 4, '2025-09-27 02:44:52', 67, 'Ongoing', NULL, NULL),
 (16, 4, 4, 'John Mar', 'Ypil', '2025-10-05', '16:29:00', 4, '2025-10-05 08:29:34', 50, 'Ongoing', NULL, NULL),
 (17, 5, 4, 'John Mar', 'Ypil', '2025-10-05', '16:39:00', 4, '2025-10-05 08:39:17', 34, 'Done', NULL, NULL),
-(18, 6, 4, 'John Mar', 'Ypil', '2025-10-05', '16:39:00', 4, '2025-10-05 08:39:42', 56, 'Ongoing', NULL, NULL);
+(18, 6, 4, 'John Mar', 'Ypil', '2025-10-05', '16:39:00', 4, '2025-10-05 08:39:42', 56, 'Cancelled', 'cancel', NULL);
 
 -- --------------------------------------------------------
 
@@ -241,21 +241,23 @@ CREATE TABLE `tblservice` (
   `number` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` varchar(500) NOT NULL,
-  `image` varchar(255) NOT NULL
+  `image` varchar(255) NOT NULL,
+  `category` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblservice`
 --
 
-INSERT INTO `tblservice` (`number`, `name`, `description`, `image`) VALUES
-(4, 'Etchant', 'HAHAHAAHAHAHAHHHAHAHAHA', 'images/services/cat-1.png'),
-(5, 'Ibot ngipon', 'Pa ibot ka ngipon gaw', 'images/services/sstudy laod.jpg'),
-(6, 'sample 3', 'idk aahahah', 'images/services/image.png'),
-(7, 'sample 4', 'sample for number 5', 'images/services/logo.png'),
-(8, 'sample 5', 'sample number 5', 'images/services/mcc_logo2.jpg'),
-(9, 'sample 6', 'sample for number 6', 'images/services/mcc.jpg'),
-(10, 'sample 7', 'This is for sample service', 'images/services/Mandaue City College Student Profiling.png');
+INSERT INTO `tblservice` (`number`, `name`, `description`, `image`, `category`) VALUES
+(4, 'Etchant', 'HAHAHAAHAHAHAHHHAHAHAHA', 'images/services/cat-1.png', 'Preventive Dentistry '),
+(5, 'Ibot ngipon', 'Pa ibot ka ngipon gaw', 'images/services/sstudy laod.jpg', 'Restorative Dentistry'),
+(6, 'Sample 3', 'Idk aahahah', 'images/services/image.png', 'Esthetic/Cosmetic Dentistry'),
+(7, 'Sample 4', 'Sample for number 5', 'images/services/logo.png', 'All Porcelain Crowns/Veneers'),
+(8, 'Sample 5', 'Sample number 5', 'images/services/mcc_logo2.jpg', 'Porcelain-Fused To Metal Crowns'),
+(9, 'Sample 6', 'Sample for number 6', 'images/services/mcc.jpg', 'Full-Metal Crowns'),
+(10, 'Sample 7', 'This is for sample service', 'images/services/Mandaue City College Student Profiling.png', 'Complete Dentures'),
+(11, 'Sample service', 'Sample category for a service', 'images/mcc new logo.jpg', 'Removable Patial Dentures');
 
 --
 -- Indexes for dumped tables
@@ -360,7 +362,7 @@ ALTER TABLE `tblschedule`
 -- AUTO_INCREMENT for table `tblservice`
 --
 ALTER TABLE `tblservice`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
