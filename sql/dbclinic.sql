@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 27, 2025 at 05:42 AM
+-- Generation Time: Nov 27, 2025 at 03:28 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -105,7 +105,42 @@ INSERT INTO `tblcalendar` (`id`, `date`, `start_time`, `end_time`) VALUES
 (7, '2025-10-05', '13:47:00', '14:48:00'),
 (8, '2025-10-05', '15:14:00', '16:14:00'),
 (9, '2025-10-05', '17:29:00', '18:30:00'),
-(10, '2025-10-05', '18:55:00', '19:55:00');
+(10, '2025-10-05', '18:55:00', '19:55:00'),
+(11, '2025-11-27', '22:06:00', '23:06:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblcategory`
+--
+
+CREATE TABLE `tblcategory` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblcategory`
+--
+
+INSERT INTO `tblcategory` (`id`, `name`, `description`, `image`, `created_at`) VALUES
+(1, 'Preventive Dentistry', 'Preventive dentistry focuses on maintaining optimal oral health and preventing dental issues before they arise.', 'images/categories/preventive-dentistry.png', '2025-11-27 11:46:10'),
+(2, 'Restorative Dentistry', 'Restorative dentistry focuses on repairing or replacing damaged or missing teeth to improve oral health, function, and appearance.', 'images/categories/restorative-dentistry.png', '2025-11-27 11:46:10'),
+(3, 'All Porcelain Crowns/Veneers', 'All-porcelain crowns and veneers are dental restorations that improve a tooth\'s appearance and/or function by covering it with a thin layer of porcelain.', 'images/categories/all-porcelain-crowns.png', '2025-11-27 11:46:10'),
+(4, 'Porcelain-Fused To Metal Crowns', 'These crowns combine strength and aesthetics, with a metal base covered by a layer of porcelain to match natural teeth.', 'images/categories/porcelain-fused-crowns.png', '2025-11-27 11:46:10'),
+(5, 'Full-Metal Crowns', 'Made entirely of metal, these crowns are highly durable and are used primarily for back teeth due to their strength.', 'images/categories/full-metal-crowns.png', '2025-11-27 11:46:10'),
+(6, 'Plastic Crowns', 'Often used as temporary solutions, these crowns are made from acrylic and are less durable than other types.', 'images/categories/plastic-crowns.png', '2025-11-27 11:46:10'),
+(7, 'Complete Dentures', 'Full dentures replace all missing teeth in the upper and/or lower jaw, providing improved function and appearance.', 'images/categories/complete-dentures.png', '2025-11-27 11:46:10'),
+(8, 'Removable Partial Dentures', 'These dentures replace some missing teeth and can be taken out for cleaning and maintenance.', 'images/categories/removable-partial-dentures.png', '2025-11-27 11:46:10'),
+(9, 'Provisional Dentures', 'Temporary dentures used while waiting for permanent solutions, they provide functionality and aesthetics during the transition.', 'images/categories/provisional-dentures.png', '2025-11-27 11:46:10'),
+(10, 'Esthetic/Cosmetic Dentistry', 'Focused on improving the appearance of teeth, gums, and smiles through various procedures like whitening and veneers.', 'images/categories/cosmetic-dentistry.png', '2025-11-27 11:46:10'),
+(11, 'Orthodontics', 'This specialty involves correcting misaligned teeth and jaws using braces, aligners, and other devices for improved function and appearance.', 'images/categories/orthodontics.png', '2025-11-27 11:46:10'),
+(12, 'Oral Surgery', 'Surgical procedures in the mouth, including tooth extractions, jaw realignment, and treatment of oral diseases.', 'images/categories/oral-surgery.png', '2025-11-27 11:46:10'),
+(13, 'Root Canal Treatment', 'A procedure to remove infected pulp from inside a tooth, relieving pain and saving the tooth from extraction.', 'images/categories/root-canal-treatment.png', '2025-11-27 11:46:10'),
+(14, 'Pediatric Dentistry', 'Specialized dental care for children, focusing on their unique dental needs, preventive care, and education.', 'images/categories/pediatric-dentistry.png', '2025-11-27 11:46:10');
 
 -- --------------------------------------------------------
 
@@ -191,7 +226,7 @@ INSERT INTO `tblpatient` (`number`, `firstname`, `surname`, `date_of_birth`, `se
 (4, 'John Mar', 'Ypil', '2002-12-21', 'Male', 'Married', 'Student', 22, '09374939832', 'idk', 'ypil.johnmar.mcc@gmail.com', 'anonymous-girl.png', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Increase intake of food or water\"],\"thyroid\":[\"Apprehension\"],\"nervous\":[\"Headache\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Persistent cough\"],\"urinary\":[]}', '2025-09-27 11:02:35', 'jm', '763c3f1b6fe4707b8c39df149788c70b', 5, 'lami kayu'),
 (5, 'Jezrah Faith', 'Canonio', '2004-05-13', 'Female', 'Single', 'Princess', 21, '09876543211', 'yati liloan', 'canonio.jezrahfaith.mcc@gmail.com', 'pfpjez.jfif', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Family history of diabetes\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Numbness\\/Tingling\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}', '2025-09-27 11:03:26', 'jezrah', '3b02af71589ec5ea4138a1ece1866008', NULL, NULL),
 (8, 'Rodelyn', 'Estrera', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'estrera.rodelyn.mcc@gmail.com', NULL, '{\"general\":[\"Marked weight change\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Delayed healing of wounds\"],\"thyroid\":[\"Perspire easily\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Headache\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Difficulty in breathing\"]}', '2025-09-27 11:04:04', 'rodelyn', 'bc65be184bd685684a786ac70c6d2ef7', NULL, NULL),
-(9, 'Justine', 'Aguinaldo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'aguinaldo.justinelouise.mcc@gmail.com', NULL, NULL, '2025-09-27 11:04:46', 'justine', 'f6f3e757ac491a3511a5198a39c5ce29', NULL, NULL),
+(9, 'Justine', 'Aguinaldo', '0000-00-00', '', '', '', 0, '', '', 'aguinaldo.justinelouise.mcc@gmail.com', NULL, NULL, '2025-09-27 11:04:46', 'justine', 'f6f3e757ac491a3511a5198a39c5ce29', NULL, NULL),
 (10, 'Nimfa', 'Conde', '1956-03-09', 'Female', 'Single', 'Mother', 69, '09876543211', 'idk', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (11, 'Seg', 'Canonio', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'seg@gmail.com', NULL, NULL, NULL, 'seg', '54151f5b2b56a1345561afde6059ac63', NULL, NULL),
 (12, 'Crazy', 'Rapidboots', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'crazy@test.com', NULL, NULL, NULL, 'crazy', 'fa2ee41779ef60891cbfdfcd0dccaa7c', NULL, NULL),
@@ -241,23 +276,23 @@ CREATE TABLE `tblservice` (
   `number` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` varchar(500) NOT NULL,
-  `image` varchar(255) NOT NULL,
-  `category` varchar(100) DEFAULT NULL
+  `category_id` int(11) DEFAULT NULL,
+  `image` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblservice`
 --
 
-INSERT INTO `tblservice` (`number`, `name`, `description`, `image`, `category`) VALUES
-(4, 'Etchant', 'HAHAHAAHAHAHAHHHAHAHAHA', 'images/services/cat-1.png', 'Preventive Dentistry '),
-(5, 'Ibot ngipon', 'Pa ibot ka ngipon gaw', 'images/services/sstudy laod.jpg', 'Restorative Dentistry'),
-(6, 'Sample 3', 'Idk aahahah', 'images/services/image.png', 'Esthetic/Cosmetic Dentistry'),
-(7, 'Sample 4', 'Sample for number 5', 'images/services/logo.png', 'All Porcelain Crowns/Veneers'),
-(8, 'Sample 5', 'Sample number 5', 'images/services/mcc_logo2.jpg', 'Porcelain-Fused To Metal Crowns'),
-(9, 'Sample 6', 'Sample for number 6', 'images/services/mcc.jpg', 'Full-Metal Crowns'),
-(10, 'Sample 7', 'This is for sample service', 'images/services/Mandaue City College Student Profiling.png', 'Complete Dentures'),
-(11, 'Sample service', 'Sample category for a service', 'images/mcc new logo.jpg', 'Removable Patial Dentures');
+INSERT INTO `tblservice` (`number`, `name`, `description`, `category_id`, `image`) VALUES
+(4, 'Etchant', 'Agoyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy', 1, 'images/588880344_1162759702712818_3890524668527245534_n.jpg'),
+(5, 'Ibot ngipon', 'Pa ibot ka ngipon gaw', 2, 'images/services/sstudy laod.jpg'),
+(6, 'Sample 3', 'Idk aahahahhansklwkldnqkw', 3, 'images/services/image.png'),
+(7, 'Sample 4', 'Sample for number 5', 4, 'images/services/logo.png'),
+(8, 'Sample 5', 'Sample number 5', 5, 'images/services/mcc_logo2.jpg'),
+(9, 'Sample 6', 'Sample for number 6', NULL, 'images/services/mcc.jpg'),
+(10, 'Sample 7', 'This is for sample service', NULL, 'images/services/Mandaue City College Student Profiling.png'),
+(11, 'Sample service', 'Sample category for a service', NULL, 'images/mcc new logo.jpg');
 
 --
 -- Indexes for dumped tables
@@ -279,6 +314,12 @@ ALTER TABLE `tblappointment`
 -- Indexes for table `tblcalendar`
 --
 ALTER TABLE `tblcalendar`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tblcategory`
+--
+ALTER TABLE `tblcategory`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -310,7 +351,8 @@ ALTER TABLE `tblschedule`
 -- Indexes for table `tblservice`
 --
 ALTER TABLE `tblservice`
-  ADD PRIMARY KEY (`number`);
+  ADD PRIMARY KEY (`number`),
+  ADD KEY `fk_service_category` (`category_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -332,7 +374,13 @@ ALTER TABLE `tblappointment`
 -- AUTO_INCREMENT for table `tblcalendar`
 --
 ALTER TABLE `tblcalendar`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `tblcategory`
+--
+ALTER TABLE `tblcategory`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `tblinventory`
@@ -363,6 +411,16 @@ ALTER TABLE `tblschedule`
 --
 ALTER TABLE `tblservice`
   MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `tblservice`
+--
+ALTER TABLE `tblservice`
+  ADD CONSTRAINT `fk_service_category` FOREIGN KEY (`category_id`) REFERENCES `tblcategory` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
