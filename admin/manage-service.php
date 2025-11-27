@@ -127,20 +127,20 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             <div class="category-box">
                                 <select name="category" id="categoryDropdown">
                                     <option value="">All Categories</option>
-                                    <option value="Preventive" <?php if($category=="Preventive") echo "selected"; ?>>Preventive Dentistry</option>
-                                    <option value="Restorative" <?php if($category=="Restorative") echo "selected"; ?>>Restorative Dentistry</option>
-                                    <option value="Veneers" <?php if($category=="Veneers") echo "selected"; ?>>All Porcelain Crowns/Veneers</option>
-                                    <option value="Fused" <?php if($category=="Fused") echo "selected"; ?>>Porcelain-Fused To Metal Crowns</option>
-                                    <option value="Full" <?php if($category=="Full") echo "selected"; ?>>Full-Metal Crowns</option>
-                                    <option value="Plastic" <?php if($category=="Plastic") echo "selected"; ?>>Plastic Crowns</option>
-                                    <option value="Dentures" <?php if($category=="Dentures") echo "selected"; ?>>Complete Dentures</option>
-                                    <option value="Removable" <?php if($category=="Removable") echo "selected"; ?>>Removable Patial Dentures</option>
-                                    <option value="Provisional" <?php if($category=="Provisional") echo "selected"; ?>>Provisional Dentures</option>
-                                    <option value="Cosmetic" <?php if($category=="Cosmetic") echo "selected"; ?>>Esthetic/Cosmetic Dentistry</option>
-                                    <option value="Orthodontic" <?php if($category=="Orthodontic") echo "selected"; ?>>Orthodontics</option>
-                                    <option value="Oral" <?php if($category=="Oral") echo "selected"; ?>>Oral Surgery</option>
-                                    <option value="Root" <?php if($category=="Root") echo "selected"; ?>>Root Canal Treatment</option>
-                                    <option value="Pediatric" <?php if($category=="Pediatric") echo "selected"; ?>>Prediatric Dentistry</option>
+                                    <option value="Preventive Dentistry " <?php if($category=="Preventive") echo "selected"; ?>>Preventive Dentistry</option>
+                                    <option value="Restorative Dentistry" <?php if($category=="Restorative") echo "selected"; ?>>Restorative Dentistry</option>
+                                    <option value="All Porcelain Crowns/Veneers" <?php if($category=="Veneers") echo "selected"; ?>>All Porcelain Crowns/Veneers</option>
+                                    <option value="Porcelain-Fused To Metal Crowns" <?php if($category=="Fused") echo "selected"; ?>>Porcelain-Fused To Metal Crowns</option>
+                                    <option value="Full-Metal Crowns" <?php if($category=="Full") echo "selected"; ?>>Full-Metal Crowns</option>
+                                    <option value="Plastic Crowns" <?php if($category=="Plastic") echo "selected"; ?>>Plastic Crowns</option>
+                                    <option value="Complete Dentures" <?php if($category=="Dentures") echo "selected"; ?>>Complete Dentures</option>
+                                    <option value="Removable Patial Dentures" <?php if($category=="Removable") echo "selected"; ?>>Removable Patial Dentures</option>
+                                    <option value="Provisional Dentures" <?php if($category=="Provisional") echo "selected"; ?>>Provisional Dentures</option>
+                                    <option value="Esthetic/Cosmetic Dentistry" <?php if($category=="Cosmetic") echo "selected"; ?>>Esthetic/Cosmetic Dentistry</option>
+                                    <option value="Orthodontics" <?php if($category=="Orthodontic") echo "selected"; ?>>Orthodontics</option>
+                                    <option value="Oral Surgery" <?php if($category=="Oral") echo "selected"; ?>>Oral Surgery</option>
+                                    <option value="Root Canal Treatment" <?php if($category=="Root") echo "selected"; ?>>Root Canal Treatment</option>
+                                    <option value="Pediatric Dentistry" <?php if($category=="Pediatric") echo "selected"; ?>>Prediatric Dentistry</option>
                                 </select>
                             </div>
                         </form>
@@ -266,15 +266,21 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 <div class="form-group">
                             <label for="serviceCategory">Category</label>
                             <select id="serviceCategory" name="category" required>
-                                <option value="">Select Dental Service</option>
-                                <option value="Preventive">Preventive Dentistry</option>
-                                <option value="Restorative">Restorative Dentistry</option>
-                                <option value="Prosthodontics">Prosthodontics (Crowns, Bridges, Dentures)</option>
-                                <option value="Cosmetic">Esthetic/Cosmetic Dentistry</option>
-                                <option value="Orthodontic">Orthodontics</option>
-                                <option value="Oral">Oral Surgery</option>
-                                <option value="Root">Root Canal Treatment</option>
-                                <option value="Pediatric">Pediatric Dentistry</option>
+                                <option value="">All Categories</option>
+                                    <option value="Preventive Dentistry ">Preventive Dentistry</option>
+                                    <option value="Restorative Dentistry">Restorative Dentistry</option>
+                                    <option value="All Porcelain Crowns/Veneers">All Porcelain Crowns/Veneers</option>
+                                    <option value="Porcelain-Fused To Metal Crowns">Porcelain-Fused To Metal Crowns</option>
+                                    <option value="Full-Metal Crowns">Full-Metal Crowns</option>
+                                    <option value="Plastic Crowns">Plastic Crowns</option>
+                                    <option value="Complete Dentures">Complete Dentures</option>
+                                    <option value="Removable Patial Dentures">Removable Patial Dentures</option>
+                                    <option value="Provisional Dentures">Provisional Dentures</option>
+                                    <option value="Esthetic/Cosmetic Dentistry">Esthetic/Cosmetic Dentistry</option>
+                                    <option value="Orthodontics">Orthodontics</option>
+                                    <option value="Oral Surgery">Oral Surgery</option>
+                                    <option value="Root Canal Treatment">Root Canal Treatment</option>
+                                    <option value="Pediatric Dentistry">Prediatric Dentistry</option>
                             </select>
                         </div>
                 <div class="form-group">
@@ -310,15 +316,20 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 <div class="form-group">
                             <label for="edit_service_category">Category</label>
                             <select id="edit_service_category" name="category" required>
-                                <option value="">Select Dental Service</option>
-                                <option value="Preventive">Preventive Dentistry</option>
-                                <option value="Restorative">Restorative Dentistry</option>
-                                <option value="Prosthodontics">Prosthodontics (Crowns, Bridges, Dentures)</option>
-                                <option value="Cosmetic">Esthetic/Cosmetic Dentistry</option>
-                                <option value="Orthodontic">Orthodontics</option>
-                                <option value="Oral">Oral Surgery</option>
-                                <option value="Root">Root Canal Treatment</option>
-                                <option value="Pediatric">Pediatric Dentistry</option>
+                                <option value="Preventive Dentistry ">Preventive Dentistry</option>
+                                    <option value="Restorative Dentistry">Restorative Dentistry</option>
+                                    <option value="All Porcelain Crowns/Veneers">All Porcelain Crowns/Veneers</option>
+                                    <option value="Porcelain-Fused To Metal Crowns">Porcelain-Fused To Metal Crowns</option>
+                                    <option value="Full-Metal Crowns">Full-Metal Crowns</option>
+                                    <option value="Plastic Crowns">Plastic Crowns</option>
+                                    <option value="Complete Dentures">Complete Dentures</option>
+                                    <option value="Removable Patial Dentures">Removable Patial Dentures</option>
+                                    <option value="Provisional Dentures">Provisional Dentures</option>
+                                    <option value="Esthetic/Cosmetic Dentistry">Esthetic/Cosmetic Dentistry</option>
+                                    <option value="Orthodontics">Orthodontics</option>
+                                    <option value="Oral Surgery">Oral Surgery</option>
+                                    <option value="Root Canal Treatment">Root Canal Treatment</option>
+                                    <option value="Pediatric Dentistry">Prediatric Dentistry</option>
                             </select>
                 </div>
 
