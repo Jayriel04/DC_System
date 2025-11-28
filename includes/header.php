@@ -151,9 +151,126 @@ if (!empty($_SESSION)) {
     font-size: 13px;
   }
 
-  @media (max-width:600px) {
+  /* Mobile hamburger menu */
+  .mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    margin-left: auto;
+    z-index: 1051;
+  }
+
+  .mobile-menu-toggle i {
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .mobile-menu-toggle {
+      display: block;
+    }
+
+    .desktop-nav {
+      display: none;
+    }
+
+    .action-buttons {
+      display: none;
+    }
+
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      background: #fff;
+      flex-direction: column;
+      padding: 16px;
+      border-bottom: 1px solid #e5e5e5;
+      z-index: 1050;
+      max-height: calc(100vh - 60px);
+      overflow-y: auto;
+    }
+
+    .mobile-nav.show {
+      display: flex;
+    }
+
+    .mobile-nav a {
+      display: block;
+      padding: 12px 0;
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+      border-bottom: -2px solid #f0f0f0;
+    }
+
+    .mobile-nav a:last-child {
+      border-bottom: none;
+    }
+
+    .mobile-nav a:hover {
+      color: #007bff;
+    }
+
+    .mobile-nav .login-btn {
+      background: none;
+      color: #007bff;
+      padding: 10px 0;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .mobile-nav .signup-btn {
+      background: #007bff;
+      color: #fff;
+      padding: 10px 16px;
+      
+      margin-top: 8px;
+      text-align: center;
+      display: block;
+    }
+
+    .mobile-nav .signup-btn:hover {
+      background: #0056b3;
+    }
+
+    .mobile-nav .profile-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px 0;
+      border-top: 1px solid #f0f0f0;
+      margin-top: 12px;
+    }
+
+    .mobile-nav .profile-section a {
+      border: none;
+      padding: 8px 0;
+    }
+
+    .hdr-icons {
+      display: none;
+    }
+
     .hdr-icons .profile-text {
       display: none;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .hdr-icons .profile-text {
+      display: none;
+    }
+  }
+
+  @media (min-width: 769px) {
+    .mobile-nav {
+      display: none !important;
     }
   }
 
@@ -296,7 +413,8 @@ if (!empty($_SESSION)) {
     color: #64748b;
   }
 </style>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
 <header class="header">
   <div class="header-container">
     <div class="header-content">
@@ -325,6 +443,36 @@ if (!empty($_SESSION)) {
           <a href="<?php echo $base; ?>/index.php#contact scroll" class="nav-link">Contact Us</a>
         <?php endif; ?>
       </nav>
+
+      <!-- Mobile Navigation -->
+      <nav class="mobile-nav" id="mobileNav">
+        <?php if ($current == 'index.php'): ?>
+          <a href="/index#home" class="nav-link scroll">Home</a>
+          <a href="/index#about" class="nav-link scroll">About Us</a>
+          <a href="/index#services" class="nav-link scroll">Services</a>
+          <a href="/index#contact" class="nav-link scroll">Contact Us</a>
+        <?php else: ?>
+          <a href="<?php echo $base; ?>/index.php#home" class="nav-link">Home</a>
+          <a href="<?php echo $base; ?>/index.php#about" class="nav-link">About Us</a>
+          <a href="<?php echo $base; ?>/index.php#services" class="nav-link">Services</a>
+          <a href="<?php echo $base; ?>/index.php#contact" class="nav-link">Contact Us</a>
+        <?php endif; ?>
+
+        <?php if (!$logged_in): ?>
+          <!-- Mobile: Login / Sign up -->
+          <a href="<?php echo $base; ?>/user/login.php" class="login-btn">Login</a>
+          <a href="<?php echo $base; ?>/user/create_account.php" class="signup-btn">Sign Up</a>
+        <?php else: ?>
+          <!-- Mobile: Profile section -->
+          <div class="profile-section">
+            <a href="<?php echo $base; ?>/user/profile.php"><i class="ri-user-line"></i>My Profile</a>
+            <a href="<?php echo $base; ?>/user/change-password.php"><i class="ri-lock-password-line"></i>Change Password</a>
+            <a href="<?php echo $base; ?>/user/logout.php" style="color: #c0392b;"><i class="ri-logout-box-r-line"></i>Sign Out</a>
+          </div>
+        <?php endif; ?>
+      </nav>
+
+      <!-- Desktop action buttons (for logged-in users) -->
       <div class="action-buttons">
         <?php if (!$logged_in): ?>
           <!-- Not logged in: show Login / Sign up -->
@@ -390,6 +538,11 @@ if (!empty($_SESSION)) {
 
         <?php endif; ?>
       </div>
+
+      <!-- Mobile Menu Toggle (hamburger icon) -->
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu" aria-controls="mobileNav">
+        <i class="ri-menu-3-line"></i>
+      </button>
     </div>
   </div>
 </header>
@@ -522,6 +675,41 @@ if (!empty($_SESSION)) {
     document.addEventListener('click', function (e) {
       if (menuVisible && !profileLink.contains(e.target) && !profileMenu.contains(e.target)) {
         toggleMenu();
+      }
+    });
+  })();
+
+  // Mobile Menu Toggle Script
+  (function () {
+    var mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    var mobileNav = document.getElementById('mobileNav');
+    var menuOpen = false;
+
+    if (!mobileMenuToggle || !mobileNav) return;
+
+    mobileMenuToggle.addEventListener('click', function (e) {
+      e.preventDefault();
+      menuOpen = !menuOpen;
+      mobileNav.classList.toggle('show', menuOpen);
+      mobileMenuToggle.setAttribute('aria-expanded', menuOpen);
+    });
+
+    // Close menu when a link is clicked
+    var links = mobileNav.querySelectorAll('a');
+    links.forEach(function (link) {
+      link.addEventListener('click', function () {
+        menuOpen = false;
+        mobileNav.classList.remove('show');
+        mobileMenuToggle.setAttribute('aria-expanded', false);
+      });
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function (e) {
+      if (menuOpen && !mobileNav.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+        menuOpen = false;
+        mobileNav.classList.remove('show');
+        mobileMenuToggle.setAttribute('aria-expanded', false);
       }
     });
   })();

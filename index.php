@@ -175,7 +175,7 @@ if (isset($_POST['submit_feedback'])) {
   $baseHref = rtrim($appRoot, '/\\') . '/';
   ?>
   <base href="<?php echo htmlspecialchars($baseHref, ENT_QUOTES, 'UTF-8'); ?>">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta charset="utf-8">
   <title>JF Dental Care</title>
   <script
@@ -190,6 +190,20 @@ if (isset($_POST['submit_feedback'])) {
 
   <!--script-->
   <style>
+    * {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
     .service-grid {
       display: flex;
       flex-wrap: wrap;
@@ -209,6 +223,27 @@ if (isset($_POST['submit_feedback'])) {
       /* Make it slightly larger on hover */
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
       /* Add a subtle shadow for depth */
+    }
+
+    @media (max-width: 1024px) {
+      .service-card {
+        flex: 0 0 calc(33.333% - 15px);
+        max-width: 240px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .service-card {
+        flex: 0 0 calc(50% - 10px);
+        max-width: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .service-card {
+        flex: 0 0 calc(100% - 10px);
+        max-width: 87%;
+      }
     }
   </style>
   <script src="js/jquery-1.11.0.min.js"></script>

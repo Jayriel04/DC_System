@@ -607,7 +607,6 @@ fieldset#body {
   height: 35px;
   background: url(../images/nav.png)no-repeat 0px 0px;
   display: inline-block;
-  float: left;
   cursor: pointer;
   margin: 0px 0px;
 	}
@@ -3463,8 +3462,12 @@ hr {
       .contact-main {
         flex-direction: column;
         gap: 32px;
+		width: 378px;
       }
+	  .map-container {
+		  width: 378px;
     }
+	}
 	.services-carousel .carousel-inner {}
 .services-carousel .service-slide {
   display: flex;
