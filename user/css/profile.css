@@ -18,7 +18,7 @@ body {
 .modal-content {
     background-color: #fefefe;
     margin: 5% auto;
-    padding: 20px;
+    padding: 0;
     border: none;
     border-radius: 16px;
     position: relative;
@@ -106,6 +106,7 @@ body {
     margin: 2rem auto;
     padding: 0 15px;
 }
+
 
 .patient-header {
     background: white;
@@ -302,7 +303,7 @@ body {
 
 /* Modern Medical History Table */
 .medical-history-table {
-    width: 100%;
+    width: 99%;
     border-collapse: collapse;
 }
 
@@ -316,7 +317,7 @@ body {
 }
 
 .medical-history-table thead th {
-    font-weight: 600;
+    font-weight: 500;
     color: #495057;
     background-color: #f8f9fa;
 }
@@ -334,7 +335,7 @@ body {
 .card {
     background: white;
     border-radius: 12px;
-    padding: 25px;
+    padding: 14px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -469,7 +470,7 @@ body {
 
 @media (max-width: 768px) {
     .container {
-        padding: 20px;
+        padding: 5px;
     }
 
     .patient-header {
@@ -484,14 +485,61 @@ body {
     }
 
     .action-buttons {
-        width: 100%;
+        display: flex !important;
         flex-direction: column;
+        gap: 10px;
+        width: 100%;
     }
 
-    .btn {
+    .action-buttons .btn {
         width: 100%;
-        justify-content: center;
+        padding: 10px 15px !important;
+        font-size: 14px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
+
+    .card-body {
+        padding: 0;
+        width: 99%;
+    }
+}
+
+@media (max-width: 480px) {
+    .patient-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .action-buttons {
+        display: flex !important;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+        padding: 12px 10px !important;
+        font-size: 13px !important;
+    }
+
+    .contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Ensure buttons are always visible */
+.action-buttons {
+    display: flex !important;
+}
+
+.action-buttons .btn {
+    display: inline-block !important;
+    visibility: visible !important;
 }
 
 /* --- Auth Page Styles --- */
