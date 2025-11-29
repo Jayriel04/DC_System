@@ -336,7 +336,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="submit" name="update_calendar" class="btn btn-primary">Save changes</button>
+              <button type="submit" name="update_calendar" class="btn btn-schedule" style=" background-color: #008779 !important; color: white;">Save changes</button>
             </div>
           </form>
         </div>
@@ -371,7 +371,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="submit" name="add_schedule" class="btn btn-primary">Add Schedule</button>
+              <button type="submit" name="add_schedule" class="btn btn-primary" style=" background-color: #008779 !important; color: white;">Add Schedule</button>
             </div>
           </form>
         </div>

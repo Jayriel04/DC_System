@@ -444,7 +444,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel">Cancel</button>
-                    <button type="submit" name="add_patient" class="btn btn-schedule">Add Patient</button>
+                    <button type="submit" name="add_patient" class="btn btn-schedule" style=" background-color: #008779 !important; color: white;">Add Patient</button>
                 </div>
             </form>
         </div>
@@ -527,7 +527,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel">Cancel</button>
-                    <button type="submit" name="update_patient" class="btn btn-schedule">Save Changes</button>
+                    <button type="submit" name="update_patient" class="btn btn-schedule" style=" background-color: #008779 !important; color: white;">Save Changes</button>
                 </div>
             </form>
         </div>

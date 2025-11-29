@@ -298,7 +298,6 @@
     width: 100%;
 }
 
-<<<<<<< HEAD
         .submit-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
@@ -311,7 +310,6 @@
     width: 1200px;
     margin: 5% -50%;
 }
-=======
 .submit-btn {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -331,7 +329,6 @@
     box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
 }
 
->>>>>>> 838161f942143a027c9762ae3181f7d3b203acb1
 
 @media (max-width: 992px) {
     .health-questionnaire-modal .two-column {
@@ -366,9 +363,7 @@
     margin: 16px 0;
   }
 
-<<<<<<< HEAD
   .health-questionnaire-modal .section {
-=======
 .modal-content {
     border-radius: 16px;
     padding: 5px;
@@ -390,7 +385,6 @@
 .modal-body .section-title {
     font-size: 18px;
     font-weight: 600;
->>>>>>> 838161f942143a027c9762ae3181f7d3b203acb1
     margin-bottom: 16px;
   }
 
@@ -521,23 +515,17 @@
   .health-questionnaire-modal .submit-btn {
     padding: 10px 20px;
     font-size: 14px;
-<<<<<<< HEAD
-    width: 100%;
-  }
-=======
     color: #333;
     transition: all 0.2s;
     user-select: none;
     margin-bottom: 0;
     /* Override bootstrap default */
 }
->>>>>>> 838161f942143a027c9762ae3181f7d3b203acb1
 
   .calendar-header h2 {
     font-size: 14px;
   }
 
-<<<<<<< HEAD
   .nav-btn {
     padding: 4px 8px;
     font-size: 14px;
@@ -551,7 +539,6 @@
     
   }
 }
-=======
 .modal-body .option input:checked+label {
     border-color: #2563eb;
     color: #2563eb;
@@ -583,4 +570,4 @@
         font-size: 0.95em;
     }
 }
->>>>>>> 838161f942143a027c9762ae3181f7d3b203acb1
+}
