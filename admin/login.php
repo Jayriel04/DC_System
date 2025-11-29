@@ -3,6 +3,12 @@ session_start();
 error_reporting(0);
 include('includes/dbconnection.php');
 
+$toast_message = null;
+function setToast($message, $type) {
+    global $toast_message;
+    $toast_message = ['message' => $message, 'type' => $type];
+}
+
 if (isset($_POST['login'])) {
   $username = $_POST['username'];
   $password = md5($_POST['password']);
@@ -60,7 +66,7 @@ if (isset($_POST['login'])) {
     $_SESSION['login'] = $_POST['username'];
     echo "<script type='text/javascript'> document.location ='dashboard.php'; </script>";
   } else {
-    echo "<script>alert('Invalid Details');</script>";
+    setToast('Invalid Details', 'danger');
   }
 }
 
@@ -79,6 +85,7 @@ if (isset($_POST['login'])) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <!-- Layout styles -->
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/toast.css">
     <style>
         
         .auth-form-light {
@@ -119,6 +126,12 @@ if (isset($_POST['login'])) {
                         <img src="../images/Jf logo.png" alt="JF Dental Care Logo" class="logo-img" style="width:35px; margin-right:10px;">
                         <h2 style="margin-top: 10px; margin-bottom: 5px;">Welcome to <br> JF Dental Care Admin</h2>     
                           <br>
+                          <div id="toast-container"></div>
+                            <?php
+                                if ($toast_message) {
+                                    echo "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$toast_message['message']}', '{$toast_message['type']}'); });</script>";
+                                }
+                            ?>
                             <form class="pt-3" id="login" method="post" name="login">
                                   <div class="form-group">
                                       <label for="username">Username</label>
@@ -163,6 +176,7 @@ if (isset($_POST['login'])) {
   <!-- inject:js -->
   <script src="js/off-canvas.js"></script>
   <script src="js/misc.js"></script>
+  <script src="js/toast.js"></script>
   <script>
 function togglePassword(id) {
     var input = document.getElementById(id);

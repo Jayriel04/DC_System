@@ -30,9 +30,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query->bindParam(':image', $image_path, PDO::PARAM_STR);
         $query->bindParam(':category_id', $category_id, PDO::PARAM_INT);
         $query->execute();
-
-        echo "<script>alert('Service added successfully');</script>";
-        echo "<script>window.location.href = 'manage-service.php'</script>";
+        
+        $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Service added successfully.'];
+        header('Location: manage-service.php');
         exit();
     }
 
@@ -59,9 +59,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query->bindParam(':category_id', $category_id, PDO::PARAM_INT);
         $query->bindParam(':sid', $sid, PDO::PARAM_INT);
         $query->execute();
-
-        echo "<script>alert('Service updated successfully');</script>";
-        echo "<script>window.location.href = 'manage-service.php'</script>";
+        
+        $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Service updated successfully.'];
+        header('Location: manage-service.php');
         exit();
     }
     // Code for deletion
@@ -71,8 +71,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query = $dbh->prepare($sql);
         $query->bindParam(':rid', $rid, PDO::PARAM_INT);
         $query->execute();
-        echo "<script>alert('Service deleted successfully');</script>";
-        echo "<script>window.location.href = 'manage-service.php'</script>";
+        $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Service deleted successfully.'];
+        header('Location: manage-service.php');
+        exit();
     }
 
     // Initialize search and category variables
@@ -105,6 +106,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="css/sidebar.css">
         <link rel="stylesheet" href="css/manage-service.css">
+        <link rel="stylesheet" href="css/toast.css">
 
 
     </head>
@@ -115,6 +117,13 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             <div class="container-fluid page-body-wrapper">
                 <?php include_once('includes/sidebar.php'); ?>
                 <div class="main-panel">
+                    <div id="toast-container"></div>
+                    <?php
+                    if (isset($_SESSION['toast_message'])) {
+                        echo "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$_SESSION['toast_message']['message']}', '{$_SESSION['toast_message']['type']}'); });</script>";
+                        unset($_SESSION['toast_message']);
+                    }
+                    ?>
                     <div class="content-wrapper">
                         <div class="header">
                             <div class="header-content">
@@ -359,6 +368,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 
         <script src="vendors/js/vendor.bundle.base.js"></script>
         <script src="js/off-canvas.js"></script>
+        <script src="js/toast.js"></script>
         <script src="js/misc.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {

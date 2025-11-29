@@ -19,10 +19,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query_update->bindParam(':id', $schedule_id, PDO::PARAM_INT);
         
         if ($query_update->execute()) {
-            echo "<script>alert('Schedule status updated successfully.'); window.location.href='mas.php';</script>";
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Schedule status updated successfully.'];
         } else {
-            echo "<script>alert('An error occurred while updating the status.');</script>";
+            $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while updating the status.'];
         }
+        header('Location: mas.php');
         exit();
     }
 
@@ -39,10 +40,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query_cancel->bindParam(':id', $schedule_id, PDO::PARAM_INT);
 
         if ($query_cancel->execute()) {
-            echo "<script>alert('Service schedule cancelled successfully.'); window.location.href='mas.php';</script>";
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Service schedule cancelled successfully.'];
         } else {
-            echo "<script>alert('An error occurred while cancelling the service schedule.');</script>";
+            $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while cancelling the service schedule.'];
         }
+        header('Location: mas.php');
         exit();
     }
     // Handle new service appointment and patient creation from modal
@@ -93,10 +95,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             $query_schedule->execute([':pnum' => $patient_id, ':fname' => $firstname, ':sname' => $surname, ':service_id' => $service_id, ':app_date' => $app_date, ':start_time' => $start_time, ':duration' => $duration, ':status' => $app_status]);
 
             $dbh->commit();
-            echo "<script>alert('New patient and service appointment scheduled successfully.'); window.location.href='mas.php';</script>";
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'New patient and service appointment scheduled successfully.'];
+            header('Location: mas.php');
         } catch (Exception $e) {
             $dbh->rollBack();
-            echo "<script>alert('An error occurred: " . $e->getMessage() . "');</script>";
+            $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred: ' . $e->getMessage()];
+            header('Location: mas.php');
         }
     }
 
@@ -107,8 +111,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query = $dbh->prepare($sql);
         $query->bindParam(':rid', $rid, PDO::PARAM_INT);
         $query->execute();
-        echo "<script>alert('Service schedule deleted');</script>";
-        echo "<script>window.location.href = 'mas.php'</script>";
+        $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Service schedule deleted.'];
+        header('Location: mas.php');
+        exit();
     }
 
     $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
@@ -149,7 +154,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     $count_for_cancellation = $query_for_cancellation->fetchColumn();
 
     // --- SERVICE APPOINTMENT LIST ---
-    $sql_schedules = "SELECT s.*, svc.name as service_name FROM tblschedule s LEFT JOIN tblservice svc ON s.service_id = svc.number";
+    $sql_schedules = "SELECT s.*, svc.name as service_name, cat.name as category_name FROM tblschedule s LEFT JOIN tblservice svc ON s.service_id = svc.number LEFT JOIN tblcategory cat ON svc.category_id = cat.id";
     $where_clauses = [];
 
     switch ($filter) {
@@ -200,10 +205,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/mas-modal.css">
+    <link rel="stylesheet" href="css/toast.css">
     <style>
         
     </style>
@@ -215,6 +222,13 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         <div class="container-fluid page-body-wrapper">
             <?php include_once('includes/sidebar.php'); ?>
             <div class="main-panel">
+                <div id="toast-container"></div>
+                <?php
+                if (isset($_SESSION['toast_message'])) {
+                    echo "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$_SESSION['toast_message']['message']}', '{$_SESSION['toast_message']['type']}'); });</script>";
+                    unset($_SESSION['toast_message']);
+                }
+                ?>
                 <div class="content-wrapper">
                     
                     <div class="container">
@@ -269,11 +283,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                         <th>No</th>
                                         <th>First Name</th>
                                         <th>Surname</th>
+                                        <th style="width: 150px;">Category</th>
                                         <th>Service</th>
                                         <th>Date</th>
                                         <th>Time</th>
                                         <th>Duration</th>
-                                        <th>Cancel Reason</th>
+                                        <th style="width: 70px;">Reason</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -285,11 +300,22 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                 <td><?php echo htmlentities($schedule->id); ?></td>
                                                 <td><?php echo htmlentities($schedule->firstname); ?></td>
                                                 <td><?php echo htmlentities($schedule->surname); ?></td>
+                                                <td style="width: 150px;"><?php echo htmlentities($schedule->category_name ?: 'N/A'); ?></td>
                                                 <td><?php echo htmlentities($schedule->service_name ?: 'N/A'); ?></td>
                                                 <td><?php echo htmlentities($schedule->date); ?></td>
                                                 <td><?php echo format_time_12hr($schedule->time); ?></td>
                                                 <td><?php echo htmlentities($schedule->duration ? $schedule->duration . ' mins' : 'N/A'); ?></td>
-                                                <td class="cancel-reason-cell"><?php echo htmlentities($schedule->cancel_reason); ?></td>
+                                                <td class="cancel-reason-cell" style="width: 50px;">
+                                                    <?php if (!empty($schedule->cancel_reason)): ?>
+                                                    <button class="view-reason-btn" title="View Reason"
+                                                        data-reason="<?php echo htmlentities($schedule->cancel_reason); ?>"
+                                                        style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0;">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <?php else: ?>
+                                                    <span style="color: #ccc;">-</span>
+                                                    <?php endif; ?>
+                                                </td>
                                                 <td><span class="status-badge status-<?php echo strtolower(htmlentities($schedule->status)); ?>"><?php echo htmlentities($schedule->status); ?></span></td>
                                                 <td class="actions-icons">
                                                     <button class="edit-schedule-btn" title="Edit"
@@ -302,7 +328,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                         data-duration="<?php echo htmlentities($schedule->duration ? $schedule->duration . ' mins' : 'N/A'); ?>"
                                                         data-status="<?php echo htmlentities($schedule->status); ?>"
                                                         data-cancel-reason="<?php echo htmlentities($schedule->cancel_reason); ?>"
-                                                        style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0;">✏️</button>
+                                                        style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0;">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
                                                     <button class="cancel-schedule-btn" title="Cancel"
                                                         data-id="<?php echo htmlentities($schedule->id); ?>"
                                                         data-firstname="<?php echo htmlentities($schedule->firstname); ?>"
@@ -310,14 +338,18 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                         data-service="<?php echo htmlentities($schedule->service_name ?: 'N/A'); ?>"
                                                         data-date="<?php echo htmlentities($schedule->date); ?>"
                                                         data-time="<?php echo htmlentities($schedule->time); ?>"
-                                                        style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0 8px;">🚫</button>
-                                                    <a href="mas.php?delid=<?php echo $schedule->id; ?>" title="Delete" onclick="return confirm('Do you really want to Delete this service schedule?');" style="font-size: 1.25rem; color: #a0aec0; text-decoration: none;">🗑️</a>
+                                                        style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0 8px;">
+                                                        <i class="fas fa-times-circle"></i>
+                                                    </button>
+                                                    <a href="mas.php?delid=<?php echo $schedule->id; ?>" title="Delete" onclick="return confirm('Do you really want to Delete this service schedule?');" style="font-size: 1.25rem; color: #a0aec0; text-decoration: none;">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else : ?>
                                         <tr>
-                                            <td colspan="10" style="text-align: center;">No service appointments found.</td>
+                                            <td colspan="11" style="text-align: center;">No service appointments found.</td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
@@ -490,7 +522,25 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             </form>
         </div>
     </div>
+
+    <!-- View Cancellation Reason Modal -->
+    <div id="viewReasonModal" class="modal-container" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cancellation Reason</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="reasonText" style="font-size: 16px; line-height: 1.6; color: #333;"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script src="vendors/js/vendor.bundle.base.js"></script>
+    <script src="js/toast.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('newAppointmentModal');
@@ -574,6 +624,34 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         document.getElementById('cancel_admin_schedule_date_time').textContent = dataset.date + ' at ' + dataset.time;
                         document.getElementById('cancel_admin_reason').value = dataset.cancelReason || '';
                         cancelAdminModal.style.display = 'flex';
+                    });
+                });
+            }
+
+            // --- View Cancellation Reason Modal ---
+            const viewReasonModal = document.getElementById('viewReasonModal');
+            if (viewReasonModal) {
+                const viewReasonCloseBtn = viewReasonModal.querySelector('.close-button');
+                const viewReasonCancelBtn = viewReasonModal.querySelector('.btn-cancel');
+
+                function closeViewReasonModal() {
+                    viewReasonModal.style.display = 'none';
+                }
+
+                viewReasonCloseBtn.addEventListener('click', closeViewReasonModal);
+                viewReasonCancelBtn.addEventListener('click', closeViewReasonModal);
+
+                window.addEventListener('click', function(event) {
+                    if (event.target === viewReasonModal) {
+                        closeViewReasonModal();
+                    }
+                });
+
+                document.querySelectorAll('.view-reason-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const reason = this.dataset.reason;
+                        document.getElementById('reasonText').textContent = reason;
+                        viewReasonModal.style.display = 'flex';
                     });
                 });
             }

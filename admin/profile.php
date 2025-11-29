@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 error_reporting(0);
 include ('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid'] == 0)) {
@@ -19,8 +20,8 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     $query->bindParam(':aid', $adminid, PDO::PARAM_STR);
     $query->execute();
 
-    echo '<script>alert("Your profile has been updated")</script>';
-    echo "<script>window.location.href ='profile.php'</script>";
+    $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Your profile has been updated.'];
+    header('Location: profile.php');
 
   }
   ?>
@@ -46,6 +47,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     <link rel="stylesheet" href="css/profile.css" />
     <link rel="stylesheet" href="css/modal.css" />
     <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/toast.css" />
     
   </head>
   <body>
@@ -59,6 +61,13 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
         <!-- partial -->
         <div class="main-panel">
           <div class="main-content">
+              <div id="toast-container"></div>
+                <?php
+                if (isset($_SESSION['toast_message'])) {
+                    echo "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$_SESSION['toast_message']['message']}', '{$_SESSION['toast_message']['type']}'); });</script>";
+                    unset($_SESSION['toast_message']);
+                }
+                ?>
               <h1 class="page-title">My Profile</h1>
               <?php
               $adminid = $_SESSION['sturecmsaid'];
@@ -121,42 +130,6 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                   </div>
               </div>
 
-              <div id="editProfileModal" class="modal-contai    ner" style="display: none;">
-                  <div class="modal-content">
-                      <div class="modal-header">
-                          <h2>Edit Profile</h2>
-                          <button class="close-button">&times;</button>
-                      </div>
-                      <form class="forms-sample" method="post">
-                          <div class="modal-body">
-                              <div class="form-group">
-                                  <label for="adminname">Admin Name</label>
-                                  <input type="text" name="adminname" value="<?php echo htmlentities($row->AdminName); ?>" class="form-control" required='true'>
-                              </div>
-                              <div class="form-group">
-                                  <label for="username">User Name</label>
-                                  <input type="text" name="username" value="<?php echo htmlentities($row->UserName); ?>" class="form-control" readonly="">
-                              </div>
-                              <div class="form-group">
-                                  <label for="mobilenumber">Contact Number</label>
-                                  <input type="text" name="mobilenumber" value="<?php echo htmlentities($row->MobileNumber); ?>" class="form-control" maxlength='11' required='true' pattern="[0-9]+">
-                              </div>
-                              <div class="form-group">
-                                  <label for="email">Email</label>
-                                  <input type="email" name="email" value="<?php echo htmlentities($row->Email); ?>" class="form-control" required='true'>
-                              </div>
-                              <div class="form-group">
-                                  <label for="regdate">Admin Registration Date</label>
-                                  <input type="text" name="regdate" value="<?php echo htmlentities($row->AdminRegdate); ?>" readonly="" class="form-control">
-                              </div>
-                          </div>
-                          <div class="modal-footer">
-                              <button type="button" class="btn btn-cancel">Cancel</button>
-                              <button type="submit" class="btn btn-update" name="submit">Update</button>
-                          </div>
-                      </form>
-                  </div>
-              </div>
               <?php } ?>
           </div>
           <!-- content-wrapper ends -->
@@ -168,6 +141,44 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
       </div>
       <!-- page-body-wrapper ends -->
     </div>
+    <?php if ($row) { ?>
+    <div id="editProfileModal" class="modal-container" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Profile</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <form class="forms-sample" method="post">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="adminname">Admin Name</label>
+                        <input type="text" name="adminname" value="<?php echo htmlentities($row->AdminName); ?>" class="form-control" required='true'>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">User Name</label>
+                        <input type="text" name="username" value="<?php echo htmlentities($row->UserName); ?>" class="form-control" readonly="">
+                    </div>
+                    <div class="form-group">
+                        <label for="mobilenumber">Contact Number</label>
+                        <input type="text" name="mobilenumber" value="<?php echo htmlentities($row->MobileNumber); ?>" class="form-control" maxlength='11' required='true' pattern="[0-9]+">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" value="<?php echo htmlentities($row->Email); ?>" class="form-control" required='true'>
+                    </div>
+                    <div class="form-group">
+                        <label for="regdate">Admin Registration Date</label>
+                        <input type="text" name="regdate" value="<?php echo htmlentities($row->AdminRegdate); ?>" readonly="" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel">Cancel</button>
+                    <button type="submit" class="btn btn-update" name="submit">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php } ?>
     <!-- container-scroller -->
     <!-- plugins:js -->
     <script src="vendors/js/vendor.bundle.base.js"></script>
@@ -179,6 +190,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     <!-- inject:js -->
     <script src="js/off-canvas.js"></script>
     <script src="js/misc.js"></script>
+    <script src="js/toast.js"></script>
     <!-- endinject -->
     <!-- Custom js for this page -->
     <script src="js/typeahead.js"></script>
