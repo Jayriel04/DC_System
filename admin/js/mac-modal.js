@@ -13,17 +13,20 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.style.display = 'none';
     }
 
-    // Event delegation for edit buttons
-    document.getElementById('appointment-table-container').addEventListener('click', function(e) {
-        if (e.target.classList.contains('edit-appointment-btn')) {
-            const button = e.target;
+    // Event delegation for edit buttons (use closest so clicking the icon works)
+    const appointmentTableContainer = document.getElementById('appointment-table-container');
+    if (appointmentTableContainer) {
+        appointmentTableContainer.addEventListener('click', function(e) {
+            const button = e.target.closest('.edit-appointment-btn');
+            if (!button) return;
             // Populate modal fields
-            document.getElementById('edit_appointment_id').value = button.dataset.id;
-            document.getElementById('edit_firstname').value = button.dataset.firstname;
-            document.getElementById('edit_surname').value = button.dataset.surname;
-            document.getElementById('edit_date').value = button.dataset.date;
-            document.getElementById('edit_start_time').value = button.dataset.startTime;
-            document.getElementById('edit_end_time').value = button.dataset.endTime;
+            document.getElementById('edit_appointment_id').value = button.dataset.id || '';
+            document.getElementById('edit_firstname').value = button.dataset.firstname || '';
+            document.getElementById('edit_surname').value = button.dataset.surname || '';
+            document.getElementById('edit_date').value = button.dataset.date || '';
+            // dataset will convert data-start-time -> startTime
+            document.getElementById('edit_start_time').value = button.dataset.startTime || '';
+            document.getElementById('edit_end_time').value = button.dataset.endTime || '';
             
             const statusSelect = document.getElementById('edit_status');
             // Clear previous selections
@@ -36,8 +39,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             openModal();
-        }
-    });
+        });
+    }
 
     closeBtn.addEventListener('click', closeModal);
     cancelBtn.addEventListener('click', closeModal);

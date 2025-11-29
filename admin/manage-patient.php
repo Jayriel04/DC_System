@@ -350,8 +350,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                 data-address="<?php echo htmlentities($row->address); ?>"
                                                 data-email="<?php echo htmlentities($row->email); ?>"
                                                 style="background:none; border:none; cursor:pointer; padding:0; font-size: 1rem;"
-                                            >✏️</button>
-                                            <a href="manage-patient.php?delid=<?php echo ($row->number); ?>" onclick="return confirm('Do you really want to Delete?');" class="action-icon" title="Delete">🗑️</a>
+                                            ><i class="fas fa-edit"></i></button>
+                                            <a href="manage-patient.php?delid=<?php echo ($row->number); ?>" onclick="return confirm('Do you really want to Delete?');" class="action-icon" title="Delete"><i class="fas fa-trash-alt"></i></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -469,7 +469,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         <div class="form-group"><label for="edit_date_of_birth">Date of Birth</label><input type="date" id="edit_date_of_birth" name="date_of_birth" readonly></div>
                         <div class="form-group">
                             <label for="edit_sex">Sex</label>
-                            <select id="edit_sex" name="sex" readonly>
+                            <select id="edit_sex" name="sex">
                                 <option value="">Select Sex</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -477,25 +477,23 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group"><label for="edit_civil_status">Civil Status</label><input type="text" id="edit_civil_status" name="civil_status" readonly></div>
-                        <div class="form-group"><label for="edit_occupation">Occupation</label><input type="text" id="edit_occupation" name="occupation" readonly></div>
+                        <div class="form-group"><label for="edit_civil_status">Civil Status</label><input type="text" id="edit_civil_status" name="civil_status"></div>
+                        <div class="form-group"><label for="edit_occupation">Occupation</label><input type="text" id="edit_occupation" name="occupation"></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group"><label for="edit_contact_number">Phone Number</label><input type="tel" id="edit_contact_number" name="contact_number" readonly></div>
-                        <div class="form-group"><label for="edit_email">Email Address</label><input type="email" id="edit_email" name="email" readonly></div>
+                        <div class="form-group"><label for="edit_contact_number">Phone Number</label><input type="tel" id="edit_contact_number" name="contact_number"></div>
+                        <div class="form-group"><label for="edit_email">Email Address</label><input type="email" id="edit_email" name="email"></div>
                     </div>
                     <div class="form-group"><label for="edit_address">Address</label><textarea id="edit_address" name="address" rows="2" readonly></textarea></div>
 
                     <hr class="form-divider" style="margin: 20px 0; border-top: 1px solid #ccc;">
-
-                    <h3 class="form-section-title">Schedule Service</h3>
+                    <h3 class="form-section-title">Add New Service Schedule (Optional)</h3>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="edit_service_category">Service Category</label>
                             <select id="edit_service_category" name="service_category">
                                 <option value="">Select a Category</option>
                                 <?php
-                                // Fetch categories from tblcategory
                                 $cats = $dbh->query("SELECT id, name FROM tblcategory ORDER BY id ASC")->fetchAll(PDO::FETCH_OBJ);
                                 foreach ($cats as $c) {
                                     echo "<option value='" . htmlentities($c->id) . "'>" . htmlentities($c->name) . "</option>";
@@ -505,18 +503,16 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         </div>
                         <div class="form-group">
                             <label for="edit_service_id">Service</label>
-                            <select id="edit_service_id" name="service_id" disabled>
+                            <select id="edit_service_id" name="service_id">
                                 <option value="">Select a category first</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group admin-calendar-container">
-                            <label for="edit_appointment_date">Date</label>
-                            <input type="text" id="edit_appointment_date" name="app_date" placeholder="Click to select date" readonly style="cursor: pointer; background-color: #f9f9f9;">
+                        <div class="form-group">
+                            <label for="edit_app_date">Date</label>
+                            <input type="date" id="edit_app_date" name="app_date">
                         </div>
-                    </div>
-                    <div class="form-row">
                         <div class="form-group">
                             <label for="edit_start_time">Start Time</label>
                             <input type="time" id="edit_start_time" name="start_time">
@@ -588,10 +584,10 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 document.getElementById('edit_contact_number').value = dataset.contact;
                 document.getElementById('edit_address').value = dataset.address;
                 document.getElementById('edit_email').value = dataset.email;
-                
+
                 // Clear appointment fields
                 document.getElementById('edit_service_id').value = '';
-                document.getElementById('edit_appointment_date').value = '';
+                document.getElementById('edit_app_date').value = '';
                 document.getElementById('edit_start_time').value = '';
                 document.getElementById('edit_duration').value = '';
                 document.getElementById('edit_service_category').value = '';

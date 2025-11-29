@@ -28,6 +28,18 @@ if (!$row) {
     exit();
 }
 
+// Build a safe display name for the patient with fallbacks
+$patient_fullname = trim((isset($row->firstname) ? $row->firstname : '') . ' ' . (isset($row->surname) ? $row->surname : ''));
+if (empty($patient_fullname)) {
+    if (!empty($row->username)) {
+        $patient_fullname = $row->username;
+    } elseif (!empty($row->email)) {
+        $patient_fullname = $row->email;
+    } else {
+        $patient_fullname = 'Unknown Patient';
+    }
+}
+
 // Fetch health conditions for this patient
 $health_arr = [];
 if (!empty($row->health_conditions) && $row->health_conditions !== 'null' && $row->health_conditions !== '[]') {
@@ -97,9 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
           <div class="content-wrapper">
             <div class="er-container">
                 <div class="er-header">
-                    <h1>Examination Records</h1>
-                    <button class="edit-btn" id="btnEditHealth">
-                        <span class="edit-icon">✏️</span>
+                    <h1>Examination Records <span class="patient-name" style="font-size: 25px">: <?php echo htmlspecialchars($patient_fullname); ?></span></h1>
+                    <button class="edit-btn" id="btnEditHealth" aria-label="Edit Examination Records">
+                        <i class="fas fa-edit edit-icon" aria-hidden="true"></i>
                         Edit
                     </button>
                 </div>
@@ -147,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
                     <div id="medicalHistoryModal" class="modal">
         <div class="modal-content health-questionnaire-modal">
             <div class="modal-header">
-                <h2 class="modal-title">Edit Examination Records</h2>
+                <h2 class="modal-title">Edit Examination Records : <?php echo htmlspecialchars(trim($row->firstname . ' ' . $row->surname)); ?></h2>
                 <span class="close" data-dismiss="modal">&times;</span>
             </div>
             <div class="modal-body">
