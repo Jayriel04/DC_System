@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 27, 2025 at 03:28 PM
+-- Generation Time: Nov 29, 2025 at 12:40 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -70,13 +70,16 @@ CREATE TABLE `tblappointment` (
 
 INSERT INTO `tblappointment` (`id`, `firstname`, `surname`, `date`, `start_time`, `end_time`, `patient_number`, `created_at`, `status`, `cancel_reason`, `cancelled_at`) VALUES
 (1, 'John Mar', 'Ypil', '2025-09-26', '17:47:00', NULL, 4, '2025-09-26 09:54:12', 'Declined', NULL, NULL),
-(2, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:36:00', NULL, 5, '2025-09-27 06:36:43', 'Cancelled', 'sample cancelation!', '2025-11-21 14:14:21'),
+(2, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:36:00', NULL, 5, '2025-09-27 06:36:43', 'Cancelled', 'ahhahaha', '2025-11-29 17:53:10'),
 (3, 'Rodelyn', 'Estrera', '2025-09-27', '16:42:00', NULL, 8, '2025-09-27 08:42:44', 'Approved', NULL, NULL),
 (4, 'John Mar', 'Ypil', '2025-09-27', '18:14:00', '19:00:00', 4, '2025-09-27 10:33:00', 'Approved', NULL, NULL),
 (5, 'John Mar', 'Ypil', '2025-10-05', '13:47:00', '14:48:00', 4, '2025-10-05 05:49:13', 'Approved', NULL, NULL),
 (6, 'John Mar', 'Ypil', '2025-10-05', '15:14:00', '16:14:00', 4, '2025-10-05 06:15:00', 'Approved', NULL, NULL),
 (7, 'Nimfa', 'Conde', '2025-10-05', '17:39:00', '18:40:00', 10, '2025-10-05 09:40:49', 'walk-in', NULL, NULL),
-(8, 'Sig', 'Canonio', '2025-10-05', '17:29:00', NULL, 13, '2025-10-20 10:36:59', 'Cancelled', 'sample cancel!', NULL);
+(8, 'Sig', 'Canonio', '2025-10-05', '17:29:00', NULL, 13, '2025-10-20 10:36:59', 'Cancelled', 'sample cancel!', NULL),
+(9, 'Jaynard', 'Senilla', '2025-11-29', '12:08:00', NULL, 14, '2025-11-29 04:41:14', 'Approved', NULL, NULL),
+(17, 'Jezrah Faith', 'Canonio', '2025-11-29', '15:11:00', '16:11:00', 5, '2025-11-29 10:07:41', 'Cancelled', 'sample notif', '2025-11-29 18:37:58'),
+(18, 'Jezrah Faith', 'Canonio', '2025-11-29', '18:38:00', '19:39:00', 5, '2025-11-29 10:39:21', 'Pending', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -106,7 +109,10 @@ INSERT INTO `tblcalendar` (`id`, `date`, `start_time`, `end_time`) VALUES
 (8, '2025-10-05', '15:14:00', '16:14:00'),
 (9, '2025-10-05', '17:29:00', '18:30:00'),
 (10, '2025-10-05', '18:55:00', '19:55:00'),
-(11, '2025-11-27', '22:06:00', '23:06:00');
+(11, '2025-11-27', '22:06:00', '23:06:00'),
+(12, '2025-11-29', '12:08:00', '13:08:00'),
+(13, '2025-11-29', '15:11:00', '16:11:00'),
+(14, '2025-11-29', '18:38:00', '19:39:00');
 
 -- --------------------------------------------------------
 
@@ -170,6 +176,32 @@ INSERT INTO `tblinventory` (`number`, `name`, `brand`, `expiration_date`, `quant
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tblnotif`
+--
+
+CREATE TABLE `tblnotif` (
+  `id` int(11) NOT NULL,
+  `recipient_id` int(11) NOT NULL COMMENT 'ID of the admin or patient',
+  `recipient_type` enum('admin','patient') NOT NULL,
+  `message` text NOT NULL,
+  `url` varchar(255) DEFAULT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0=unread, 1=read',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblnotif`
+--
+
+INSERT INTO `tblnotif` (`id`, `recipient_id`, `recipient_type`, `message`, `url`, `is_read`, `created_at`) VALUES
+(1, 1, 'admin', 'Jezrah Faith Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 0, '2025-11-29 10:37:58'),
+(2, 1, 'admin', 'New consultation request from Jezrah Faith Canonio.', 'mac.php?filter=pending', 1, '2025-11-29 10:39:21'),
+(3, 1, 'admin', 'Jezrah Faith Canonio requested to cancel a service.', 'mas.php?filter=for_cancellation', 0, '2025-11-29 10:39:56'),
+(4, 1, 'admin', 'New feedback received from Jezrah Faith Canonio.', 'manage-reviews.php', 1, '2025-11-29 10:45:12');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tblpage`
 --
 
@@ -224,13 +256,14 @@ CREATE TABLE `tblpatient` (
 
 INSERT INTO `tblpatient` (`number`, `firstname`, `surname`, `date_of_birth`, `sex`, `status`, `occupation`, `age`, `contact_number`, `address`, `email`, `Image`, `health_conditions`, `created_at`, `username`, `password`, `rating`, `feedback`) VALUES
 (4, 'John Mar', 'Ypil', '2002-12-21', 'Male', 'Married', 'Student', 22, '09374939832', 'idk', 'ypil.johnmar.mcc@gmail.com', 'anonymous-girl.png', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Increase intake of food or water\"],\"thyroid\":[\"Apprehension\"],\"nervous\":[\"Headache\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Persistent cough\"],\"urinary\":[]}', '2025-09-27 11:02:35', 'jm', '763c3f1b6fe4707b8c39df149788c70b', 5, 'lami kayu'),
-(5, 'Jezrah Faith', 'Canonio', '2004-05-13', 'Female', 'Single', 'Princess', 21, '09876543211', 'yati liloan', 'canonio.jezrahfaith.mcc@gmail.com', 'pfpjez.jfif', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Family history of diabetes\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Numbness\\/Tingling\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}', '2025-09-27 11:03:26', 'jezrah', '3b02af71589ec5ea4138a1ece1866008', NULL, NULL),
+(5, 'Jezrah Faith', 'Canonio', '2004-05-13', 'Female', 'Single', 'Princess', 21, '09876543211', 'yati liloan', 'canonio.jezrahfaith.mcc@gmail.com', 'pfpjez.jfif', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Family history of diabetes\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Numbness\\/Tingling\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}', '2025-09-27 11:03:26', 'jezrah', '3b02af71589ec5ea4138a1ece1866008', 4, 'nice service my nigga'),
 (8, 'Rodelyn', 'Estrera', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'estrera.rodelyn.mcc@gmail.com', NULL, '{\"general\":[\"Marked weight change\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Delayed healing of wounds\"],\"thyroid\":[\"Perspire easily\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Headache\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Difficulty in breathing\"]}', '2025-09-27 11:04:04', 'rodelyn', 'bc65be184bd685684a786ac70c6d2ef7', NULL, NULL),
 (9, 'Justine', 'Aguinaldo', '0000-00-00', '', '', '', 0, '', '', 'aguinaldo.justinelouise.mcc@gmail.com', NULL, NULL, '2025-09-27 11:04:46', 'justine', 'f6f3e757ac491a3511a5198a39c5ce29', NULL, NULL),
 (10, 'Nimfa', 'Conde', '1956-03-09', 'Female', 'Single', 'Mother', 69, '09876543211', 'idk', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (11, 'Seg', 'Canonio', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'seg@gmail.com', NULL, NULL, NULL, 'seg', '54151f5b2b56a1345561afde6059ac63', NULL, NULL),
 (12, 'Crazy', 'Rapidboots', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'crazy@test.com', NULL, NULL, NULL, 'crazy', 'fa2ee41779ef60891cbfdfcd0dccaa7c', NULL, NULL),
-(13, 'Sig', 'Canonio', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'sig@test.com', NULL, '{\"general\":[\"Increase frequency of urination\",\"Burning sensation on urination\"],\"liver\":[\"History of liver ailment\"],\"diabetes\":[\"Delayed healing of wounds\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Headache\",\"Dizziness\\/Fainting\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Persistent cough\"]}', NULL, 'Sig', '252e0253e865dec297431b97709794d5', NULL, NULL);
+(13, 'Sig', 'Canonio', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'sig@test.com', NULL, '{\"general\":[\"Increase frequency of urination\",\"Burning sensation on urination\"],\"liver\":[\"History of liver ailment\"],\"diabetes\":[\"Delayed healing of wounds\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Headache\",\"Dizziness\\/Fainting\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Persistent cough\"]}', NULL, 'Sig', '252e0253e865dec297431b97709794d5', NULL, NULL),
+(14, 'Jaynard', 'Senilla', '0000-00-00', 'Male', '', '', 0, '', '', 'saging@gmail.com', NULL, NULL, '2025-11-29 04:07:01', 'jaynard', 'fa2c395447a8ad82849d3a7129830102', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -259,12 +292,13 @@ CREATE TABLE `tblschedule` (
 --
 
 INSERT INTO `tblschedule` (`id`, `appointment_id`, `patient_number`, `firstname`, `surname`, `date`, `time`, `service_id`, `created_at`, `duration`, `status`, `cancel_reason`, `cancelled_at`) VALUES
-(1, 1, 4, 'John Mar', 'Ypil', '2025-09-26', '21:32:00', 4, '2025-09-26 05:32:21', 30, 'Ongoing', 'idk', '2025-10-05 19:05:16'),
-(2, 2, 5, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:39:00', 4, '2025-09-26 22:39:38', 45, 'Request Cancel', 'sample cancel', '2025-11-21 14:59:03'),
+(1, 1, 4, 'John Mar', 'Ypil', '2025-09-26', '21:32:00', 3, '2025-09-26 05:32:21', 30, 'Ongoing', 'idk', '2025-10-05 19:05:16'),
+(2, 2, 5, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:39:00', 1, '2025-09-26 22:39:38', 45, 'For Cancellation', 'sample notif', '2025-11-29 18:39:56'),
 (3, 3, 8, 'Rodelyn', 'Estrera', '2025-09-27', '18:44:00', 4, '2025-09-27 02:44:52', 67, 'Ongoing', NULL, NULL),
-(16, 4, 4, 'John Mar', 'Ypil', '2025-10-05', '16:29:00', 4, '2025-10-05 08:29:34', 50, 'Ongoing', NULL, NULL),
-(17, 5, 4, 'John Mar', 'Ypil', '2025-10-05', '16:39:00', 4, '2025-10-05 08:39:17', 34, 'Done', NULL, NULL),
-(18, 6, 4, 'John Mar', 'Ypil', '2025-10-05', '16:39:00', 4, '2025-10-05 08:39:42', 56, 'Cancelled', 'cancel', NULL);
+(4, 4, 4, 'John Mar', 'Ypil', '2025-10-05', '16:29:00', 5, '2025-10-05 08:29:34', 50, 'Ongoing', NULL, NULL),
+(5, 5, 4, 'John Mar', 'Ypil', '2025-10-05', '16:39:00', 6, '2025-10-05 08:39:17', 34, 'Ongoing', NULL, NULL),
+(6, 6, 4, 'John Mar', 'Ypil', '2025-10-05', '16:39:00', 2, '2025-10-05 08:39:42', 56, 'Cancelled', 'cancel', NULL),
+(7, NULL, 14, 'Jaynard', 'Senilla', '2025-11-29', '17:46:00', 2, '2025-11-29 08:46:54', 45, 'Ongoing', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -285,14 +319,14 @@ CREATE TABLE `tblservice` (
 --
 
 INSERT INTO `tblservice` (`number`, `name`, `description`, `category_id`, `image`) VALUES
-(4, 'Etchant', 'Agoyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy', 1, 'images/588880344_1162759702712818_3890524668527245534_n.jpg'),
-(5, 'Ibot ngipon', 'Pa ibot ka ngipon gaw', 2, 'images/services/sstudy laod.jpg'),
-(6, 'Sample 3', 'Idk aahahahhansklwkldnqkw', 3, 'images/services/image.png'),
-(7, 'Sample 4', 'Sample for number 5', 4, 'images/services/logo.png'),
-(8, 'Sample 5', 'Sample number 5', 5, 'images/services/mcc_logo2.jpg'),
-(9, 'Sample 6', 'Sample for number 6', NULL, 'images/services/mcc.jpg'),
-(10, 'Sample 7', 'This is for sample service', NULL, 'images/services/Mandaue City College Student Profiling.png'),
-(11, 'Sample service', 'Sample category for a service', NULL, 'images/mcc new logo.jpg');
+(1, 'Etchant', 'Agoyyyyyyyyyyyyyyyyyyyyyyyyyyyyy', 1, 'images/588880344_1162759702712818_3890524668527245534_n.jpg'),
+(2, 'Ibot ngipon', 'Pa ibot ka ngipon gaw', 2, 'images/services/sstudy laod.jpg'),
+(3, 'Sample 3', 'Idk aahahahhansklwkldnqkw', 3, 'images/services/image.png'),
+(4, 'Sample 4', 'Sample for number 5', 4, 'images/services/logo.png'),
+(5, 'Sample 5', 'Sample number 5', 5, 'images/services/mcc_logo2.jpg'),
+(6, 'Sample 6', 'Sample for number 6', 6, 'images/services/mcc.jpg'),
+(7, 'Sample 7', 'This is for sample service', 7, 'images/services/Mandaue City College Student Profiling.png'),
+(8, 'Sample service', 'Sample category for a service', 8, 'images/mcc new logo.jpg');
 
 --
 -- Indexes for dumped tables
@@ -327,6 +361,13 @@ ALTER TABLE `tblcategory`
 --
 ALTER TABLE `tblinventory`
   ADD PRIMARY KEY (`number`);
+
+--
+-- Indexes for table `tblnotif`
+--
+ALTER TABLE `tblnotif`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_recipient` (`recipient_id`,`recipient_type`,`is_read`);
 
 --
 -- Indexes for table `tblpage`
@@ -368,13 +409,13 @@ ALTER TABLE `tbladmin`
 -- AUTO_INCREMENT for table `tblappointment`
 --
 ALTER TABLE `tblappointment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `tblcalendar`
 --
 ALTER TABLE `tblcalendar`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `tblcategory`
@@ -389,6 +430,12 @@ ALTER TABLE `tblinventory`
   MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `tblnotif`
+--
+ALTER TABLE `tblnotif`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `tblpage`
 --
 ALTER TABLE `tblpage`
@@ -398,13 +445,13 @@ ALTER TABLE `tblpage`
 -- AUTO_INCREMENT for table `tblpatient`
 --
 ALTER TABLE `tblpatient`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `tblschedule`
 --
 ALTER TABLE `tblschedule`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1878;
 
 --
 -- AUTO_INCREMENT for table `tblservice`

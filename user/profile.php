@@ -188,6 +188,14 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 ':st' => $status_default
             ]);
 
+            // Insert notification for admin
+            $admin_id = 1; // Assuming admin ID is 1
+            $notif_message = "New consultation request from " . htmlentities($firstname . ' ' . $surname) . ".";
+            $notif_url = "mac.php?filter=pending";
+            $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
+            $query_notif = $dbh->prepare($sql_notif);
+            $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message, ':url' => $notif_url]);
+
             $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Appointment booked successfully.'];
             header('Location: profile.php?tab=appointments');
             exit();
@@ -207,6 +215,14 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $query_cancel->bindParam(':cancel_reason', $cancel_reason, PDO::PARAM_STR);
         $query_cancel->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
         $query_cancel->execute();
+
+        // Insert notification for admin
+        $admin_id = 1; // Assuming admin ID is 1
+        $notif_message = htmlentities($_SESSION['sturecmsfirstname'] . ' ' . $_SESSION['sturecmssurname']) . " cancelled a consultation.";
+        $notif_url = "mac.php?filter=cancelled";
+        $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
+        $query_notif = $dbh->prepare($sql_notif);
+        $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message, ':url' => $notif_url]);
         
         $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Your appointment has been successfully cancelled.'];
         header('Location: profile.php?tab=appointments');
@@ -219,12 +235,20 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $cancel_reason = trim($_POST['cancel_reason']);
 
         // Verify the schedule belongs to the current patient before cancelling
-        $sql_cancel_service = "UPDATE tblschedule SET status = 'Request Cancel', cancel_reason = :cancel_reason, cancelled_at = NOW() WHERE id = :schedule_id AND patient_number = :patient_number";
+        $sql_cancel_service = "UPDATE tblschedule SET status = 'For Cancellation', cancel_reason = :cancel_reason, cancelled_at = NOW() WHERE id = :schedule_id AND patient_number = :patient_number";
         $query_cancel_service = $dbh->prepare($sql_cancel_service);
         $query_cancel_service->bindParam(':schedule_id', $schedule_id_to_cancel, PDO::PARAM_INT);
         $query_cancel_service->bindParam(':cancel_reason', $cancel_reason, PDO::PARAM_STR);
         $query_cancel_service->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
         $query_cancel_service->execute();
+
+        // Insert notification for admin
+        $admin_id = 1; // Assuming admin ID is 1
+        $notif_message = htmlentities($_SESSION['sturecmsfirstname'] . ' ' . $_SESSION['sturecmssurname']) . " requested to cancel a service.";
+        $notif_url = "mas.php?filter=for_cancellation";
+        $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
+        $query_notif = $dbh->prepare($sql_notif);
+        $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message, ':url' => $notif_url]);
 
         $_SESSION['toast_message'] = ['type' => 'info', 'message' => 'Your cancellation request has been submitted for review.'];
         header('Location: profile.php?tab=appointments');

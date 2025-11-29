@@ -11,13 +11,35 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $appointment_id = $_POST['appointment_id'];
         $status = $_POST['status'];
 
-        $sql_update = "UPDATE tblappointment SET status = :status WHERE id = :id";
-        $query_update = $dbh->prepare($sql_update);
-        $query_update->bindParam(':status', $status, PDO::PARAM_STR);
-        $query_update->bindParam(':id', $appointment_id, PDO::PARAM_INT);
+        // Fetch appointment details before updating for notification purposes
+        $sql_fetch_appt = "SELECT patient_number, date FROM tblappointment WHERE id = :id";
+        $query_fetch_appt = $dbh->prepare($sql_fetch_appt);
+        $query_fetch_appt->bindParam(':id', $appointment_id, PDO::PARAM_INT);
+        $query_fetch_appt->execute();
+        $appointment_data = $query_fetch_appt->fetch(PDO::FETCH_ASSOC);
 
-        if ($query_update->execute()) {
-            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Appointment status updated successfully.'];
+        if ($appointment_data) {
+            $sql_update = "UPDATE tblappointment SET status = :status WHERE id = :id";
+            $query_update = $dbh->prepare($sql_update);
+            $query_update->bindParam(':status', $status, PDO::PARAM_STR);
+            $query_update->bindParam(':id', $appointment_id, PDO::PARAM_INT);
+
+            if ($query_update->execute()) {
+                // If status is Approved or Declined, send notification to the patient
+                if ($status == 'Approved' || $status == 'Declined') {
+                    $patient_id = $appointment_data['patient_number'];
+                    $appointment_date = date('F j, Y', strtotime($appointment_data['date']));
+                    $message = "Your consultation on " . $appointment_date . " has been " . strtolower($status) . ".";
+                    $url = "profile.php?tab=appointments";
+
+                    $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:recipient_id, 'patient', :message, :url)";
+                    $query_notif = $dbh->prepare($sql_notif);
+                    $query_notif->execute([':recipient_id' => $patient_id, ':message' => $message, ':url' => $url]);
+                }
+                $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Appointment status updated successfully.'];
+            } else {
+                $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while updating the status.'];
+            }
         } else {
             $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while updating the status.'];
         }
@@ -90,6 +112,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             $sql_appointment = "INSERT INTO tblappointment (patient_number, firstname, surname, date, start_time, end_time, status) VALUES (:pnum, :fname, :sname, :app_date, :start_time, :end_time, :status)";
             $query_appointment = $dbh->prepare($sql_appointment);
             $query_appointment->execute([':pnum' => $patient_id, ':fname' => $firstname, ':sname' => $surname, ':app_date' => $app_date, ':start_time' => $start_time, ':end_time' => $end_time, ':status' => $app_status]);
+
+            // Insert notification for admin
+            $admin_id = 1; // Assuming admin ID is 1
+            $notif_message = "A new walk-in appointment was created for " . htmlentities($firstname . ' ' . $surname) . ".";
+            $notif_url = "mac.php?filter=today";
+            $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
+            $query_notif = $dbh->prepare($sql_notif);
+            $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message, ':url' => $notif_url]);
 
             $dbh->commit();
             $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'New patient and appointment scheduled successfully.'];
