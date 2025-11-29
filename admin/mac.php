@@ -112,7 +112,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         header('Location: mac.php');
         exit();
     }
+
+    // Initialize search and filter variables
     $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
+    $search = isset($_GET['search_query']) ? trim($_GET['search_query']) : '';
+
     // --- APPOINTMENT COUNTS ---
     $sql_all = "SELECT COUNT(*) FROM tblappointment";
     $query_all = $dbh->prepare($sql_all);
@@ -149,6 +153,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     // --- APPOINTMENT LIST ---
     $sql_appointments = "SELECT * FROM tblappointment";
     $where_clauses = [];
+    $params = [];
 
     switch ($filter) {
         case 'today':
@@ -168,13 +173,22 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             break;
     }
 
+    if (!empty($search)) {
+        $where_clauses[] = "(firstname LIKE :search OR surname LIKE :search)";
+        $params[':search'] = "%$search%";
+    }
+
     if (!empty($where_clauses)) {
         $sql_appointments .= " WHERE " . implode(' AND ', $where_clauses);
     }
 
     $sql_appointments .= " ORDER BY date DESC, start_time DESC";
     $query_appointments = $dbh->prepare($sql_appointments);
-    $query_appointments->execute();
+    if (!empty($params)) {
+        $query_appointments->execute($params);
+    } else {
+        $query_appointments->execute();
+    }
     $appointments = $query_appointments->fetchAll(PDO::FETCH_OBJ);
 
     // Helper to format time
@@ -230,12 +244,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 <button type="button" class="new-appointment-btn" id="newAppointmentBtn">New
                                     Appointment</button>
                             </div>
-                        <div class="appointment-management-card">
-                            <div class="filter-section">
-                                <div class="search-box">
-                                    <input type="text" placeholder="Search appointments by patient name"
-                                        aria-label="Search appointments">
+                        <div class="appointment-management-card"> 
+                            <div class="filter-section"> 
+                                <form method="GET" class="search-form" style="flex-grow: 1;">
+                                <div class="search-box"> 
+                                    <input type="hidden" name="filter" value="<?php echo htmlentities($filter); ?>">
+                                        <input type="text" name="search_query" placeholder="Search by name..." value="<?php echo htmlentities($search); ?>" aria-label="Search appointments">
                                 </div>
+                                </form>
                                 <div class="filter-buttons">
                                     <a href="mac.php?filter=all"
                                         class="filter-btn <?php if ($filter === 'all')

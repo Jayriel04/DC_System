@@ -117,6 +117,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     }
 
     $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
+    $search = isset($_GET['search_query']) ? trim($_GET['search_query']) : '';
     // --- SERVICE APPOINTMENT COUNTS ---
     $sql_all = "SELECT COUNT(*) FROM tblschedule";
     $query_all = $dbh->prepare($sql_all);
@@ -156,6 +157,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     // --- SERVICE APPOINTMENT LIST ---
     $sql_schedules = "SELECT s.*, svc.name as service_name, cat.name as category_name FROM tblschedule s LEFT JOIN tblservice svc ON s.service_id = svc.number LEFT JOIN tblcategory cat ON svc.category_id = cat.id";
     $where_clauses = [];
+    $params = [];
 
     switch ($filter) {
         case 'today':
@@ -178,13 +180,22 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             break;
     }
 
+    if (!empty($search)) {
+        $where_clauses[] = "(s.firstname LIKE :search OR s.surname LIKE :search OR svc.name LIKE :search)";
+        $params[':search'] = "%$search%";
+    }
+
     if (!empty($where_clauses)) {
         $sql_schedules .= " WHERE " . implode(' AND ', $where_clauses);
     }
 
     $sql_schedules .= " ORDER BY s.date DESC, s.time DESC";
     $query_schedules = $dbh->prepare($sql_schedules);
-    $query_schedules->execute();
+    if (!empty($params)) {
+        $query_schedules->execute($params);
+    } else {
+        $query_schedules->execute();
+    }
     $schedules = $query_schedules->fetchAll(PDO::FETCH_OBJ);
 
     // Helper to format time
@@ -242,30 +253,33 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 
                             </div>
                         <div class="appointment-management-card">
-                            <div class="filter-section">
-                                <div class="search-box">
-                                    <input type="text" placeholder="Search appointments by patient name or service..." aria-label="Search appointments">
-                                </div>
+                            <div class="filter-section"> 
+                                <form method="GET" class="search-form" style="flex-grow: 1;">
+                                    <div class="search-box"> 
+                                        <input type="hidden" name="filter" value="<?php echo htmlentities($filter); ?>">
+                                        <input type="text" name="search_query" placeholder="Search by patient or service name..." value="<?php echo htmlentities($search); ?>" aria-label="Search appointments">
+                                    </div>
+                                </form>
                                 <div class="filter-buttons">
-                                    <a href="mas.php?filter=all" class="filter-btn <?php if ($filter === 'all') echo 'active'; ?>" data-filter="all">
+                                    <a href="mas.php?filter=all&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'all') echo 'active'; ?>" data-filter="all">
                                         All Appointments <span class="filter-count"><?php echo $count_all; ?></span>
                                     </a>
-                                    <a href="mas.php?filter=today" class="filter-btn <?php if ($filter === 'today') echo 'active'; ?>" data-filter="today">
+                                    <a href="mas.php?filter=today&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'today') echo 'active'; ?>" data-filter="today">
                                         Today <span class="filter-count"><?php echo $count_today; ?></span>
                                     </a>
-                                    <a href="mas.php?filter=upcoming" class="filter-btn <?php if ($filter === 'upcoming') echo 'active'; ?>" data-filter="upcoming">
+                                    <a href="mas.php?filter=upcoming&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'upcoming') echo 'active'; ?>" data-filter="upcoming">
                                         Upcoming <span class="filter-count"><?php echo $count_upcoming; ?></span>
                                     </a>
-                                    <a href="mas.php?filter=pending" class="filter-btn <?php if ($filter === 'pending') echo 'active'; ?>" data-filter="pending">
+                                    <a href="mas.php?filter=pending&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'pending') echo 'active'; ?>" data-filter="pending">
                                         Ongoing <span class="filter-count"><?php echo $count_pending; ?></span>
                                     </a>
-                                    <a href="mas.php?filter=completed" class="filter-btn <?php if ($filter === 'completed') echo 'active'; ?>" data-filter="completed">
+                                    <a href="mas.php?filter=completed&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'completed') echo 'active'; ?>" data-filter="completed">
                                         Completed <span class="filter-count"><?php echo $count_completed; ?></span>
                                     </a>
-                                    <a href="mas.php?filter=cancelled" class="filter-btn <?php if ($filter === 'cancelled') echo 'active'; ?>" data-filter="cancelled">
+                                    <a href="mas.php?filter=cancelled&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'cancelled') echo 'active'; ?>" data-filter="cancelled">
                                         Cancelled <span class="filter-count"><?php echo $count_cancelled; ?></span>
                                     </a>
-                                    <a href="mas.php?filter=for_cancellation" class="filter-btn <?php if ($filter === 'for_cancellation') echo 'active'; ?>" data-filter="for_cancellation">
+                                    <a href="mas.php?filter=for_cancellation&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'for_cancellation') echo 'active'; ?>" data-filter="for_cancellation">
                                         Request Cancellation <span class="filter-count"><?php echo $count_for_cancellation; ?></span>
                                     </a>
                                 </div>
