@@ -360,7 +360,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn-danger btn-cancel">Cancel</button>
-                        <button type="submit" name="update_service" class="btn-success">Update Service</button>
+                        <button type="submit" name="update_service" class="btn-success" style=" background-color: #008779 !important; color: white;">Update Service</button>
                     </div>
                 </form>
             </div>

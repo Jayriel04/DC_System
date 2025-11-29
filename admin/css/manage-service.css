@@ -106,7 +106,7 @@ body {
 .service-card {
     background: white;
     width: 223.54px;
-    height: 357px;
+    height: 425px;
     border-radius: 12px;    
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     transition: transform 0.2s, box-shadow 0.2s;
