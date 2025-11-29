@@ -3,6 +3,12 @@ session_start();
 error_reporting(0);
 include('includes/dbconnection.php');
 
+$toast_message = null;
+function setToast($message, $type) {
+    global $toast_message;
+    $toast_message = ['message' => $message, 'type' => $type];
+}
+
 if (isset($_POST['login'])) {
     $username = $_POST['username']; // Changed to username
     $password = md5($_POST['password']);
@@ -40,7 +46,7 @@ if (isset($_POST['login'])) {
             header('Location: ../index.php');
             exit();
     } else {
-        echo "<script>alert('Invalid Details');</script>";
+        setToast('Invalid username or password.', 'danger');
     }
 }
 ?>
@@ -52,6 +58,7 @@ if (isset($_POST['login'])) {
     <title>Login User</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="../css/toast.css">
 </head>
 <body>
     <div class="container-login">
@@ -90,6 +97,14 @@ if (isset($_POST['login'])) {
             <div class="form-container">
                 <h1>Welcome Back!</h1>
                 <p class="subtitle">Sign in to your account</p>
+
+                <div id="toast-container"></div>
+                <script src="../js/toast.js"></script>
+                <?php
+                    if ($toast_message) {
+                        echo "<script>showToast('{$toast_message['message']}', '{$toast_message['type']}');</script>";
+                    }
+                ?>
 
                 <form id="login" method="post" name="login">
                     <div class="form-group">

@@ -2,6 +2,13 @@
 session_start();
 include('includes/dbconnection.php');
 
+$toast_message = null;
+function setToast($message, $type) {
+    global $toast_message;
+    $toast_message = ['message' => $message, 'type' => $type];
+}
+
+
 // Only use columns that exist in tblpatient:
 // firstname, surname, date_of_birth, sex, status, occupation, age,
 // contact_number, address, username, password, Image, health_conditions
@@ -22,15 +29,15 @@ if (isset($_POST['register'])) {
 
     // Basic validation
     if ($password_raw === '' || $username === '' || $firstname === '' || $surname === '' || $email === '') {
-        echo "<script>alert('Please fill in required fields.');</script>";
+        setToast('Please fill in all required fields.', 'danger');
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo "<script>alert('Please provide a valid email address.');</script>";
+        setToast('Please provide a valid email address.', 'danger');
     } elseif (substr(strtolower($email), -10) !== '@gmail.com') {
-        echo "<script>alert('Only @gmail.com addresses are allowed.');</script>";
+        setToast('Only @gmail.com addresses are allowed.', 'danger');
     } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password_raw)) {
-        echo "<script>alert('Password is not strong enough. It must be at least 8 characters and include uppercase, lowercase, a number, and a special character.');</script>";
+        setToast('Password is not strong enough. It must be at least 8 characters and include uppercase, lowercase, a number, and a special character.', 'danger');
     } elseif ($password_raw !== $confirm_password) {
-        echo "<script>alert('Passwords do not match.');</script>";
+        setToast('Passwords do not match.', 'danger');
     } else {
         // Check if username or email already exist in tblpatient
         $checkSql = "SELECT number FROM tblpatient WHERE username = :username OR email = :email";
@@ -40,7 +47,7 @@ if (isset($_POST['register'])) {
         $checkQuery->execute();
 
         if ($checkQuery->rowCount() > 0) {
-            echo "<script>alert('Username or email already exists. Please choose another one.');</script>";
+            setToast('Username or email already exists. Please choose another one.', 'danger');
         } else {
             // compute age from date_of_birth if provided
             $age = null;
@@ -116,10 +123,11 @@ if (isset($_POST['register'])) {
                 $_SESSION['sturecmssurname'] = $surname;
                 $_SESSION['login'] = $username;
 
+                $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Account created successfully! Welcome.'];
                 header('Location: ../index.php');
                 exit();
             } else {
-                echo "<script>alert('Error creating account. Please try again.');</script>";
+                setToast('Error creating account. Please try again.', 'danger');
             }
         }
     }
@@ -138,6 +146,7 @@ if (isset($_POST['register'])) {
     <title>Create Account</title>    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="../css/toast.css">
 </head>
 <body>
     <div class="container-login">
@@ -176,6 +185,14 @@ if (isset($_POST['register'])) {
             <div class="form-container">
                 <h1>Create an Account</h1>
                 <p class="subtitle">Join us and manage your dental health!</p>
+
+                <div id="toast-container"></div>
+                <script src="../js/toast.js"></script>
+                <?php
+                    if ($toast_message) {
+                        echo "<script>showToast('{$toast_message['message']}', '{$toast_message['type']}');</script>";
+                    }
+                ?>
 
                 <form class="pt-3" method="post" name="register">
                     <div style="display: flex; gap: 20px;">

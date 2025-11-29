@@ -27,7 +27,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $query_update->bindParam(':health_json', $health_json, PDO::PARAM_STR);
         $query_update->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
         $query_update->execute();
-
+        $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Examination record updated successfully.'];
         header('Location: profile.php?tab=medical');
         exit();
     }
@@ -90,7 +90,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
             ':number' => $patient_number
         ]);
 
-        // Redirect to the profile page to show the updated data
+        $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Profile updated successfully.'];
         header('Location: profile.php');
         exit();
     }
@@ -163,7 +163,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $qryChk = $dbh->prepare($sqlChk);
         $qryChk->execute([':pn' => $patient_number, ':dt' => $appointment_date, ':tm' => $appointment_time]);
         if ((int) $qryChk->fetchColumn() > 0) {
-            $_SESSION['modal_error'] = 'You already have an appointment at that date and time.';
+            $_SESSION['toast_message'] = ['type' => 'warning', 'message' => 'You already have an appointment at that date and time.'];
         } else {
             // Fetch the end_time from tblcalendar
             $sql_get_end_time = "SELECT end_time FROM tblcalendar WHERE `date` = :dt AND `start_time` = :tm LIMIT 1";
@@ -188,12 +188,10 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 ':st' => $status_default
             ]);
 
-            $_SESSION['modal_success'] = 'Appointment booked successfully.';
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Appointment booked successfully.'];
             header('Location: profile.php?tab=appointments');
             exit();
         }
-        // If there was an error, redirect back to show it
-        header('Location: profile.php?tab=appointments&show_booking=1');
         exit();
     }
 
@@ -210,7 +208,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $query_cancel->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
         $query_cancel->execute();
         
-        $_SESSION['profile_message'] = 'Your appointment has been successfully cancelled.';
+        $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Your appointment has been successfully cancelled.'];
         header('Location: profile.php?tab=appointments');
         exit();
     }
@@ -228,7 +226,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $query_cancel_service->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
         $query_cancel_service->execute();
 
-        $_SESSION['profile_message'] = 'Your cancellation request has been submitted for review.';
+        $_SESSION['toast_message'] = ['type' => 'info', 'message' => 'Your cancellation request has been submitted for review.'];
         header('Location: profile.php?tab=appointments');
         exit();
     }
@@ -310,6 +308,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <link href="css/profile.css" rel="stylesheet">
     <link href="../css/style.v2.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/toast.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -317,13 +316,14 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
 <body>
     <?php include_once(__DIR__ . '../includes/header.php'); ?>
+    <div id="toast-container" class="toast-container top-center"></div>
     <div class="container">
         <?php if ($patient): ?>
             <!-- Patient Header -->
             <?php
-            if (isset($_SESSION['profile_message'])) {
-                echo '<div class="alert alert-success" style="margin-bottom: 20px;">' . htmlspecialchars($_SESSION['profile_message']) . '</div>';
-                unset($_SESSION['profile_message']);
+            if (isset($_SESSION['toast_message'])) {
+                echo "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$_SESSION['toast_message']['message']}', '{$_SESSION['toast_message']['type']}'); });</script>";
+                unset($_SESSION['toast_message']);
             }
             ?>
             <div class="patient-header">
@@ -559,12 +559,6 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 </div>
                 <div class="modal-body" style="padding: 15px;">
                     <form method="post" action="profile.php">
-                        <?php
-                        if (isset($_SESSION['modal_error'])) {
-                            echo '<div class="alert alert-danger">' . htmlspecialchars($_SESSION['modal_error']) . '</div>';
-                            unset($_SESSION['modal_error']);
-                        }
-                        ?>
                         <div class="form-group">
                             <label for="appointment_date">Preferred Date</label>
                             <!-- This input is now the trigger and will be populated by the calendar -->
@@ -948,6 +942,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
 
     <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/toast.js"></script>
     <script src="vendors/js/vendor.bundle.base.js"></script>
     <script src="../js/bootstrap.js"></script>
     <!-- Load calendar CSS -->

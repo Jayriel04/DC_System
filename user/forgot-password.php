@@ -10,8 +10,11 @@ use PHPMailer\PHPMailer\Exception;
 // Make sure this path is correct for your project structure
 require '../vendor/autoload.php';
 
-// Message variable for feedback
-$message = '';
+$toast_message = null;
+function setToast($message, $type) {
+    global $toast_message;
+    $toast_message = ['message' => $message, 'type' => $type];
+}
 if(isset($_POST['submit'])) {
   $email = $_POST['email'];
   // Check if email exists in the database
@@ -60,10 +63,11 @@ if(isset($_POST['submit'])) {
         header('location:verify-otp.php');
         exit(); // Stop script execution after redirect
     } catch (Exception $e) {
-        $message = "<div class='alert alert-danger text-center'>The OTP email could not be sent. Please check your mail server configuration. Mailer Error: {$mail->ErrorInfo}</div>";
+        // For debugging: error_log("Mailer Error: {$mail->ErrorInfo}");
+        setToast('The OTP email could not be sent. Please try again later.', 'danger');
     }
   } else {
-    $message = '<div class="alert alert-warning text-center">Email address not found in our records.</div>';
+    setToast('Email address not found in our records.', 'warning');
   }
 }
 
@@ -75,31 +79,8 @@ if(isset($_POST['submit'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-      /* Style for the message box */
-      .alert {
-        padding: 15px;
-        margin-bottom: 20px;
-        border: 1px solid transparent;
-        border-radius: 4px;
-      }
-      .alert-success {
-        color: #155724;
-        background-color: #d4edda;
-        border-color: #c3e6cb;
-      }
-      .alert-danger {
-        color: #721c24;
-        background-color: #f8d7da;
-        border-color: #f5c6cb;
-      }
-      .alert-warning {
-        color: #856404;
-        background-color: #fff3cd;
-        border-color: #ffeeba;
-      }
-    </style>
     <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="../css/toast.css">
   </head>
   <body>
     <div class="container-login">
@@ -138,7 +119,15 @@ if(isset($_POST['submit'])) {
             <div class="form-container">
                 <h1>Reset Password</h1>
                 <p class="subtitle">Enter your email to receive a One-Time Password (OTP).</p>
-                <?php if(!empty($message)) echo $message; ?>
+
+                <div id="toast-container"></div>
+                <script src="../js/toast.js"></script>
+                <?php
+                    if ($toast_message) {
+                        echo "<script>showToast('{$toast_message['message']}', '{$toast_message['type']}');</script>";
+                    }
+                ?>
+
                 <form method="post">
                 <div class="form-group">
                     <label for="email">Email Address</label>

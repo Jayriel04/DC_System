@@ -9,16 +9,18 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 }
 
 $patient_number = $_SESSION['sturecmsnumber'];
-$message = '';
-$message_type = '';
+$toast_message = null;
+function setToast($message, $type) {
+    global $toast_message;
+    $toast_message = ['message' => $message, 'type' => $type];
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     // Basic validation
     if ($_POST['newpassword'] !== $_POST['confirmpassword']) {
-        $message = 'New Password and Confirm Password fields do not match.';
-        $message_type = 'danger';
+        setToast('New Password and Confirm Password fields do not match.', 'danger');
     } else {
-        $cpassword = md5($_POST['currentpassword']); // Using md5 for consistency with login
+        $cpassword = md5($_POST['currentpassword']);
         $newpassword = md5($_POST['newpassword']);
 
         $sql = "SELECT number FROM tblpatient WHERE number=:sid AND password=:cpassword";
@@ -33,16 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
             $chngpwd1->bindParam(':sid', $patient_number, PDO::PARAM_INT);
             $chngpwd1->bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
             if ($chngpwd1->execute()) {
-                $_SESSION['profile_message'] = 'Your password was successfully changed.';
+                $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Your password was successfully changed.'];
                 header('Location: profile.php');
                 exit();
             } else {
-                $message = 'Something went wrong. Please try again.';
-                $message_type = 'danger';
+                setToast('Something went wrong. Please try again.', 'danger');
             }
         } else {
-            $message = 'Your current password is wrong.';
-            $message_type = 'danger';
+            setToast('Your current password is wrong.', 'danger');
         }
     }
 }
@@ -54,12 +54,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     <title>Change Password</title>
     <link rel="stylesheet" href="./css/profile.css">
     <link href="./css/header.css" rel="stylesheet">
+    <link href="../css/toast.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <script type="text/javascript">
         function checkpass() {
             if (document.changepassword.newpassword.value != document.changepassword.confirmpassword.value) {
-                alert('New Password and Confirm Password fields do not match.');
+                showToast('New Password and Confirm Password fields do not match.', 'danger');
                 document.changepassword.confirmpassword.focus();
                 return false;
             }
@@ -85,11 +86,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
 
             <h2 class="form-title">Change Password</h2>
 
-            <?php if (!empty($message)): ?>
-                <div class="alert alert-<?php echo $message_type; ?>"><?php echo htmlspecialchars($message); ?></div>
-            <?php endif; ?>
+            <div id="toast-container"></div>
 
             <form name="changepassword" method="post" onsubmit="return checkpass();">
+                <?php
+                    if ($toast_message) {
+                        echo "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$toast_message['message']}', '{$toast_message['type']}'); });</script>";
+                    }
+                ?>
                 <div class="form-group">
                     <label for="currentpassword">Current Password</label>
                     <div class="input-wrapper">
@@ -118,6 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
             </form>
         </div>
     </div>
+    <script src="../js/toast.js"></script>
     <script>
         function togglePasswordVisibility(inputId, icon) {
             const passwordInput = document.getElementById(inputId);
