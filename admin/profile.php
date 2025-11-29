@@ -173,7 +173,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel">Cancel</button>
-                    <button type="submit" class="btn btn-update" name="submit">Update</button>
+                    <button type="submit" class="btn btn-update" name="submit"style=" background-color: #008779 !important; color: white;">Update</button>
                 </div>
             </form>
         </div>
