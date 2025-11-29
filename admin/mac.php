@@ -91,6 +91,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             $query_appointment = $dbh->prepare($sql_appointment);
             $query_appointment->execute([':pnum' => $patient_id, ':fname' => $firstname, ':sname' => $surname, ':app_date' => $app_date, ':start_time' => $start_time, ':end_time' => $end_time, ':status' => $app_status]);
 
+            // Insert notification for admin
+            $admin_id = 1; // Assuming admin ID is 1
+            $notif_message = "A new walk-in appointment was created for " . htmlentities($firstname . ' ' . $surname) . ".";
+            $notif_url = "mac.php?filter=today";
+            $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
+            $query_notif = $dbh->prepare($sql_notif);
+            $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message, ':url' => $notif_url]);
+
             $dbh->commit();
             $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'New patient and appointment scheduled successfully.'];
             header('Location: mac.php');

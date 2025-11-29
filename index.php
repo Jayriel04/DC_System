@@ -155,6 +155,18 @@ if (isset($_POST['submit_feedback'])) {
       $query->bindParam(':rating', $rating, PDO::PARAM_INT);
       $query->bindParam(':feedback', $feedback, PDO::PARAM_STR);
       $query->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
+
+      // Insert notification for admin
+      $admin_id = 1; // Assuming admin ID is 1
+      $patient_name_sql = "SELECT firstname, surname FROM tblpatient WHERE number = :pnum";
+      $patient_name_query = $dbh->prepare($patient_name_sql);
+      $patient_name_query->execute([':pnum' => $patient_number]);
+      $patient_info = $patient_name_query->fetch(PDO::FETCH_ASSOC);
+      $notif_message = "New feedback received from " . htmlentities($patient_info['firstname'] . ' ' . $patient_info['surname']) . ".";
+      $notif_url = "manage-reviews.php";
+      $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
+      $query_notif = $dbh->prepare($sql_notif);
+      $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message, ':url' => $notif_url]);
       $query->execute();
       echo "<script>alert('Thank you for your feedback!'); window.location.href=window.location.href;</script>";
     } catch (PDOException $e) {

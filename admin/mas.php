@@ -40,6 +40,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query_cancel->bindParam(':id', $schedule_id, PDO::PARAM_INT);
 
         if ($query_cancel->execute()) {
+            // Insert notification for admin
+            $admin_id = 1; // Assuming admin ID is 1
+            $patient_name = $_POST['patient_name_for_notif']; // Hidden input needed in the form
+            $notif_message = "A service for " . htmlentities($patient_name) . " was cancelled by an admin.";
+            $notif_url = "mas.php?filter=cancelled";
+            $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
+            $query_notif = $dbh->prepare($sql_notif);
+            $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message, ':url' => $notif_url]);
             $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Service schedule cancelled successfully.'];
         } else {
             $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while cancelling the service schedule.'];
@@ -520,6 +528,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             <form id="cancelScheduleAdminForm" method="POST">
                 <div class="modal-body">
                     <input type="hidden" name="schedule_id" id="cancel_admin_schedule_id">
+                    <input type="hidden" name="patient_name_for_notif" id="cancel_admin_patient_name_hidden">
                     <p>Are you sure you want to cancel the service schedule for <strong
                             id="cancel_admin_patient_name"></strong> for the service <strong
                             id="cancel_admin_service_name"></strong> on <strong
@@ -634,6 +643,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         const dataset = this.dataset;
                         document.getElementById('cancel_admin_schedule_id').value = dataset.id;
                         document.getElementById('cancel_admin_patient_name').textContent = dataset.firstname + ' ' + dataset.surname;
+                        document.getElementById('cancel_admin_patient_name_hidden').value = dataset.firstname + ' ' + dataset.surname;
                         document.getElementById('cancel_admin_service_name').textContent = dataset.service;
                         document.getElementById('cancel_admin_schedule_date_time').textContent = dataset.date + ' at ' + dataset.time;
                         document.getElementById('cancel_admin_reason').value = dataset.cancelReason || '';
