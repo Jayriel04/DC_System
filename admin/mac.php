@@ -197,6 +197,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/dashboard.css">
@@ -289,7 +290,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                         <th>Date</th>
                                         <th>Start Time</th>
                                         <th>End Time</th>
-                                        <th>Cancel Reason</th>
+                                        <th>Reason</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -304,10 +305,18 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                 <td><?php echo htmlentities($appointment->date); ?></td>
                                                 <td><?php echo format_time_12hr($appointment->start_time); ?></td>
                                                 <td><?php echo format_time_12hr($appointment->end_time); ?></td>
-                                                <td><?php echo htmlentities($appointment->cancel_reason); ?></td>
-                                                <td><span
-                                                        class="status-badge status-<?php echo strtolower(htmlentities($appointment->status)); ?>"><?php echo htmlentities($appointment->status); ?></span>
+                                                <td class="cancel-reason-cell">
+                                                    <?php if (!empty($appointment->cancel_reason)): ?>
+                                                    <button class="view-reason-btn" title="View Reason"
+                                                        data-reason="<?php echo htmlentities($appointment->cancel_reason); ?>"
+                                                        style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0;">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <?php else: ?>
+                                                    <span style="color: #ccc;">-</span>
+                                                    <?php endif; ?>
                                                 </td>
+                                                <td><span class="status-badge status-<?php echo strtolower(htmlentities($appointment->status)); ?>"><?php echo htmlentities($appointment->status); ?></span></td>
                                                 <td class="actions-icons">
                                                     <button class="edit-appointment-btn" title="Edit"
                                                         data-id="<?php echo htmlentities($appointment->id); ?>"
@@ -317,8 +326,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                         data-start-time="<?php echo htmlentities($appointment->start_time); ?>"
                                                         data-end-time="<?php echo htmlentities($appointment->end_time); ?>"
                                                         data-status="<?php echo htmlentities($appointment->status); ?>"
-                                                        style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0;">✏️</button>
-
+                                                        style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0;">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
                                                     <button class="cancel-appointment-admin-btn" title="Cancel"
                                                         data-id="<?php echo htmlentities($appointment->id); ?>"
                                                         data-firstname="<?php echo htmlentities($appointment->firstname); ?>"
@@ -327,11 +337,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                         data-start-time="<?php echo htmlentities($appointment->start_time); ?>"
                                                         data-end-time="<?php echo htmlentities($appointment->end_time); ?>"
                                                         data-cancel-reason="<?php echo htmlentities($appointment->cancel_reason); ?>"
-                                                        style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0 8px;">🚫</button>
-
+                                                        style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0 8px;">
+                                                        <i class="fas fa-times-circle"></i>
+                                                    </button>
                                                     <a href="mac.php?delid=<?php echo $appointment->id; ?>" title="Delete"
                                                         onclick="return confirm('Do you really want to Delete ?');"
-                                                        style="font-size: 1.25rem; color: #a0aec0;">🗑️</a>
+                                                        style="font-size: 1.25rem; color: #a0aec0; text-decoration: none;">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -527,6 +540,22 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         </div>
     </div>
 
+    <!-- View Cancellation Reason Modal -->
+    <div id="viewReasonModal" class="modal-container" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cancellation Reason</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="reasonText" style="font-size: 16px; line-height: 1.6; color: #333;"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script src="vendors/js/vendor.bundle.base.js"></script>
     <script src="js/toast.js"></script>
     <script>
@@ -627,6 +656,34 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     cancelAdminModal.style.display = 'flex';
                 });
             });
+
+            // --- View Cancellation Reason Modal ---
+            const viewReasonModal = document.getElementById('viewReasonModal');
+            if (viewReasonModal) {
+                const viewReasonCloseBtn = viewReasonModal.querySelector('.close-button');
+                const viewReasonCancelBtn = viewReasonModal.querySelector('.btn-cancel');
+
+                function closeViewReasonModal() {
+                    viewReasonModal.style.display = 'none';
+                }
+
+                viewReasonCloseBtn.addEventListener('click', closeViewReasonModal);
+                viewReasonCancelBtn.addEventListener('click', closeViewReasonModal);
+
+                window.addEventListener('click', function (event) {
+                    if (event.target === viewReasonModal) {
+                        closeViewReasonModal();
+                    }
+                });
+
+                document.querySelectorAll('.view-reason-btn').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const reason = this.dataset.reason;
+                        document.getElementById('reasonText').textContent = reason;
+                        viewReasonModal.style.display = 'flex';
+                    });
+                });
+            }
         });
     </script>
     <script src="js/mac-modal.js"></script>
