@@ -505,7 +505,7 @@ if (isset($_POST['submit_feedback'])) {
   <div class="modal fade health-questionnaire-modal" id="healthModal" tabindex="-1" role="dialog"
     aria-labelledby="healthModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-      <div class="modal-content">
+      <div class="modal-content" >
         <form method="post">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"

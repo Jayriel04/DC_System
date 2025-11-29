@@ -298,6 +298,20 @@
     width: 100%;
 }
 
+<<<<<<< HEAD
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+.modal-content {
+    border-radius: 16px;
+    padding: 5px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    width: 1200px;
+    margin: 5% -50%;
+}
+=======
 .submit-btn {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -317,6 +331,7 @@
     box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
 }
 
+>>>>>>> 838161f942143a027c9762ae3181f7d3b203acb1
 
 @media (max-width: 992px) {
     .health-questionnaire-modal .two-column {
@@ -325,25 +340,35 @@
 }
 
 @media (max-width: 768px) {
-    .health-questionnaire-modal .modal-body {
-        padding: 20px;
-    }
+    .health-questionnaire-modal .modal-dialog {
+    margin: 10px;
+    max-width: 100%;
+  }
 
-    .health-questionnaire-modal .section {
-        padding: 15px;
-    }
+  .health-questionnaire-modal .modal-content {
+    border-radius: 12px;
+    width: 97%;
+    left: 188px;
+  }
 
-    .health-questionnaire-modal .appointment-fields .row {
-        flex-direction: column;
-    }
-}
+  .health-questionnaire-modal .modal-header {
+    padding: 16px;
+  }
 
-/* Styles for the health condition modal, based on the provided UI */
+  .health-questionnaire-modal .modal-body {
+    padding: 16px;
+    max-height: 85vh;
+  }
 
-.modal-dialog.modal-lg {
-    max-width: 720px;
-}
+  .health-questionnaire-modal .two-column {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
 
+<<<<<<< HEAD
+  .health-questionnaire-modal .section {
+=======
 .modal-content {
     border-radius: 16px;
     padding: 5px;
@@ -365,50 +390,168 @@
 .modal-body .section-title {
     font-size: 18px;
     font-weight: 600;
+>>>>>>> 838161f942143a027c9762ae3181f7d3b203acb1
     margin-bottom: 16px;
-    color: #000;
-}
+  }
 
-.modal-body .divider {
-    height: 1px;
-    background: #e5e5e5;
-    margin-bottom: 20px;
-}
+  .health-questionnaire-modal .section-title {
+    font-size: 13px;
+  }
 
-.modal-body .options {
+  .health-questionnaire-modal .form-group {
+    margin-bottom: 10px;
+  }
+
+  .health-questionnaire-modal .inline-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .health-questionnaire-modal .inline-group label {
+    font-size: 13px;
+  }
+
+  .appointment-fields {
+    padding: 12px;
+  }
+
+  .appointment-fields .row {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 12px;
+  }
+
+  .appointment-fields .col-md-6 {
+    width: 100%;
+  }
+
+  .calendar-wrapper {
+    padding: 10px;
+  }
+
+  .calendar-header h2 {
+    font-size: 15px;
+  }
+
+  .weekday {
+    font-size: 11px;
+    padding: 4px 0;
+  }
+
+  .day {
+    font-size: 12px;
+    aspect-ratio: 1;
+  }
+
+  .health-questionnaire-modal .submit-btn {
+    padding: 12px 24px;
+    font-size: 15px;
+    width: 100%;
+  }
+
+  .health-questionnaire-modal .allergy-section {
+    padding: 12px;
+  }
+
+  .health-questionnaire-modal .allergy-title {
+    font-size: 13px;
+  }
 }
 
-.modal-body .option {
-    position: relative;
-}
+@media (max-width: 480px) {
+  .health-questionnaire-modal .modal-dialog {
+    margin: 5px;
+  }
 
-.modal-body .option input[type="checkbox"] {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-}
+  .health-questionnaire-modal .modal-header {
+    padding: 12px;
+  }
 
-.modal-body .option label {
-    display: inline-block;
-    padding: 8px 16px;
-    border: 2px solid #e5e5e5;
-    border-radius: 24px;
-    cursor: pointer;
+  .health-questionnaire-modal .modal-header h3 {
+    font-size: 16px;
+  }
+
+  .health-questionnaire-modal .modal-body {
+    padding: 16px;
+    max-height: 822vh;
+  }
+
+  .health-questionnaire-modal .two-column {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 12px 0;
+  }
+
+  .health-questionnaire-modal .section {
+    margin-bottom: 12px;
+  }
+
+  .health-questionnaire-modal .section-title {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .health-questionnaire-modal .form-group {
+    margin-bottom: 8px;
+    gap: 6px;
+  }
+
+  .health-questionnaire-modal .form-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .health-questionnaire-modal .form-group label {
+    font-size: 13px;
+  }
+
+  .health-questionnaire-modal .input-group input,
+  .health-questionnaire-modal .input-group textarea {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .appointment-fields {
+    padding: 10px;
+    margin-bottom: 16px;
+  }
+
+  .health-questionnaire-modal .submit-btn {
+    padding: 10px 20px;
     font-size: 14px;
+<<<<<<< HEAD
+    width: 100%;
+  }
+=======
     color: #333;
     transition: all 0.2s;
     user-select: none;
     margin-bottom: 0;
     /* Override bootstrap default */
 }
+>>>>>>> 838161f942143a027c9762ae3181f7d3b203acb1
 
-.modal-body .option label:hover {
-    border-color: #cbd5e1;
+  .calendar-header h2 {
+    font-size: 14px;
+  }
+
+<<<<<<< HEAD
+  .nav-btn {
+    padding: 4px 8px;
+    font-size: 14px;
+  }
+
+  .day {
+    font-size: 11px;
+  }
+  .tabs {
+    flex-direction: column;
+    
+  }
 }
-
+=======
 .modal-body .option input:checked+label {
     border-color: #2563eb;
     color: #2563eb;
@@ -440,3 +583,4 @@
         font-size: 0.95em;
     }
 }
+>>>>>>> 838161f942143a027c9762ae3181f7d3b203acb1

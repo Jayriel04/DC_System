@@ -305,12 +305,14 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <link href="./css/header.css" rel="stylesheet">
     <link href="css/custom-calendar.css" rel="stylesheet">
     <link href="./css/edit.css" rel="stylesheet">
+    <link href="css/profile.css" rel="stylesheet">
     <link href="../css/style.v2.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/toast.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
-
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta charset="utf-8">
 
 <body>
     <?php include_once(__DIR__ . '../includes/header.php'); ?>
@@ -456,15 +458,17 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                                                         <?php echo date("F j, Y", strtotime($appt['date'])) . ' at ' . format_time_12hr($appt['start_time']); ?>
                                                     </div>
                                                 </div>
+                                                
+                                            </div>
+                                            <div class="appointment-title">Consultation
                                                 <?php if (in_array($appt['status'], ['Pending', 'Approved'])): ?>
                                                     <button type="button" class="btn btn-danger btn-sm cancel-consultation-btn"
                                                         data-appointment-id="<?php echo $appt['id']; ?>"
-                                                        style="margin-left: auto; padding: 2px 8px; font-size: 12px; background-color: red; color: white;">
+                                                        style="margin-left: auto; padding: 5px 14px; font-size: 12px; background-color: red; color: white;">
                                                         Cancel
                                                     </button>
                                                 <?php endif; ?>
                                             </div>
-                                            <div class="appointment-title">Consultation</div>
                                         </div>
                                     <?php endforeach; ?>
                                 <?php else: ?>
@@ -491,16 +495,18 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                                                         <?php echo date("F j, Y", strtotime($schedule['date'])) . ' at ' . format_time_12hr($schedule['time']); ?>
                                                     </div>
                                                 </div>
-                                                <div class="appointment-actions">
-                                                    <?php if ($schedule['sched_status'] === 'Ongoing'): ?>
-                                                        <button type="button" class="btn btn-danger btn-sm request-cancel-btn"
-                                                            data-schedule-id="<?php echo $schedule['id']; ?>"
-                                                            style="padding: 2px 8px; font-size: 12px; background-color: red; color: white;">Request Cancel</button>
-                                                    <?php endif; ?>
-                                                </div>
+                                                
                                             </div>
                                             <div class="appointment-title">
                                                 <?php echo htmlentities($schedule['service_name'] ?: 'Dental Service'); ?>
+                                            
+                                            <div class="appointment-actions">
+                                                    <?php if ($schedule['sched_status'] === 'Ongoing'): ?>
+                                                        <button type="button" class="btn btn-danger btn-sm request-cancel-btn"
+                                                            data-schedule-id="<?php echo $schedule['id']; ?>"
+                                                            style="margin-left: auto; width: 119px; padding: 5px 14px; font-size: 12px; background-color: red; color: white;">Request Cancel</button>
+                                                    <?php endif; ?>
+                                                </div>
                                             </div>
                                         </div>
                                     <?php endforeach; ?>
@@ -522,12 +528,12 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <!-- Cancel Consultation Modal -->
     <div id="cancelConsultationModal" class="modal" tabindex="-1" role="dialog" style="display: none !important; display: flex; align-items: center; justify-content: center;">
         <div class="modal-dialog" role="document">
-            <div class="modal-content" style=" width: 500px; left: 300px;">
+            <div class="modal-content" style=" width: 450px; left: 231px;">
                 <div class="modal-header">
                     <h4 class="modal-title">Cancel Appointment</h4>
                     <span class="close" data-dismiss="modal">&times;</span>
                 </div>
-                <div class="modal-body" style="padding: 20px;">
+                <div class="modal-body" style="padding: 12px;">
                     <form method="post" action="profile.php">
                         <input type="hidden" name="cancel_appointment_id" id="cancel_appointment_id">
                         <div class="form-group">
@@ -546,7 +552,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <!-- Book Appointment Modal -->
     <div id="bookAppointmentModal" class="modal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
-            <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-content" style="max-width: 500px; left: 230px;">
                 <div class="modal-header">
                     <h4 class="modal-title">Book a New Appointment</h4>
                     <span class="close" data-dismiss="modal">&times;</span>
@@ -913,12 +919,12 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <!-- Cancel Service Appointment Modal -->
     <div id="cancelServiceModal" class="modal" tabindex="-1" role="dialog" style="display: none !important; display: flex; align-items: center; justify-content: center;">
         <div class="modal-dialog" role="document">
-            <div class="modal-content" style=" width: 500px; left: 300px;">
+            <div class="modal-content" style=" width: 450px; left: 231px;">
                 <div class="modal-header">
                     <h4 class="modal-title">Request Cancellation</h4>
                     <span class="close" data-dismiss="modal">&times;</span>
                 </div>
-                <div class="modal-body" style="padding: 20px;">
+                <div class="modal-body" style="padding: 12px;">
                     <form method="post" action="profile.php">
                         <input type="hidden" name="schedule_id_to_cancel" id="schedule_id_to_cancel">
                         <div class="form-group">
