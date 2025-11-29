@@ -11,15 +11,41 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $schedule_id = $_POST['schedule_id'];
         $status = $_POST['status'];
         $cancel_reason = ($status === 'Cancelled') ? $_POST['cancel_reason'] : NULL;
-
-        $sql_update = "UPDATE tblschedule SET status = :status, cancel_reason = :cancel_reason WHERE id = :id";
-        $query_update = $dbh->prepare($sql_update);
-        $query_update->bindParam(':status', $status, PDO::PARAM_STR);
-        $query_update->bindParam(':cancel_reason', $cancel_reason, PDO::PARAM_STR);
-        $query_update->bindParam(':id', $schedule_id, PDO::PARAM_INT);
         
-        if ($query_update->execute()) {
-            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Schedule status updated successfully.'];
+        // Fetch schedule details before updating for notification purposes
+        $sql_fetch_schedule = "SELECT s.patient_number, s.date, svc.name as service_name 
+                               FROM tblschedule s 
+                               LEFT JOIN tblservice svc ON s.service_id = svc.number 
+                               WHERE s.id = :id";
+        $query_fetch_schedule = $dbh->prepare($sql_fetch_schedule);
+        $query_fetch_schedule->bindParam(':id', $schedule_id, PDO::PARAM_INT);
+        $query_fetch_schedule->execute();
+        $schedule_data = $query_fetch_schedule->fetch(PDO::FETCH_ASSOC);
+
+        if ($schedule_data) {
+            $sql_update = "UPDATE tblschedule SET status = :status, cancel_reason = :cancel_reason WHERE id = :id";
+            $query_update = $dbh->prepare($sql_update);
+            $query_update->bindParam(':status', $status, PDO::PARAM_STR);
+            $query_update->bindParam(':cancel_reason', $cancel_reason, PDO::PARAM_STR);
+            $query_update->bindParam(':id', $schedule_id, PDO::PARAM_INT);
+
+            if ($query_update->execute()) {
+                // If status is Done or Cancelled, send a notification to the patient
+                if ($status == 'Done' || $status == 'Cancelled') {
+                    $patient_id = $schedule_data['patient_number'];
+                    $service_name = $schedule_data['service_name'] ?: 'your service';
+                    $schedule_date = date('F j, Y', strtotime($schedule_data['date']));
+                    $message = "Your appointment for " . $service_name . " on " . $schedule_date . " has been marked as " . strtolower($status) . ".";
+                    $url = "profile.php?tab=appointments";
+
+                    $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:recipient_id, 'patient', :message, :url)";
+                    $query_notif = $dbh->prepare($sql_notif);
+                    $query_notif->execute([':recipient_id' => $patient_id, ':message' => $message, ':url' => $url]);
+                }
+                $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Schedule status updated successfully.'];
+            } else {
+                $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while updating the status.'];
+            }
         } else {
             $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while updating the status.'];
         }
