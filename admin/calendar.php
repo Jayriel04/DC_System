@@ -26,8 +26,8 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
       $count = $queryCheck->fetchColumn();
 
       if ($count > 0) {
-        echo "<script>alert('Cannot delete: one or more appointments exist for this schedule.');</script>";
-        echo "<script>window.location.href = 'calendar.php'</script>";
+        $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'Cannot delete: one or more appointments exist for this schedule.'];
+        header('Location: calendar.php');
         exit();
       }
     }
@@ -37,8 +37,8 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     $query = $dbh->prepare($sql);
     $query->bindParam(':rid', $rid, PDO::PARAM_INT);
     $query->execute();
-    echo "<script>alert('Event deleted');</script>";
-    echo "<script>window.location.href = 'calendar.php'</script>";
+    $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Event deleted.'];
+    header('Location: calendar.php');
   }
 
   // Handle admin declining an appointment: mark matching appointments as Declined
@@ -51,11 +51,11 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     $queryd->bindParam(':dt', $dd, PDO::PARAM_STR);
     $queryd->bindParam(':tm', $tt, PDO::PARAM_STR);
     if ($queryd->execute()) {
-      echo "<script>alert('Appointment(s) declined');</script>";
+      $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Appointment(s) declined.'];
     } else {
-      echo "<script>alert('Unable to decline appointment(s)');</script>";
+      $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'Unable to decline appointment(s).'];
     }
-    echo "<script>window.location.href = 'calendar.php'</script>";
+    header('Location: calendar.php');
     exit();
   }
 
@@ -82,8 +82,8 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
         $count = $queryCheck->fetchColumn();
 
         if ($count > 0) {
-          echo "<script>alert('Cannot edit: one or more appointments exist for this schedule.');</script>";
-          echo "<script>window.location.href = 'calendar.php'</script>";
+          $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'Cannot edit: one or more appointments exist for this schedule.'];
+          header('Location: calendar.php');
           exit();
         }
       }
@@ -95,11 +95,11 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
       $queryu->bindParam(':end_time', $uend, PDO::PARAM_STR);
       $queryu->bindParam(':id', $eid, PDO::PARAM_INT);
       if ($queryu->execute()) {
-        echo "<script>alert('Event updated');</script>";
-        echo "<script>window.location.href = 'calendar.php'</script>";
+        $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Event updated.'];
+        header('Location: calendar.php');
         exit();
       } else {
-        echo "<script>alert('Could not update event.');</script>";
+        $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'Could not update event.'];
       }
     }
   }
@@ -117,10 +117,12 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
         $query->bindParam(':start_time', $start_time, PDO::PARAM_STR);
         $query->bindParam(':end_time', $end_time, PDO::PARAM_STR);
         if ($query->execute()) {
-            echo "<script>alert('New schedule added successfully.'); window.location.href='calendar.php';</script>";
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'New schedule added successfully.'];
         } else {
-            echo "<script>alert('An error occurred. Please try again.');</script>";
+            $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred. Please try again.'];
         }
+        header('Location: calendar.php');
+        exit();
     }
   }
   // Month navigation
@@ -173,6 +175,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
      <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="./css/sidebar.css">
+    <link rel="stylesheet" href="css/toast.css">
     <!-- endinject -->
     <!-- Custom CSS for new calendar UI -->
     <link rel="stylesheet" href="css/new-calendar.css">
@@ -184,6 +187,13 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
       <div class="container-fluid page-body-wrapper">
         <?php include_once('includes/sidebar.php'); ?>
         <div class="main-panel">
+            <div id="toast-container"></div>
+            <?php
+            if (isset($_SESSION['toast_message'])) {
+                echo "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$_SESSION['toast_message']['message']}', '{$_SESSION['toast_message']['type']}'); });</script>";
+                unset($_SESSION['toast_message']);
+            }
+            ?>
             <div class="content-wrapper">
                 <div class="header">
                         <div class="header-text">
@@ -279,6 +289,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     <script src="vendors/moment/moment.min.js"></script>
     <script src="vendors/daterangepicker/daterangepicker.js"></script>
     <!-- End plugin js for this page -->
+    <script src="js/toast.js"></script>
     <!-- inject:js -->
     <script src="js/off-canvas.js"></script>
     <script src="js/misc.js"></script>

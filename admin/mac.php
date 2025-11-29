@@ -17,10 +17,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query_update->bindParam(':id', $appointment_id, PDO::PARAM_INT);
 
         if ($query_update->execute()) {
-            echo "<script>alert('Appointment status updated successfully.'); window.location.href='mac.php';</script>";
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Appointment status updated successfully.'];
         } else {
-            echo "<script>alert('An error occurred while updating the status.');</script>";
+            $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while updating the status.'];
         }
+        header('Location: mac.php');
         exit();
     }
 
@@ -37,10 +38,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query_cancel->bindParam(':id', $appointment_id, PDO::PARAM_INT);
 
         if ($query_cancel->execute()) {
-            echo "<script>alert('Appointment cancelled successfully.'); window.location.href='mac.php';</script>";
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Appointment cancelled successfully.'];
         } else {
-            echo "<script>alert('An error occurred while cancelling the appointment.');</script>";
+            $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while cancelling the appointment.'];
         }
+        header('Location: mac.php');
         exit();
     }
     // Handle new appointment and patient creation from modal
@@ -90,10 +92,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             $query_appointment->execute([':pnum' => $patient_id, ':fname' => $firstname, ':sname' => $surname, ':app_date' => $app_date, ':start_time' => $start_time, ':end_time' => $end_time, ':status' => $app_status]);
 
             $dbh->commit();
-            echo "<script>alert('New patient and appointment scheduled successfully.'); window.location.href='mac.php';</script>";
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'New patient and appointment scheduled successfully.'];
+            header('Location: mac.php');
         } catch (Exception $e) {
             $dbh->rollBack();
-            echo "<script>alert('An error occurred: " . $e->getMessage() . "');</script>";
+            $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred: ' . $e->getMessage()];
+            header('Location: mac.php');
         }
     }
 
@@ -104,8 +108,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query = $dbh->prepare($sql);
         $query->bindParam(':rid', $rid, PDO::PARAM_INT);
         $query->execute();
-        echo "<script>alert('Appointment deleted');</script>";
-        echo "<script>window.location.href = 'mac.php'</script>";
+        $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Appointment deleted.'];
+        header('Location: mac.php');
+        exit();
     }
     $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
     // --- APPOINTMENT COUNTS ---
@@ -196,6 +201,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/mac-modal.css">
+    <link rel="stylesheet" href="css/toast.css">
 </head>
 
 <body>
@@ -204,6 +210,13 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         <div class="container-fluid page-body-wrapper">
             <?php include_once('includes/sidebar.php'); ?>
             <div class="main-panel">
+                <div id="toast-container"></div>
+                <?php
+                if (isset($_SESSION['toast_message'])) {
+                    echo "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$_SESSION['toast_message']['message']}', '{$_SESSION['toast_message']['type']}'); });</script>";
+                    unset($_SESSION['toast_message']);
+                }
+                ?>
                 <div class="content-wrapper">
                     <div class="container">
 
@@ -515,6 +528,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     </div>
 
     <script src="vendors/js/vendor.bundle.base.js"></script>
+    <script src="js/toast.js"></script>
     <script>
         // Helper function to format time for display, now in a scope accessible to all listeners
         function formatTime12hr(time24hr) {

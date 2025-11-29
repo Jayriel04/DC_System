@@ -19,10 +19,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query_update->bindParam(':id', $schedule_id, PDO::PARAM_INT);
         
         if ($query_update->execute()) {
-            echo "<script>alert('Schedule status updated successfully.'); window.location.href='mas.php';</script>";
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Schedule status updated successfully.'];
         } else {
-            echo "<script>alert('An error occurred while updating the status.');</script>";
+            $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while updating the status.'];
         }
+        header('Location: mas.php');
         exit();
     }
 
@@ -39,10 +40,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query_cancel->bindParam(':id', $schedule_id, PDO::PARAM_INT);
 
         if ($query_cancel->execute()) {
-            echo "<script>alert('Service schedule cancelled successfully.'); window.location.href='mas.php';</script>";
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Service schedule cancelled successfully.'];
         } else {
-            echo "<script>alert('An error occurred while cancelling the service schedule.');</script>";
+            $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while cancelling the service schedule.'];
         }
+        header('Location: mas.php');
         exit();
     }
     // Handle new service appointment and patient creation from modal
@@ -93,10 +95,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             $query_schedule->execute([':pnum' => $patient_id, ':fname' => $firstname, ':sname' => $surname, ':service_id' => $service_id, ':app_date' => $app_date, ':start_time' => $start_time, ':duration' => $duration, ':status' => $app_status]);
 
             $dbh->commit();
-            echo "<script>alert('New patient and service appointment scheduled successfully.'); window.location.href='mas.php';</script>";
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'New patient and service appointment scheduled successfully.'];
+            header('Location: mas.php');
         } catch (Exception $e) {
             $dbh->rollBack();
-            echo "<script>alert('An error occurred: " . $e->getMessage() . "');</script>";
+            $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred: ' . $e->getMessage()];
+            header('Location: mas.php');
         }
     }
 
@@ -107,8 +111,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query = $dbh->prepare($sql);
         $query->bindParam(':rid', $rid, PDO::PARAM_INT);
         $query->execute();
-        echo "<script>alert('Service schedule deleted');</script>";
-        echo "<script>window.location.href = 'mas.php'</script>";
+        $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Service schedule deleted.'];
+        header('Location: mas.php');
+        exit();
     }
 
     $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
@@ -204,6 +209,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/mas-modal.css">
+    <link rel="stylesheet" href="css/toast.css">
     <style>
         
     </style>
@@ -215,6 +221,13 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         <div class="container-fluid page-body-wrapper">
             <?php include_once('includes/sidebar.php'); ?>
             <div class="main-panel">
+                <div id="toast-container"></div>
+                <?php
+                if (isset($_SESSION['toast_message'])) {
+                    echo "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$_SESSION['toast_message']['message']}', '{$_SESSION['toast_message']['type']}'); });</script>";
+                    unset($_SESSION['toast_message']);
+                }
+                ?>
                 <div class="content-wrapper">
                     
                     <div class="container">
@@ -491,6 +504,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         </div>
     </div>
     <script src="vendors/js/vendor.bundle.base.js"></script>
+    <script src="js/toast.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('newAppointmentModal');

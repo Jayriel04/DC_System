@@ -20,9 +20,11 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
         ]);
 
         if ($query_insert) {
-            echo "<script>alert('New product added successfully.'); window.location.href='manage-inventory.php';</script>";
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'New product added successfully.'];
+            header('Location: manage-inventory.php');
         } else {
-            echo "<script>alert('An error occurred while adding the product.');</script>";
+            $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while adding the product.'];
+            header('Location: manage-inventory.php');
         }
         exit();
     }
@@ -43,9 +45,11 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
         ]);
 
         if ($query_update) {
-            echo "<script>alert('Inventory item updated successfully.'); window.location.href='manage-inventory.php';</script>";
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Inventory item updated successfully.'];
+            header('Location: manage-inventory.php');
         } else {
-            echo "<script>alert('An error occurred while updating the item.');</script>";
+            $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while updating the item.'];
+            header('Location: manage-inventory.php');
         }
         exit();
     }
@@ -68,8 +72,9 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
         $query = $dbh->prepare($sql);
         $query->bindParam(':rid', $rid, PDO::PARAM_STR);
         $query->execute();
-        echo "<script>alert('Data deleted');</script>";
-        echo "<script>window.location.href = 'manage-inventory.php'</script>";
+        $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Data deleted.'];
+        header('Location: manage-inventory.php');
+        exit();
     }
 ?>
 <!DOCTYPE html>
@@ -86,6 +91,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/mas-modal.css">
     <link rel="stylesheet" href="css/manage-inventory.css">
+    <link rel="stylesheet" href="css/toast.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 </head>
@@ -95,6 +101,13 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
         <div class="container-fluid page-body-wrapper">
             <?php include_once('includes/sidebar.php');?>
             <div class="main-panel">
+                <div id="toast-container"></div>
+                    <?php
+                    if (isset($_SESSION['toast_message'])) {
+                        echo "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$_SESSION['toast_message']['message']}', '{$_SESSION['toast_message']['type']}'); });</script>";
+                        unset($_SESSION['toast_message']);
+                    }
+                    ?>
                 <div class="content-wrapper">
                     <div class="inventory-container">
                         <div class="header">
@@ -366,6 +379,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
     <script src="vendors/moment/moment.min.js"></script>
     <script src="vendors/daterangepicker/daterangepicker.js"></script>
     <script src="vendors/chartist/chartist.min.js"></script>
+    <script src="js/toast.js"></script>
     <script src="js/off-canvas.js"></script>
     <script src="js/misc.js"></script>
     <script src="js/dashboard.js"></script>

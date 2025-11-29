@@ -100,10 +100,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 $alert_message = 'Patient details updated successfully.';
             }
             $dbh->commit();
-            echo "<script>alert('{$alert_message}'); window.location.href='manage-patient.php';</script>";
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => $alert_message];
+            header('Location: manage-patient.php');
         } catch (Exception $e) {
             $dbh->rollBack();
-            echo "<script>alert('An error occurred: " . addslashes($e->getMessage()) . "');</script>";
+            $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred: ' . addslashes($e->getMessage())];
+            header('Location: manage-patient.php');
         }
         exit();
     }
@@ -168,10 +170,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             }
             
             $dbh->commit();
-            echo "<script>alert('{$alert_message}'); window.location.href='manage-patient.php';</script>";
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => $alert_message];
+            header('Location: manage-patient.php');
         } catch (Exception $e) {
             $dbh->rollBack();
-            echo "<script>alert('An error occurred: " . addslashes($e->getMessage()) . "');</script>";
+            $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred: ' . addslashes($e->getMessage())];
+            header('Location: manage-patient.php');
         }
         exit();
     }
@@ -191,8 +195,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query = $dbh->prepare($sql);
         $query->bindParam(':rid', $rid, PDO::PARAM_INT);
         $query->execute();
-        echo "<script>alert('Data deleted');</script>";
-        echo "<script>window.location.href = 'manage-patient.php'</script>";
+        $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Data deleted.'];
+        header('Location: manage-patient.php');
+        exit();
     }
 ?>
 <!DOCTYPE html>
@@ -210,6 +215,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
      <link rel="stylesheet" href="css/sidebar.css">
      <link rel="stylesheet" href="css/mas-modal.css">   
     <link rel="stylesheet" href="css/admin-calendar-availability.css">
+    <link rel="stylesheet" href="css/toast.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
@@ -218,6 +224,13 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         <div class="container-fluid page-body-wrapper">
             <?php include_once('includes/sidebar.php');?>
             <div class="main-panel" style="background-color: #f5f7fa;">
+                <div id="toast-container"></div>
+                <?php
+                if (isset($_SESSION['toast_message'])) {
+                    echo "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$_SESSION['toast_message']['message']}', '{$_SESSION['toast_message']['type']}'); });</script>";
+                    unset($_SESSION['toast_message']);
+                }
+                ?>
                 <div class="content-wrapper" style="background-color: #f5f7fa;">
                     <div class="header">
                         <div class="header-text">
@@ -525,6 +538,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     </div>
 
     <script src="vendors/js/vendor.bundle.base.js"></script>
+    <script src="js/toast.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         // --- Add Patient Modal ---
