@@ -197,7 +197,6 @@ if (isset($_POST['submit_feedback'])) {
   <!--coustom css-->
   <link href="./css/style.css" rel="stylesheet" type="text/css" />
   <link href="./css/header.css" rel="stylesheet" type="text/css" />
-  <link href="./css/footer.css" rel="stylesheet" type="text/css" />
   <link href="./css/style.v2.css" rel="stylesheet" type="text/css" />
 
   <!--script-->

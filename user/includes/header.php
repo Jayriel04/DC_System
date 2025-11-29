@@ -24,6 +24,7 @@ $user_surname = '';
 $user_role = '';
 $user_image = '';
 $notif_count = 0;
+$notifications_data = []; // Initialize notifications array
 if (!empty($_SESSION)) {
   $possible_keys = ['user_id', 'userid', 'id', 'user', 'username', 'email', 'sturecmsnumber', 'sturecmsfirstname', 'sturecmssurname'];
   foreach ($possible_keys as $k) {
@@ -54,9 +55,29 @@ if (!empty($_SESSION)) {
       }
     }
   }
-  // optional notification count stored in session by your app
-  if (isset($_SESSION['notif_count']))
-    $notif_count = intval($_SESSION['notif_count']);
+  // Fetch unread notification count for the logged-in patient
+  if ($logged_in && isset($_SESSION['sturecmsnumber'])) {
+      $patient_id = $_SESSION['sturecmsnumber'];
+      
+      // Fetch last 10 notifications for the dropdown
+      $sql_notif = "SELECT id, message, url, is_read, created_at FROM tblnotif 
+                    WHERE recipient_id = :patient_id AND recipient_type = 'patient' 
+                    ORDER BY created_at DESC LIMIT 10";
+      $query_notif = $dbh->prepare($sql_notif);
+      $query_notif->bindParam(':patient_id', $patient_id, PDO::PARAM_INT);
+      $query_notif->execute();
+      $notifications = $query_notif->fetchAll(PDO::FETCH_ASSOC);
+
+      $unread_count = 0;
+      foreach ($notifications as $notif) {
+          if ($notif['is_read'] == 0) {
+              $unread_count++;
+          }
+          // Format for JSON
+          $notifications_data[] = ['id' => $notif['id'], 'message' => $notif['message'], 'url' => $base . '/user/' . $notif['url'], 'is_read' => $notif['is_read'], 'time' => date('M d, Y g:i A', strtotime($notif['created_at']))];
+      }
+      $notif_count = $unread_count;
+  }
   // also allow nested user array like $_SESSION['user']['id']
   if (!$logged_in && isset($_SESSION['user']) && is_array($_SESSION['user']) && !empty($_SESSION['user']['id'])) {
     $logged_in = true;
@@ -171,6 +192,29 @@ if (!empty($_SESSION)) {
     display: none;
     z-index: 1050;
     border: 1px solid rgba(0, 0, 0, .06);
+  }
+  .notif-tabs {
+    display: flex;
+    border-bottom: 1px solid #f1f1f1;
+    padding: 0 12px;
+  }
+  .notif-tab {
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6c757d;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    border-bottom: 2px solid transparent;
+  }
+  .notif-tab.active {
+    color: #007bff;
+    border-bottom-color: #007bff;
+  }
+  .notif-tab:hover {
+    color: #0056b3;
   }
 
   .notif-panel.show {
@@ -379,14 +423,14 @@ if (!empty($_SESSION)) {
           <div id="notifPanel" class="notif-panel" role="dialog" aria-label="Notifications" aria-hidden="true">
             <div class="panel-header">
               <span>Notifications</span>
-              <a href="<?php echo $base; ?>/user/activity_feed.php"
-                style="font-size:13px; color:#007bff; text-decoration:none;">See all</a>
+            </div>
+            <div class="notif-tabs">
+                <button class="notif-tab active" data-tab="all">All</button>
+                <button class="notif-tab" data-tab="unread">Unread</button>
             </div>
             <div class="panel-body" id="notifBody">
               <div class="notif-empty">Loading...</div>
             </div>
-            <div class="panel-footer"><a href="<?php echo $base; ?>/user/activity_feed.php"
-                style="text-decoration:none;">View activity</a></div>
           </div>
 
         <?php endif; ?>
@@ -403,7 +447,7 @@ if (!empty($_SESSION)) {
     var notifBody = document.getElementById('notifBody');
     var notifBadge = document.getElementById('notifBadge');
     var panelVisible = false;
-    var fetchUrl = '<?php echo $base; ?>/user/activity_feed.php?get_notifications=1';
+    var userNotifications = <?php echo json_encode($notifications_data); ?>;
 
     function openPanel() {
       if (!notifPanel) return;
@@ -411,8 +455,22 @@ if (!empty($_SESSION)) {
       notifPanel.setAttribute('aria-hidden', 'false');
       if (notifIcon) notifIcon.setAttribute('aria-expanded', 'true');
       panelVisible = true;
-      // fetch notifications
-      fetchNotifications();
+      
+      // Set the 'All' tab as active and render all notifications by default
+      document.querySelector('.notif-tab[data-tab="all"]').classList.add('active');
+      document.querySelector('.notif-tab[data-tab="unread"]').classList.remove('active');
+      renderNotifications(userNotifications, 'all');
+
+      // After showing, mark them as read on the server
+      // This still requires a call to a server file, but it's only for updating state.
+      var unreadIds = userNotifications.filter(n => n.is_read == 0).map(n => n.id);
+      if (unreadIds.length > 0) {
+        fetch('<?php echo $base; ?>/user/ajax_helpers.php?action=mark_as_read', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ids: unreadIds })
+        }).then(() => { if(notifBadge) notifBadge.style.display = 'none'; });
+      }
     }
     function closePanel() {
       if (!notifPanel) return;
@@ -425,32 +483,10 @@ if (!empty($_SESSION)) {
       if (panelVisible) closePanel(); else openPanel();
     }
 
-    function fetchNotifications() {
-      if (!notifBody) return;
-      notifBody.innerHTML = '<div class="notif-empty">Loading...</div>';
-      // try jQuery if available, otherwise fetch()
-      if (typeof $ !== 'undefined' && typeof $.get === 'function') {
-        $.get(fetchUrl).done(function (data) {
-          renderNotifications(data);
-        }).fail(function () {
-          notifBody.innerHTML = '<div class="notif-empty">Unable to load notifications.</div>';
-        });
-      } else {
-        fetch(fetchUrl, { credentials: 'same-origin' }).then(function (r) {
-          if (!r.ok) throw new Error('Network');
-          return r.json();
-        }).then(function (data) {
-          renderNotifications(data);
-        }).catch(function () {
-          notifBody.innerHTML = '<div class="notif-empty">Unable to load notifications.</div>';
-        });
-      }
-    }
-
-    function renderNotifications(data) {
+    function renderNotifications(data, filter = 'all') {
       if (!notifBody) return;
       try {
-        if (!data || (Array.isArray(data) && data.length === 0)) {
+        if (!data || !Array.isArray(data)) {
           notifBody.innerHTML = '<div class="notif-empty">No notifications.</div>';
           if (notifBadge) notifBadge.style.display = 'none';
           return;
@@ -458,22 +494,28 @@ if (!empty($_SESSION)) {
         // if data contains items array
         var items = Array.isArray(data) ? data : (data.items || []);
         if (!items || items.length === 0) {
-          notifBody.innerHTML = '<div class="notif-empty">No notifications.</div>';
+          notifBody.innerHTML = '<div class="notif-empty">You have no notifications.</div>';
           if (notifBadge) notifBadge.style.display = 'none';
+          return;
+        }
+
+        var filteredItems = (filter === 'unread') ? items.filter(n => n.is_read == 0) : items;
+        if (filteredItems.length === 0) {
+          notifBody.innerHTML = `<div class="notif-empty">No ${filter} notifications.</div>`;
           return;
         }
         var html = '';
         items.forEach(function (n) {
-          var text = (n.text || n.message || n.title || '').toString();
-          var time = n.time || n.date || '';
-          html += '<div class="notif-item">';
-          html += '<div class="dot"></div>';
-          html += '<div class="msg"><div style="font-weight:600; margin-bottom:4px;">' + escapeHtml(text) + '</div><div style="font-size:12px;color:#888;">' + escapeHtml(time) + '</div></div>';
-          html += '</div>';
+          var text = (n.message || '').toString();
+          var time = n.time || '';
+          var url = n.url || '#';
+          var isUnread = n.is_read == 0;
+          html += '<a href="' + escapeHtml(url) + '" class="notif-item ' + (isUnread ? 'unread' : '') + '" data-id="' + n.id + '">';
+          if(isUnread) html += '<div class="dot"></div>';
+          html += '<div class="msg"><div class="msg-text">' + escapeHtml(text) + '</div><div class="msg-time">' + escapeHtml(time) + '</div></div>';
+          html += '</a>';
         });
         notifBody.innerHTML = html;
-        // hide badge after opening (optional)
-        if (notifBadge) notifBadge.style.display = 'none';
       } catch (e) {
         notifBody.innerHTML = '<div class="notif-empty">Error rendering notifications.</div>';
       }
@@ -493,6 +535,20 @@ if (!empty($_SESSION)) {
       if (notifPanel && !notifPanel.contains(t) && notifIcon && !notifIcon.contains(t)) {
         closePanel();
       }
+    });
+
+    // Handle tab clicks
+    var tabsContainer = document.querySelector('.notif-tabs');
+    if (tabsContainer) tabsContainer.addEventListener('click', function(e) {
+        if (e.target.matches('.notif-tab')) {
+            var filter = e.target.getAttribute('data-tab');
+            // Update active tab
+            tabsContainer.querySelector('.notif-tab.active').classList.remove('active');
+            e.target.classList.add('active');
+            
+            // Re-render notifications with the new filter
+            renderNotifications(userNotifications, filter);
+        }
     });
 
     // close on Escape
@@ -526,4 +582,46 @@ if (!empty($_SESSION)) {
       }
     });
   })();
+
+  // Add some styles for the new notification structure
+  var style = document.createElement('style');
+  style.innerHTML = `
+    .notif-panel .notif-item {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      align-items: flex-start;
+      transition: background-color .15s;
+    }
+    .notif-panel .notif-item:hover {
+      background-color: #f8f9fa;
+    }
+    .notif-panel .notif-item.unread {
+      background-color: #e9f5ff;
+    }
+    .notif-panel .notif-item .dot {
+      width: 8px;
+      height: 8px;
+      background: #007bff;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .notif-panel .notif-item .msg {
+      font-size: 14px;
+      color: #333;
+      flex-grow: 1;
+    }
+    .notif-panel .notif-item .msg-text {
+      margin-bottom: 4px;
+    }
+    .notif-panel .notif-item .msg-time {
+      font-size: 12px;
+      color: #6c757d;
+    }
+  `;
+  document.head.appendChild(style);
 </script>
