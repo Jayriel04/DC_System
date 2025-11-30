@@ -217,6 +217,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="css/admin-calendar-availability.css">
     <link rel="stylesheet" href="css/toast.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+    </style>
 </head>
 <body>
     <div class="container-scroller">
@@ -316,8 +324,19 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 <tr>
                                     <td>
                                         <div class="patient-cell">
-                                            
-                                        <div class="avatar"><?php echo htmlentities($row->f_initial) . htmlentities($row->s_initial); ?></div>
+                                            <?php
+                                            $avatar_image = 'avatar.png'; // Default fallback
+                                            if (!empty($row->Image)) {
+                                                $avatar_image = $row->Image;
+                                            } elseif ($row->sex === 'Male') {
+                                                $avatar_image = 'man-icon.png';
+                                            } elseif ($row->sex === 'Female') {
+                                                $avatar_image = 'woman-icon.jpg';
+                                            }
+                                            ?>
+                                            <div class="avatar">
+                                                <img src="../admin/images/<?php echo htmlentities($avatar_image); ?>" alt="Avatar">
+                                            </div>
                                             <div class="patient-info">
                                                 <div class="patient-name"><?php echo htmlentities($row->firstname) . ' ' . htmlentities($row->surname); ?></div>
                                                 <div class="patient-id">ID: <?php echo htmlentities($row->number); ?></div>
