@@ -79,7 +79,7 @@
     .sidebar .nav-item .submenu-item li a {
         padding: 0.5rem 0;
         display: block;
-        color: #adb5bd; /* Lighter color for submenu items */
+        color: #554; /* Lighter color for submenu items */
         font-size: 0.875rem;
         position: relative;
     }

@@ -209,7 +209,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-    <link rel="stylesheet" href="css/manage-patient.css">
+    <link rel="stylesheet" href="css/stylev2.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/style.css">
      <link rel="stylesheet" href="css/sidebar.css">

@@ -10,6 +10,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 
     <head>
         <title>Dashboard</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+        <meta charset="utf-8">
         <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
         <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
         <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
@@ -401,7 +403,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             </div>
                         </div>
                     </div>
-                    <?php include_once('includes/footer.php'); ?>
+                   
                 </div>
             </div>
         </div>

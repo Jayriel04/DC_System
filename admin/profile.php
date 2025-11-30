@@ -30,22 +30,15 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
   <head>
    
     <title>Admin Profile</title>
-    <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-    <!-- endinject -->
-    <!-- Plugin css for this page -->
     <link rel="stylesheet" href="vendors/select2/select2.min.css">
     <link rel="stylesheet" href="vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
-    <!-- End plugin css for this page -->
-    <!-- inject:css -->
-    <!-- endinject -->
-    <!-- Layout styles -->
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/sidebar.css" />
-    <link rel="stylesheet" href="css/profile.css" />
-    <link rel="stylesheet" href="css/modal.css" />
+    <link rel="stylesheet" href="css/stylev2.css" />
+    <link rel="stylesheet" href="css/mas-modal.css" />
     <link rel="stylesheet" href="css/dashboard.css" />
     <link rel="stylesheet" href="css/toast.css" />
     
@@ -90,8 +83,8 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                           <p><?php echo htmlentities($row->Email); ?></p>
                       </div>
                   </div>
-                  <button class="edit-btn" id="editProfileBtn">
-                      <span>Edit</span>
+                  <button class="edit-btn" id="editProfileBtn" style="padding: 8px 20px;background-color: white;border: 1px solid #e2e8f0;border-radius: 6px;cursor: pointer;display: flex;align-items: center;gap: 8px;color: #64748b;font-size: 14px;transition: all 0.3s;background-color: #f8fafc;border-color: #cbd5e1;">
+                      <span >Edit</span>
                       <svg class="edit-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                       </svg>

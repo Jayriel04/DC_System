@@ -39,31 +39,21 @@ exit(); // Stop further script execution
   <head>
    
     <title>Student  Management System|| Change Password</title>
-    <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-    <!-- endinject -->
-    <!-- Plugin css for this page -->
     <link rel="stylesheet" href="vendors/select2/select2.min.css">
     <link rel="stylesheet" href="vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
-    <!-- End plugin css for this page -->
-    <!-- inject:css -->
-    <!-- endinject -->
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/change-password.css" >
+    <link rel="stylesheet" href="css/stylev2.css" >
     <link rel="stylesheet" href="css/sidebar.css" />
     <link rel="stylesheet" href="css/dashboard.css">
   </head>
   <body>
     <div class="container-scroller">
-      <!-- partial:partials/_navbar.html -->
      <?php include_once('includes/header.php');?>
-      <!-- partial -->
       <div class="container-fluid page-body-wrapper">
-        <!-- partial:partials/_sidebar.html -->
       <?php include_once('includes/sidebar.php');?>
-        <!-- partial -->
         <div class="main-panel">
           <div class="content-wrapper">
             

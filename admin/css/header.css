@@ -85,7 +85,7 @@
 .header-right {
     display: flex;
     align-items: center;
-    gap: 25px;
+    gap: 2px;
 }
 
 /* Notification and Message Icons */

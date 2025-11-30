@@ -245,7 +245,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/dashboard.css">
-    <link rel="stylesheet" href="css/mac-modal.css">
+    <link rel="stylesheet" href="css/mas-modal.css">
     <link rel="stylesheet" href="css/toast.css">
 </head>
 
@@ -731,6 +731,40 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 });
             }
         });
+
+        // --- Edit Appointment Modal ---
+        const editModal = document.getElementById('editAppointmentModal');
+        if (editModal) {
+            const editCloseBtn = editModal.querySelector('.close-button');
+            const editCancelBtn = editModal.querySelector('.btn-cancel');
+
+            function closeEditModal() {
+                editModal.style.display = 'none';
+            }
+
+            editCloseBtn.addEventListener('click', closeEditModal);
+            editCancelBtn.addEventListener('click', closeEditModal);
+
+            window.addEventListener('click', function (event) {
+                if (event.target === editModal) {
+                    closeEditModal();
+                }
+            });
+
+            document.querySelectorAll('.edit-appointment-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const dataset = this.dataset;
+                    document.getElementById('edit_appointment_id').value = dataset.id;
+                    document.getElementById('edit_firstname').value = dataset.firstname;
+                    document.getElementById('edit_surname').value = dataset.surname;
+                    document.getElementById('edit_date').value = dataset.date;
+                    document.getElementById('edit_start_time').value = dataset.startTime;
+                    document.getElementById('edit_end_time').value = dataset.endTime;
+                    document.getElementById('edit_status').value = dataset.status;
+                    editModal.style.display = 'flex';
+                });
+            });
+        }
     </script>
     <script src="js/mac-modal.js"></script>
 

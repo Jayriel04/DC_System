@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
     <link rel="stylesheet" href="css/view-er-modal.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/dashboard.css">
-    <link rel="stylesheet" href="css/view-er.css">
+    <link rel="stylesheet" href="css/stylev2.css">
 </head>
 
 <body>
@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
             <div class="er-container">
                 <div class="er-header">
                     <h1>Examination Records <span class="patient-name" style="font-size: 25px">: <?php echo htmlspecialchars($patient_fullname); ?></span></h1>
-                    <button class="edit-btn" id="btnEditHealth" aria-label="Edit Examination Records">
+                    <button class="edit-btn" id="btnEditHealth" aria-label="Edit Examination Records" style="padding: 8px 20px;background-color: white;border: 1px solid #e2e8f0;border-radius: 6px;cursor: pointer;display: flex;align-items: center;gap: 8px;color: #64748b;font-size: 14px;transition: all 0.3s;background-color: #f8fafc;border-color: #cbd5e1;">
                         <i class="fas fa-edit edit-icon" aria-hidden="true"></i>
                         Edit
                     </button>
@@ -159,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
                     <div id="medicalHistoryModal" class="modal">
         <div class="modal-content health-questionnaire-modal">
             <div class="modal-header">
-                <h2 class="modal-title">Edit Examination Records : <?php echo htmlspecialchars(trim($row->firstname . ' ' . $row->surname)); ?></h2>
+                <h2 class="modal-title">Edit Examination Records <?php echo htmlspecialchars(trim($row->firstname . ' ' . $row->surname)); ?></h2>
                 <span class="close" data-dismiss="modal">&times;</span>
             </div>
             <div class="modal-body">
@@ -329,7 +329,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
                                 value="Allergic reaction to local anesthesia" <?php echo hc_checked('extraction', 'Allergic reaction to local anesthesia'); ?>></div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" name="save_health" class="btn btn-primary">Save Changes</button>
+                        <button type="submit" name="save_health" class="btn btn-primary" style="background-color: #008779 !important;color: white;">Save Changes</button>
                     </div>
                 </form>
             </div>

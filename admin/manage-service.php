@@ -105,8 +105,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         <link rel="stylesheet" href="css/dashboard.css">
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="css/sidebar.css">
-        <link rel="stylesheet" href="css/manage-service.css">
+        <link rel="stylesheet" href="css/stylev2.css">
         <link rel="stylesheet" href="css/toast.css">
+        <link rel="stylesheet" href="css/mas-modal.css"> 
 
 
     </head>

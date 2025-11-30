@@ -162,23 +162,16 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
   <head>
     <title>Calendar</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-    <!-- endinject -->
-    <!-- Plugin css for this page -->
     <link rel="stylesheet" href="vendors/daterangepicker/daterangepicker.css">
     <link rel="stylesheet" href="vendors/chartist/chartist.min.css">
-    <!-- End plugin css for this page -->
-    <!-- inject:css -->
      <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="./css/sidebar.css">
     <link rel="stylesheet" href="css/toast.css">
-    <!-- endinject -->
-    <!-- Custom CSS for new calendar UI -->
-    <link rel="stylesheet" href="css/new-calendar.css">
+    <link rel="stylesheet" href="css/stylev2.css">
   </head>
 
   <body>
