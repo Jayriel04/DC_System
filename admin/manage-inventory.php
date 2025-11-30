@@ -108,7 +108,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                         unset($_SESSION['toast_message']);
                     }
                     ?>
-                <div class="content-wrapper">
+                <div class="content-wrapper" style="padding: 0.75rem 1.5rem 0;">
                     <div class="inventory-container">
                         <div class="header">
                             <div class="header-content">

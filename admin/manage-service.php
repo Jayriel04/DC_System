@@ -125,7 +125,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         unset($_SESSION['toast_message']);
                     }
                     ?>
-                    <div class="content-wrapper">
+                    <div class="content-wrapper" style="padding: 0.75rem 1.5rem 0;">
                         <div class="header">
                             <div class="header-content">
                                 <h1>Services</h1>
@@ -284,84 +284,88 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         </div>
 
         <!-- Add Service Modal -->
-        <div class="modal" id="addServiceModal">
+        <div class="modal-container" id="addServiceModal" style="display: none;">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2>Add New Service</h2>
                     <button class="close-button">&times;</button>
                 </div>
                 <form id="addServiceForm" method="post" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="serviceName">Service Name</label>
-                        <input type="text" id="serviceName" name="sname" required>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="serviceName">Service Name</label>
+                            <input type="text" id="serviceName" name="sname" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_category_id">Category</label>
+                            <select id="add_category_id" name="category_id" required>
+                                <option value="">Select a Category</option>
+                                <?php if (!empty($categories_list)): ?>
+                                    <?php foreach ($categories_list as $cat): ?>
+                                        <option value="<?php echo htmlentities($cat->id); ?>"><?php echo htmlentities($cat->name); ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceDescription">Description</label>
+                            <textarea id="serviceDescription" name="sdesc" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceImage">Service Image</label>
+                            <input type="file" name="image" accept="image/*">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="add_category_id">Category</label>
-                        <select id="add_category_id" name="category_id" required>
-                            <option value="">Select a Category</option>
-                            <?php if (!empty($categories_list)): ?>
-                                <?php foreach ($categories_list as $cat): ?>
-                                    <option value="<?php echo htmlentities($cat->id); ?>"><?php echo htmlentities($cat->name); ?></option>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="serviceDescription">Description</label>
-                        <textarea id="serviceDescription" name="sdesc" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="serviceImage">Service Image</label>
-                        <input type="file" name="image" accept="image/*">
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn-danger btn-cancel">Cancel</button>
-                        <button type="submit" name="add_service" class="btn-success">Add Service</button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-cancel">Cancel</button>
+                        <button type="submit" name="add_service" class="btn btn-schedule" style=" background-color: #008779 !important; color: white;">Add Service</button>
                     </div>
                 </form>
             </div>
         </div>
 
         <!-- Edit Service Modal -->
-        <div class="modal" id="editServiceModal">
+        <div class="modal-container" id="editServiceModal" style="display: none;">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2>Edit Service</h2>
                     <button class="close-button">&times;</button>
                 </div>
                 <form id="editServiceForm" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="id" id="edit_service_id">
-                    <input type="hidden" name="existing_image" id="edit_existing_image">
-                    <div class="form-group">
-                        <label for="edit_service_name">Service Name</label>
-                        <input type="text" name="sname" id="edit_service_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_category_id">Category</label>
-                        <select id="edit_category_id" name="category_id" required>
-                            <option value="">Select a Category</option>
-                            <?php if (!empty($categories_list)): ?>
-                                <?php foreach ($categories_list as $cat): ?>
-                                    <option value="<?php echo htmlentities($cat->id); ?>"><?php echo htmlentities($cat->name); ?></option>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </select>
-                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="edit_service_id">
+                        <input type="hidden" name="existing_image" id="edit_existing_image">
+                        <div class="form-group">
+                            <label for="edit_service_name">Service Name</label>
+                            <input type="text" name="sname" id="edit_service_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_category_id">Category</label>
+                            <select id="edit_category_id" name="category_id" required>
+                                <option value="">Select a Category</option>
+                                <?php if (!empty($categories_list)): ?>
+                                    <?php foreach ($categories_list as $cat): ?>
+                                        <option value="<?php echo htmlentities($cat->id); ?>"><?php echo htmlentities($cat->name); ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="edit_service_description">Description</label>
-                        <textarea name="sdesc" id="edit_service_description" required></textarea>
+                        <div class="form-group">
+                            <label for="edit_service_description">Description</label>
+                            <textarea name="sdesc" id="edit_service_description" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_service_image">Service Image</label>
+                            <input type="file" name="image" id="edit_service_image" accept="image/*">
+                            <small>Leave blank to keep the current image.</small>
+                            <img id="edit_image_preview" src="" alt="Current Image"
+                                style="max-width: 100px; margin-top: 10px; display: none;">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="edit_service_image">Service Image</label>
-                        <input type="file" name="image" id="edit_service_image" accept="image/*">
-                        <small>Leave blank to keep the current image.</small>
-                        <img id="edit_image_preview" src="" alt="Current Image"
-                            style="max-width: 100px; margin-top: 10px; display: none;">
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn-danger btn-cancel">Cancel</button>
-                        <button type="submit" name="update_service" class="btn-success" style=" background-color: #008779 !important; color: white;">Update Service</button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-cancel">Cancel</button>
+                        <button type="submit" name="update_service" class="btn btn-update" style=" background-color: #008779 !important; color: white;">Update Service</button>
                     </div>
                 </form>
             </div>
@@ -432,7 +436,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         // Clear the file input
                         document.getElementById('edit_service_image').value = '';
 
-                        editModal.style.display = 'flex';
+                        editModal.style.display = 'flex'; // Changed from 'block' to 'flex'
                     });
                 });
 
