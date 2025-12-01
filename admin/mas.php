@@ -377,7 +377,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                         data-status="<?php echo htmlentities($schedule->status); ?>"
                                                         data-cancel-reason="<?php echo htmlentities($schedule->cancel_reason); ?>"
                                                         style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0;">
-                                                        <i class="fas fa-edit"></i>
+                                                        <i class="fas fa-edit" style="color: #007bffe3;"></i>
                                                     </button>
                                                     <button class="cancel-schedule-btn" title="Cancel"
                                                         data-id="<?php echo htmlentities($schedule->id); ?>"
@@ -387,10 +387,10 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                         data-date="<?php echo htmlentities($schedule->date); ?>"
                                                         data-time="<?php echo htmlentities($schedule->time); ?>"
                                                         style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0 8px;">
-                                                        <i class="fas fa-times-circle"></i>
+                                                        <i class="fas fa-times-circle" style="color: #ff000078;"></i>
                                                     </button>
                                                     <a href="mas.php?delid=<?php echo $schedule->id; ?>" title="Delete" onclick="return confirm('Do you really want to Delete this service schedule?');" style="font-size: 1.25rem; color: #a0aec0; text-decoration: none;">
-                                                        <i class="fas fa-trash-alt"></i>
+                                                        <i class="fas fa-trash-alt" style="color: red"></i>
                                                     </a>
                                                 </td>
                                             </tr>

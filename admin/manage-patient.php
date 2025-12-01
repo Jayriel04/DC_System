@@ -216,6 +216,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
      <link rel="stylesheet" href="css/mas-modal.css">   
     <link rel="stylesheet" href="css/admin-calendar-availability.css">
     <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="css/admin-calendar-availability.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         .avatar img {
@@ -369,8 +370,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                 data-address="<?php echo htmlentities($row->address); ?>"
                                                 data-email="<?php echo htmlentities($row->email); ?>"
                                                 style="background:none; border:none; cursor:pointer; padding:0; font-size: 1rem;"
-                                            ><i class="fas fa-edit"></i></button>
-                                            <a href="manage-patient.php?delid=<?php echo ($row->number); ?>" onclick="return confirm('Do you really want to Delete?');" class="action-icon" title="Delete"><i class="fas fa-trash-alt"></i></a>
+                                            ><i class="fas fa-edit" style="color:#007bffe3 ;"></i></button>
+                                            <a href="manage-patient.php?delid=<?php echo ($row->number); ?>" onclick="return confirm('Do you really want to Delete?');" class="action-icon" title="Delete"><i class="fas fa-trash-alt" style="color:red;"></i></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -528,9 +529,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="edit_app_date">Date</label>
-                            <input type="date" id="edit_app_date" name="app_date">
+                         <div class="form-group admin-calendar-container">
+                            <label for="edit_appointment_date">Date</label>
+                            <input type="text" id="edit_appointment_date" name="app_date" placeholder="Click to select date" readonly style="cursor: pointer; background-color: #f9f9f9;">
                         </div>
                         <div class="form-group">
                             <label for="edit_start_time">Start Time</label>
@@ -606,7 +607,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 
                 // Clear appointment fields
                 document.getElementById('edit_service_id').value = '';
-                document.getElementById('edit_app_date').value = '';
+                document.getElementById('edit_appointment_date').value = '';
                 document.getElementById('edit_start_time').value = '';
                 document.getElementById('edit_duration').value = '';
                 document.getElementById('edit_service_category').value = '';

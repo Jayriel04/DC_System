@@ -298,6 +298,7 @@ if (!empty($_SESSION)) {
   /* Notification panel styles */
   .notif-panel {
     position: absolute;
+    left: 1357px;
     right: 8px;
     top: calc(100% + 10px);
     width: 320px;
@@ -422,7 +423,7 @@ if (!empty($_SESSION)) {
 
   .profile-dropdown-menu {
     position: absolute;
-    right: 0;
+    right: -23px;
     top: calc(100% + 10px);
     background: #fff;
     border-radius: 8px;
@@ -432,6 +433,7 @@ if (!empty($_SESSION)) {
     border: 1px solid rgba(0, 0, 0, .06);
     display: none;
     padding: 6px;
+    top: 57px;
   }
 
   .profile-dropdown-menu.show {

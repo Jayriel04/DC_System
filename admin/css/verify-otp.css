@@ -141,7 +141,7 @@ input::placeholder {
 .submit-btn {
     width: 100%;
     padding: 16px;
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    background: linear-gradient(135deg,#28a745, #28a745);
     color: white;
     border: none;
     border-radius: 8px;

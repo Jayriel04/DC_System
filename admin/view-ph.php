@@ -78,6 +78,7 @@ function time12_viewph($t) {
     <link rel="stylesheet" href="css/view-ph.css" />
     <link rel="stylesheet" href="css/sidebar.css" />
     <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/stylev2.css">
     
   </head>
   <body>

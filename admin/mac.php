@@ -373,7 +373,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                         data-end-time="<?php echo htmlentities($appointment->end_time); ?>"
                                                         data-status="<?php echo htmlentities($appointment->status); ?>"
                                                         style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0;">
-                                                        <i class="fas fa-edit"></i>
+                                                        <i class="fas fa-edit" style="color: #007bffe3;"></i>
                                                     </button>
                                                     <button class="cancel-appointment-admin-btn" title="Cancel"
                                                         data-id="<?php echo htmlentities($appointment->id); ?>"
@@ -384,12 +384,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                         data-end-time="<?php echo htmlentities($appointment->end_time); ?>"
                                                         data-cancel-reason="<?php echo htmlentities($appointment->cancel_reason); ?>"
                                                         style="background:none; border:none; cursor:pointer; font-size: 1.25rem; color: #a0aec0; padding: 0 8px;">
-                                                        <i class="fas fa-times-circle"></i>
+                                                        <i class="fas fa-times-circle" style="color:#ff000078"></i>
                                                     </button>
                                                     <a href="mac.php?delid=<?php echo $appointment->id; ?>" title="Delete"
                                                         onclick="return confirm('Do you really want to Delete ?');"
                                                         style="font-size: 1.25rem; color: #a0aec0; text-decoration: none;">
-                                                        <i class="fas fa-trash-alt"></i>
+                                                        <i class="fas fa-trash-alt" style="color: red;"></i>
                                                     </a>
                                                 </td>
                                             </tr>
