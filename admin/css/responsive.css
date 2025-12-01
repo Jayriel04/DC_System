@@ -1,0 +1,64 @@
+/* Responsive styles for mobile devices */
+
+/* Initially hide the mobile navigation toggle on larger screens */
+.mobile-nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 24px;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+@media (max-width: 768px) {
+    .admin-header {
+        flex-wrap: wrap;
+        padding: 10px 15px;
+    }
+
+    .header-left {
+        order: 1;
+    }
+
+    .header-right {
+        order: 2;
+    }
+
+    /* Show mobile nav toggle and hide dashboard info */
+    .mobile-nav-toggle {
+        display: block;
+    }
+
+    .dashboard-info {
+        display: none;
+    }
+
+    /* Adjust logo area */
+    .logo-container {
+        margin-right: 0;
+    }
+
+    .logo-text-group {
+        display: none; /* Hide "JF Dental Care" text */
+    }
+
+    .logo-img {
+        height: 35px; /* Adjust logo size */
+    }
+
+    /* Adjust user profile display */
+    .user-profile .user-info .name,
+    .user-profile .user-info .role,
+    .user-profile .dropdown-arrow {
+        display: none; /* Hide name, role, and arrow */
+    }
+
+    .user-profile .user-avatar {
+        margin-right: 0;
+    }
+
+    .user-profile .nav-link.dropdown-toggle {
+        padding: 0;
+    }
+}

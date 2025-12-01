@@ -1,7 +1,9 @@
 <link rel="stylesheet" href="css/header.css">
+<link rel="stylesheet" href="css/responsive.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <link rel="stylesheet" href="css/notification.css">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta charset="utf-8">
 <header class="admin-header">
     <?php
     // Determine the page title and description based on the current script
@@ -69,6 +71,9 @@
     }
     ?>
     <div class="header-left">
+        <button class="mobile-nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+            <i class="fas fa-bars"></i>
+        </button>
         <div class="logo-container">
             <img src="images/Jf logo.png" alt="Logo" class="logo-img">
             <div class="logo-text-group">
