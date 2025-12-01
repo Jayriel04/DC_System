@@ -61,4 +61,123 @@
     .user-profile .nav-link.dropdown-toggle {
         padding: 0;
     }
+
+    /* Responsive Sidebar */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 250px; /* Adjust width as needed */
+        z-index: 1030; /* Ensure it's above other content */
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    /* Overlay for when the sidebar is open */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1029; /* Below sidebar, above content */
+    }
+}
+
+/* Dashboard responsive styles */
+@media (max-width: 768px) {
+    /* Adjust main content padding */
+    .content-wrapper {
+        padding: 15px;
+    }
+
+    /* Stack stat cards */
+    .stats-grid {
+        grid-template-columns: 1fr; /* Stack cards vertically */
+        gap: 15px;
+    }
+
+    /* Adjust chart section header for mobile */
+    .chart-section > div:first-child {
+        flex-direction: column;
+        align-items: center; /* Center align the content */
+        gap: 15px; /* Add space between title/buttons and legend */
+    }
+
+    .chart-section > div:first-child > div:first-child {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px !important; /* Override inline style and stack title/buttons */
+        width: 100%;
+    }
+
+    .chart-section .card-title {
+        margin-bottom: 0; /* Reset margin */
+    }
+
+    .chart-section .btn-group {
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 0;
+        width: 47vh; /* Reset margin */
+        margin-top: 0; /* Reset margin */
+    }
+
+    .chart-section .legend {
+        margin-top: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        width: 43vh;
+        gap: 5px;
+    }
+
+    /* Stack content grid cards */
+    .content-grid {
+        grid-template-columns: 1fr; /* Stack cards vertically */
+        gap: 20px;
+    }
+
+    /* Adjust appointment and review items */
+    /* Adjust appointment items */
+    .appointment,
+    .review-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .appointment .appointment-info {
+        flex-grow: 1;
+    }
+
+    .appointment > div:last-child,
+    .review-header > div:last-child {
+        width: 100%;
+        text-align: left;
+        margin-top: 5px;
+    }
+
+    .appointment-time {
+        text-align: left;
+    }
+
+    /* Adjust review items */
+    .review-header > div[style*="text-align: right"] {
+        text-align: left !important;
+    }
+
+    .review-date {
+        margin-top: 5px;
+    }
+
+    .review-text {
+        padding-left: 0;
+    }
 }

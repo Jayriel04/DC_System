@@ -9,6 +9,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <html lang="en">
 
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+        <meta charset="utf-8">
         <title>Dashboard</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
         <meta charset="utf-8">
@@ -19,6 +21,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link rel="stylesheet" href="./css/dashboard.css">
         <link rel="stylesheet" href="./css/sidebar.css">
+        <link rel="stylesheet" href="./css/responsive.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     </head>
     <body>

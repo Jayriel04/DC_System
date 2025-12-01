@@ -1,3 +1,5 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta charset="utf-8">
 <aside class="sidebar" id="sidebar">
     <ul class="nav">
         <li class="nav-item" data-page="dashboard.php">
@@ -56,6 +58,7 @@
         </li>
     </ul>
 </aside>
+<div class="sidebar-overlay d-none" id="sidebarOverlay"></div>
 
 <style>
     .sidebar .nav-item .submenu {
@@ -109,6 +112,9 @@
     document.addEventListener('DOMContentLoaded', function() {
         const currentPage = "<?php echo basename($_SERVER['PHP_SELF']); ?>";
         const navItems = document.querySelectorAll('.sidebar .nav-item');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.querySelector('.mobile-nav-toggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
 
         // Function to open a submenu
         function openSubmenu(submenu) {
@@ -151,5 +157,21 @@
                 parentLi.classList.toggle('active');
             });
         });
+
+        // Sidebar toggle for mobile
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.add('open');
+                sidebarOverlay.classList.remove('d-none');
+            });
+        }
+
+        // Close sidebar when overlay is clicked
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                this.classList.add('d-none');
+            });
+        }
     });
 </script>
