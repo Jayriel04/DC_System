@@ -283,8 +283,7 @@ if (isset($_POST['submit_feedback'])) {
       <div class="callbacks_container">
         <ul class="rslides" id="slider">
           <li>
-            <h2>Where beautiful</h2>
-            <h2> Smiles come to life</h2>
+            <h2>Where beautiful smiles come to life</h2>
             <p class="hero-description">
               Experience comprehensive dental care with our advanced patient management system.
               We provide personalized treatment plans and state of the art dental services
@@ -383,7 +382,7 @@ if (isset($_POST['submit_feedback'])) {
   <!--sevices-->
 
   <section class="services-section" id="services">
-    <h1>Our Services</h1>
+    <h1 style="color: #092c7a;">Our Services</h1>
     <div class="subtitle">
       We offer comprehensive dental services using the latest technology and techniques to<br>
       ensure your optimal oral health and beautiful smile.
@@ -429,7 +428,7 @@ if (isset($_POST['submit_feedback'])) {
 
   <!--Contact-->
 
-  <div class="contact-title" id="contact">Contact Us</div>
+  <div class="contact-title" id="contact" style="color: #092c7a;">Contact Us</div>
   <div class="contact-desc">
     Get in touch with us today and take the first step towards better oral health.
   </div>

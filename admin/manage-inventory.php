@@ -199,7 +199,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                 <span class="search-icon"></span>
                                 <input type="text" class="search-input" name="search_query" placeholder="Search patients by name..." value="<?php echo htmlentities($search); ?>" id="searchInput">
                             </div>
-
+                            
                         </div>
                     </form>
 
@@ -208,7 +208,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Product</th>
+                                        <th>Material</th>
                                         <th>Brand</th>
                                         <th>Category</th>
                                         <th>Quantity</th>
@@ -311,7 +311,40 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                 </tbody>
                             </table>
                         </div>
-                        <!-- Pagination can be added here if needed -->
+                        <div align="left" class="mt-4">
+                            <?php
+                            // Build the query string for pagination links
+                            $query_params = [];
+                            if ($search)
+                                $query_params['search_query'] = $search;
+                            if ($category_filter)
+                                $query_params['category_filter'] = $category_filter;
+                            ?>
+                            <ul class="pagination">
+                                <li><a
+                                        href="?pageno=1<?php echo http_build_query($query_params) ? '&' . http_build_query($query_params) : ''; ?>"><strong>First</strong></a>
+                                </li>
+                                <li class="<?php if ($pageno <= 1)
+                                    echo 'disabled'; ?>">
+                                    <a
+                                        href="<?php if ($pageno <= 1)
+                                            echo '#';
+                                        else
+                                            echo "?pageno=" . ($pageno - 1) . (http_build_query($query_params) ? '&' . http_build_query($query_params) : ''); ?>"><strong>Prev</strong></a>
+                                </li>
+                                <li class="<?php if ($pageno >= $total_pages)
+                                    echo 'disabled'; ?>">
+                                    <a
+                                        href="<?php if ($pageno >= $total_pages)
+                                            echo '#';
+                                        else
+                                            echo "?pageno=" . ($pageno + 1) . (http_build_query($query_params) ? '&' . http_build_query($query_params) : ''); ?>"><strong>Next</strong></a>
+                                </li>
+                                <li><a
+                                        href="?pageno=<?php echo $total_pages; ?><?php echo http_build_query($query_params) ? '&' . http_build_query($query_params) : ''; ?>"><strong>Last</strong></a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                     </div>
                 </div>
@@ -329,14 +362,14 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
             </div>
             <form id="addInventoryForm" method="POST">
                 <div class="modal-body">
-                    <div class="form-group"><label for="add_name">Product Name</label><input type="text" id="add_name" name="name" required></div>
+                    <div class="form-group"><label for="add_name">Material Name</label><input type="text" id="add_name" name="name" required></div>
                     <div class="form-row">
                         <div class="form-group"><label for="add_brand">Brand</label><input type="text" id="add_brand" name="brand"></div>
                         <div class="form-group"><label for="add_category">Category</label><input type="text" id="add_category" name="category"></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group"><label for="add_quantity">Quantity</label><input type="number" id="add_quantity" name="quantity" required min="0"></div>
-                        <div class="form-group"><label for="add_expiration_date">Expiration Date</label><input type="date" id="add_expiration_date" name="expiration_date" required></div>
+                        <div class="form-group"><label for="add_quantity">Quantity</label><input type="number" id="add_quantity" name="quantity" min="0"></div>
+                        <div class="form-group"><label for="add_expiration_date">Expiration Date</label><input type="date" id="add_expiration_date" name="expiration_date" ></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -357,14 +390,14 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
             <form id="editInventoryForm" method="POST">
                 <input type="hidden" name="inventory_id" id="edit_inventory_id">
                 <div class="modal-body">
-                    <div class="form-group"><label for="edit_name">Product Name</label><input type="text" id="edit_name" name="name" required></div>
+                    <div class="form-group"><label for="edit_name">Material Name</label><input type="text" id="edit_name" name="name" required></div>
                     <div class="form-row">
                         <div class="form-group"><label for="edit_brand">Brand</label><input type="text" id="edit_brand" name="brand"></div>
                         <div class="form-group"><label for="edit_category">Category</label><input type="text" id="edit_category" name="category"></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group"><label for="edit_quantity">Quantity</label><input type="number" id="edit_quantity" name="quantity" required min="0"></div>
-                        <div class="form-group"><label for="edit_expiration_date">Expiration Date</label><input type="date" id="edit_expiration_date" name="expiration_date" required></div>
+                        <div class="form-group"><label for="edit_quantity">Quantity</label><input type="number" id="edit_quantity" name="quantity" min="0"></div>
+                        <div class="form-group"><label for="edit_expiration_date">Expiration Date</label><input type="date" id="edit_expiration_date" name="expiration_date" ></div>
                     </div>
                 </div>
                 <div class="modal-footer">

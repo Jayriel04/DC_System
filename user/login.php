@@ -86,7 +86,7 @@ if (isset($_POST['login'])) {
             <div class="header">
                 <a href="../index.php" class="logo">
                     <img src="../images/Jf logo.png" alt="JF Dental Care Logo">
-                    <span>JF DENTAL CARE</span>
+                    <span style="color: #092c7a;">JF DENTAL CARE</span>
                 </a>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="color: #999; font-size: 14px;">Don't have an account?</span>
