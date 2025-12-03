@@ -80,6 +80,8 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta charset="utf-8">
     <title>Inventory</title>
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
@@ -243,13 +245,12 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                         $params[':category_filter'] = $category_filter;
                                     }
 
-                                    // Get total rows for pagination
                                     $query1 = $dbh->prepare($count_sql);
                                     $query1->execute($params);
-                                    $total_rows = $query1->fetchColumn();
+                                    $total_rows = (int) $query1->fetchColumn();
                                     $total_pages = ceil($total_rows / $no_of_records_per_page);
 
-                                    $sql .= " ORDER BY name ASC LIMIT :offset, :limit";
+                                    $sql .= " ORDER BY number ASC LIMIT :offset, :limit";
                                     $query = $dbh->prepare($sql);
                                     $query->bindParam(':offset', $offset, PDO::PARAM_INT);
                                     $query->bindParam(':limit', $no_of_records_per_page, PDO::PARAM_INT);
@@ -259,14 +260,13 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                     $query->execute();
                                     $results = $query->fetchAll(PDO::FETCH_OBJ);
 
-                                    $cnt = $offset + 1;
                                     if ($query->rowCount() > 0) {
                                         foreach ($results as $row) {
                                             $status = 'in-stock';
                                             $statusText = 'In Stock';
                                             if ($row->quantity == 0) {
                                                 $status = 'out-of-stock';
-                                                $statusText = 'Out of Stock';
+                                                $statusText = 'Out of stock';
                                                 $out_of_stock_items[] = $row->name;
                                             } elseif ($row->quantity <= 2) {
                                                 $status = 'low-stock';
@@ -274,8 +274,8 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                                 $low_stock_items[] = $row->name;
                                             }
                                     ?>
-                                    <tr>
-                                        <td><?php echo htmlentities($cnt); ?></td>
+                                    <tr data-id="<?php echo htmlentities($row->number); ?>">
+                                        <td><?php echo htmlentities($row->number); ?></td>
                                         <td><strong><?php echo htmlentities($row->name); ?></strong></td>
                                         <td><?php echo htmlentities($row->brand); ?></td>
                                         <td><?php echo htmlentities($row->category); ?></td>
@@ -301,8 +301,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                             </div>
                                         </td>
                                     </tr>
-                                    <?php $cnt = $cnt + 1;
-                                        }
+                                    <?php }
                                     } else { ?>
                                     <tr>
                                         <td colspan="8" style="text-align: center;">No products found.</td>

@@ -181,3 +181,170 @@
         padding-left: 0;
     }
 }
+
+/* Login page responsive styles */
+@media (max-width: 768px) {
+    .auth .auth-form-light {
+        padding: 2rem !important; /* Reduce padding on smaller screens */
+    }
+
+    .auth .brand-logo h2 {
+        font-size: 1.5rem; /* Adjust heading size */
+    }
+
+    .auth .form-control-lg {
+        font-size: 0.9rem; /* Make form inputs smaller */
+    }
+
+    .auth .loginbtn {
+        padding: 0.8rem 1rem; /* Adjust button padding */
+        font-size: 0.9rem;
+    }
+
+    .auth .my-2.d-flex {
+        flex-direction: column; /* Stack "Keep me signed in" and "Forgot password" */
+        align-items: flex-start !important;
+        gap: 10px; /* Add space between stacked items */
+    }
+
+    .auth .auth-link {
+        margin-left: 0; /* Reset margin for forgot password link */
+    }
+}
+
+/* Calendar responsive styles */
+@media (max-width: 768px) {
+    .calendar-container {
+        padding: 15px;
+    }
+
+    .calendar-header .header-controls {
+        gap: 10px;
+        align-items: center;
+    }
+
+    .calendar-header h2 {
+        font-size: 1.2rem;
+        order: 2;
+    }
+
+    .calendar-header .header-controls .btn {
+        order: 1;
+    }
+
+    .calendar-header .header-controls a:last-of-type {
+        order: 3;
+    }
+
+    .calendar {
+        gap: 5px;
+    }
+
+    .day-header {
+        font-size: 0.75rem;
+        padding: 5px 0;
+    }
+
+    .day-cell {
+        min-height: 80px;
+    }
+
+    .day-number {
+        font-size: 0.8rem;
+    }
+
+    .event {
+        font-size: 0.65rem;
+        padding: 2px;
+        line-height: 1.2;
+    }
+    .category-box {
+        font-size: 0.75rem;
+        padding: 5px;
+    }
+    .service-card {
+        width: auto;
+    }
+}
+
+/* Patient History (view-ph.php) responsive styles */
+@media (max-width: 768px) {
+    .patient-name-header {
+        font-size: 1rem; /* Adjust header font size */
+        margin-bottom: 20px;
+    }
+
+    .history-container {
+        flex-direction: column; /* Stack cards vertically */
+        gap: 20px;
+    }
+
+    .history-card {
+        padding: 15px;
+        width: 337px; /* Reduce padding for smaller screens */
+    }
+
+    .history-header {
+        gap: 15px; /* Adjust gap in header */
+    }
+
+    .history-title {
+        font-size: 1.1rem; /* Adjust title font size */
+    }
+
+    .history-table {
+        font-size: 0.85rem; /* Make table font smaller */
+    }
+}
+
+/* Examination Record (view-er.php) responsive styles */
+@media (max-width: 768px) {
+    .er-container {
+        padding: 15px;
+    }
+
+    .er-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .er-header h1 {
+        font-size: 1.25rem;
+    }
+
+    .er-header .patient-name {
+        font-size: 1.25rem !important;
+    }
+
+    .er-table {
+        display: block;
+        width: 100%;
+    }
+
+    .er-table thead {
+        display: none; /* Hide table headers */
+    }
+
+    .er-table tbody,
+    .er-table tr,
+    .er-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .er-table tr {
+        margin-bottom: 15px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        overflow: hidden;
+        width: 315px;
+    }
+
+    .er-table td {
+        padding: 10px 15px;
+        border: none;
+        text-align: left;
+    }
+}

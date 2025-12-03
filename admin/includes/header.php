@@ -156,9 +156,9 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
 
-                <a class="dropdown-item" href="profile.php"><i class="dropdown-item-icon icon-user "></i> My Profile</a>
-                <a class="dropdown-item" href="change-password.php"><i class="dropdown-item-icon icon-energy"></i> Setting</a>
-                <a class="dropdown-item" href="logout.php"><i class="dropdown-item-icon icon-power"></i>Sign Out</a>
+                <a class="dropdown-item" href="profile.php"><i class="fa-solid fa-user"></i> My Profile</a>
+                <a class="dropdown-item" href="change-password.php"><i class="fa-solid fa-key"></i> Change Password</a>
+                <a class="dropdown-item" href="logout.php"><i class="fa-solid fa-power-off"></i> Sign Out</a>
             </div>
         </div>
 

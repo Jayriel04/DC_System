@@ -404,8 +404,11 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
             <!-- Tabs -->
             <div class="tabs" id="profileTabs">
-
-                <div class="tab active" data-tab-target="#medicalContent">
+                <div class="tab active" data-tab-target="#aboutContent">
+                    👤
+                    About
+                </div>
+                <div class="tab" data-tab-target="#medicalContent">
                     🩺
                     Examination Record
                 </div>
@@ -418,7 +421,51 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
             <!-- Tab Content Panels -->
             <div class="tab-content-container">
 
-                <div id="medicalContent" class="tab-pane active">
+                <div id="aboutContent" class="tab-pane active">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title" style="margin: 0;">Personal Information</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="profile-details-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">First Name</span>
+                                    <span class="detail-value"><?php echo htmlentities($patient->firstname); ?></span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Last Name</span>
+                                    <span class="detail-value"><?php echo htmlentities($patient->surname); ?></span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Username</span>
+                                    <span class="detail-value"><?php echo htmlentities($patient->username); ?></span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Gender</span>
+                                    <span class="detail-value"><?php echo htmlentities($patient->sex ?: 'N/A'); ?></span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Civil Status</span>
+                                    <span class="detail-value"><?php echo htmlentities($patient->status ?: 'N/A'); ?></span>
+                               </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Occupation</span>
+                                    <span class="detail-value"><?php echo htmlentities($patient->occupation ?: 'N/A'); ?></span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Age</span>
+                                    <span class="detail-value"><?php echo htmlentities($patient->age ?: 'N/A'); ?></span>
+                                </div>
+                                <div class="detail-item full-width">
+                                    <span class="detail-label">Address</span>
+                                    <span class="detail-value"><?php echo htmlentities($patient->address ?: 'N/A'); ?></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="medicalContent" class="tab-pane">
                     <div class="card">
                         <div class="card-header">
                             <h2 class="card-title" style="margin: 0;">Examination Records</h2>
@@ -631,7 +678,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 <form method="post" action="profile.php" enctype="multipart/form-data">
                     <div class="header">
                         <div class="breadcrumb">My profile › <span>Edit Profile</span></div>
-                        <button type="submit" name="update_profile" class="save-btn">Save →</button>
+                       <span class="close" data-dismiss="modal">&times;</span>
                     </div>
 
                     <div class="profile-section">
@@ -721,6 +768,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                                 <input type="text" id="edit_occupation" name="occupation"
                                     value="<?php echo htmlentities($patient->occupation); ?>">
                             </div>
+                            <button type="submit" name="update_profile" class="save-btn">Save →</button>
                         </div>
                     </div>
                 </form>
@@ -978,6 +1026,34 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
             padding-left: 1.25rem;
         }
 
+        .profile-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .detail-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-check {
+            position: relative;
+            display: block;
+            padding-left: 1.25rem;
+        }
+
         .form-check-input {
             position: absolute;
             margin-top: 0.3rem;
@@ -1038,12 +1114,12 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                     this.classList.add('active');
 
                     const targetId = this.getAttribute('data-tab-target');
-                    contentPanes.forEach(pane => {
-                        pane.style.display = (pane.id === targetId.substring(1)) ? 'block' : 'none';
-                    });
+                    contentPanes.forEach(pane => { // Use classList to toggle visibility
+                        pane.classList.toggle('active', pane.id === targetId.substring(1));
+                    }); 
                 });
             });
-
+            
             // Open a specific tab if requested in URL
             if (tabToOpen) {
                 const tab = document.querySelector(`.tab[data-tab-target="#${tabToOpen}Content"]`);

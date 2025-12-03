@@ -160,6 +160,8 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
   <html lang="en">
 
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta charset="utf-8">
     <title>Calendar</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
@@ -172,6 +174,8 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     <link rel="stylesheet" href="./css/sidebar.css">
     <link rel="stylesheet" href="css/toast.css">
     <link rel="stylesheet" href="css/stylev2.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   </head>
 
   <body>
@@ -249,10 +253,10 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                                                 data-start="' . htmlentities($event->start_time) . '" 
                                                 data-end="' . htmlentities($event->end_time) . '" 
                                                 title="Edit" 
-                                                style="background:none; border:none; padding:0; font-size: 1.2rem; color: #007bff; cursor:pointer;">✏️</button>';
+                                                style="background:none; border:none; padding:0; font-size: 1rem; color: #007bff; cursor:pointer;"><i class="fa-regular fa-pen-to-square"></i></button>';
                                         echo ' <a href="calendar.php?delid=' . htmlentities($event->id) . '" 
                                                 onclick="return confirm(\'Do you really want to delete this schedule?\');" 
-                                                class="btn btn-danger-emoji btn-xs" title="Delete" style="background:none; border:none; padding:0 0 0 8px; font-size: 1.2rem; color: #dc3545; cursor:pointer;">🗑️</a>';
+                                                class="btn btn-danger-emoji btn-xs" title="Delete" style="background:none; border:none; padding:0 0 0 8px; font-size: 1rem; color: #dc3545; cursor:pointer;"><i class="fa-regular fa-trash-can"></i></a>';
                                     }
                                     echo '</div>';
                                     echo '</div>';
@@ -287,18 +291,9 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     <script src="js/off-canvas.js"></script>
     <script src="js/misc.js"></script>
     <!-- endinject -->
-    <!-- Custom js for this page -->
-    <script src="js/new-calendar.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.getElementById('addScheduleBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-                const addModal = new bootstrap.Modal(document.getElementById('addScheduleModal'));
-                addModal.show();
-            });
-        });
-    </script>
-    <!-- End custom js for this page -->
+    <!-- Custom js for this page --> 
+    <script src="js/new-calendar.js"></script> 
+    <!-- End custom js for this page --> 
 
     <!-- Edit Event Modal -->
     <div class="modal fade" id="editEventModal" tabindex="-1" role="dialog" aria-labelledby="editEventModalLabel"

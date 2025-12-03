@@ -97,6 +97,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <html lang="en">
 
     <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>Services</title>
         <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
         <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
@@ -113,6 +115,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     </head>
 
     <body>
+    
         <div class="container-scroller">
             <?php include_once('includes/header.php'); ?>
             <div class="container-fluid page-body-wrapper">
@@ -191,7 +194,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             if ($category_id_filter) {
                                 $sql .= " AND s.category_id = :category_id";
                             }
-                            $sql .= " ORDER BY s.name ASC LIMIT :offset, :limit";
+                            $sql .= " ORDER BY s.number ASC LIMIT :offset, :limit";
                             $query = $dbh->prepare($sql);
                             $query->bindParam(':offset', $offset, PDO::PARAM_INT);
                             $query->bindParam(':limit', $no_of_records_per_page, PDO::PARAM_INT);

@@ -75,7 +75,8 @@ if(isset($_POST['submit'])) {
 <!DOCTYPE html>
 <html lang="en">
   <head>
-  
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum
     <title>Forgot Password</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">

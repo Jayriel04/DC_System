@@ -83,7 +83,7 @@ div#bs-example-navbar-collapse-1 {
 	font-weight: 100;
 	margin-bottom: 0;
 }
-a.navbar-brand span {
+.navbar-header a.navbar-brand span {
     font-size: .45em;
     padding-top: 12px;
     display: block;

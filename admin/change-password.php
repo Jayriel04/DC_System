@@ -37,7 +37,8 @@ exit(); // Stop further script execution
 <!DOCTYPE html>
 <html lang="en">
   <head>
-   
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta charset="utf-8">
     <title>Student  Management System|| Change Password</title>
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
