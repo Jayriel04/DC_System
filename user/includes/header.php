@@ -181,7 +181,7 @@ if (!empty($_SESSION)) {
   /* Notification panel styles */
   .notif-panel {
     position: absolute;
-    left: 1382px;
+    left: 906px;
     right: 8px;
     top: calc(100% + 10px);
     width: 320px;
@@ -189,7 +189,6 @@ if (!empty($_SESSION)) {
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
-    overflow: hidden;
     display: none;
     z-index: 1050;
     border: 1px solid rgba(0, 0, 0, .06);
@@ -424,7 +423,7 @@ if (!empty($_SESSION)) {
           <!-- Notification panel (hidden by default) -->
           <div id="notifPanel" class="notif-panel" role="dialog" aria-label="Notifications" aria-hidden="true">
             <div class="panel-header">
-              <span>Notifications</span>
+              <span style="color: #766c6c;">Notifications</span>
             </div>
             <div class="notif-tabs">
                 <button class="notif-tab active" data-tab="all">All</button>
@@ -507,7 +506,7 @@ if (!empty($_SESSION)) {
           return;
         }
         var html = '';
-        items.forEach(function (n) {
+        filteredItems.forEach(function (n) {
           var text = (n.message || '').toString();
           var time = n.time || '';
           var url = n.url || '#';

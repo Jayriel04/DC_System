@@ -3464,8 +3464,11 @@ hr {
         gap: 32px;
 		width: 339px;
       }
+	  .feedback {
+		  width: 298px;
+	}
 	  .map-container {
-		  width: 378px;
+		  width: 354px;
     }
 	}
 	.services-carousel .carousel-inner {}

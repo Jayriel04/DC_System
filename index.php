@@ -456,7 +456,7 @@ if (isset($_POST['submit_feedback'])) {
           <i class="ri-mail-line"></i>
           <div>
             <span class="label">Email</span><br>
-            <a href="mailto:info@jfdentalcare.com">info@jfdentalcare.com</a>
+            <a href="mailto:dr.jamesbflores@gmail.com">dr.jamesbflores@gmail.com</a>
           </div>
         </li>
         <li>
@@ -479,7 +479,7 @@ if (isset($_POST['submit_feedback'])) {
       </ul>
     </div>
     <!-- Right: Feedback Star Rating -->
-    <div style="display: flex; justify-content: center; align-items: center; min-height: 350px;">
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 350px;" class="feedback">
       <form method="post" action="" class="feedback-form" style="max-width: 500px; width: 100%; margin: auto;">
         <div
           style="margin-top: 20px; background: #f5f8ff; border-radius: 16px; box-shadow: 0 2px 8px #e0e7ff; padding: 24px; text-align: center;">

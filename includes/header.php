@@ -298,7 +298,7 @@ if (!empty($_SESSION)) {
   /* Notification panel styles */
   .notif-panel {
     position: absolute;
-    left: 1357px;
+    left: 910px;
     right: 8px;
     top: calc(100% + 10px);
     width: 320px;
@@ -571,7 +571,7 @@ if (!empty($_SESSION)) {
           <!-- Notification panel (hidden by default) -->
           <div id="notifPanel" class="notif-panel" role="dialog" aria-label="Notifications" aria-hidden="true">
             <div class="panel-header">
-              <span>Notifications</span>
+              <span style="color: #766c6c;">Notifications</span>
             </div>
             <div class="notif-tabs">
                 <button class="notif-tab active" data-tab="all">All</button>

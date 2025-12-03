@@ -325,18 +325,18 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 
                         <div class="patient-list-card" id="appointment-table-container">
                             <h2 class="section-title">Service Appointments (<?php echo count($schedules); ?>)</h2>
-                            <table class="patient-table">
+                            <table class="patient-table" style="overflow-x: auto;">
                                 <thead>
                                     <tr>
                                         <th>No</th>
                                         <th>First Name</th>
                                         <th>Surname</th>
                                         <th style="width: 150px;">Category</th>
-                                        <th>Service</th>
+                                        <th style="width: 315px;">Service</th>
                                         <th>Date</th>
                                         <th>Time</th>
                                         <th>Duration</th>
-                                        <th style="width: 70px;">Reason</th>
+                                        <th style="width: 75px;">Reason</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -349,7 +349,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                 <td><?php echo htmlentities($schedule->firstname); ?></td>
                                                 <td><?php echo htmlentities($schedule->surname); ?></td>
                                                 <td style="width: 150px;"><?php echo htmlentities($schedule->category_name ?: 'N/A'); ?></td>
-                                                <td><?php echo htmlentities($schedule->service_name ?: 'N/A'); ?></td>
+                                                <td style="width: 315px;"><?php echo htmlentities($schedule->service_name ?: 'N/A'); ?></td>
                                                 <td><?php echo htmlentities($schedule->date); ?></td>
                                                 <td><?php echo format_time_12hr($schedule->time); ?></td>
                                                 <td><?php echo htmlentities($schedule->duration ? $schedule->duration . ' mins' : 'N/A'); ?></td>

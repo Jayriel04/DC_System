@@ -82,6 +82,30 @@
   align-items: flex-start;
 }
 
+.notif-panel .notif-item.unread {
+  background-color: #f0f9ff; /* A light blue/green tint for unread items */
+}
+
+.notif-panel .notif-item.unread .dot {
+  background-color: #2ecc71; /* Green dot for unread items */
+}
+
+.notif-panel .notif-item.read {
+  color: #6c757d; /* Muted text color for read items */
+}
+
+.notif-panel .notif-item.read .msg {
+  color: #6c757d;
+}
+
+.notif-panel .notif-item.read .dot {
+  background-color: #adb5bd; /* Gray dot for read items */
+}
+
+.notif-panel .notif-item:hover {
+  background-color: #f8f9fa;
+}
+
 .notif-panel .notif-item+.notif-item {
   margin-top: 6px;
 }
@@ -89,7 +113,6 @@
 .notif-panel .notif-item .dot {
   width: 10px;
   height: 10px;
-  background: #2ecc71;
   border-radius: 50%;
   margin-top: 6px;
   flex-shrink: 0;
