@@ -131,11 +131,14 @@ if (isset($_POST['book_appointment'])) {
       $query_insert_appt->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
       $query_insert_appt->execute();
 
-      $dbh->commit();
-      echo "<script>alert('Appointment booked successfully!'); window.location.href=window.location.href;</script>";
+      // Commit transaction and redirect with a success message
+      $dbh->commit();      
+      $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Appointment booked successfully.'];
+      header('Location: user/profile.php?tab=appointments');
+      exit();
     } catch (PDOException $e) {
       $dbh->rollBack();
-      // For debugging: error_log("Booking failed: " . $e->getMessage());
+      error_log("Booking failed: " . $e->getMessage());
       echo "<script>alert('Something went wrong. Please try again.');</script>";
     }
   } else {
