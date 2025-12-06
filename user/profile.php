@@ -8,6 +8,34 @@ use PHPMailer\PHPMailer\Exception;
 
 require '../vendor/autoload.php';
 
+/**
+ * Renders a professional HTML email template for admin notifications.
+ *
+ * @param string $title The title of the notification (e.g., "New Consultation Request").
+ * @param string $message The main message content of the notification.
+ * @param string|null $ctaUrl An optional URL for a call-to-action button.
+ * @param string $ctaText The text for the call-to-action button.
+ * @return string The full HTML body of the email.
+ */
+function getAdminNotificationEmailBody(string $title, string $message, ?string $ctaUrl = null, string $ctaText = 'View in Admin Panel'): string
+{
+    ob_start();
+    ?>
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+        <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #ddd;">
+            <h2 style="margin: 0; color: #092c7a;">JF Dental Care - Admin Notification</h2>
+        </div>
+        <div style="padding: 20px 0; text-align: left;">
+            <p>Dear Admin,</p>
+            <h3 style="color: #333; margin-top: 0;"><?php echo htmlspecialchars($title); ?></h3>
+            <p><?php echo $message; // Message is expected to be pre-formatted with HTML if needed ?></p>
+            <?php if ($ctaUrl): ?><p style="text-align: center; margin-top: 30px;"><a href="<?php echo htmlspecialchars($ctaUrl); ?>" style="background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-size: 16px;"><?php echo htmlspecialchars($ctaText); ?></a></p><?php endif; ?>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
 if (strlen($_SESSION['sturecmsnumber']) == 0) {
     header('location:logout.php');
     exit();
@@ -235,8 +263,14 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                     //Content
                     $mail->isHTML(true);
                     $mail->Subject = 'New Consultation Request';
-                    $mail->Body    = "A new consultation has been booked by " . htmlentities($firstname . ' ' . $surname) . " for " . date('F j, Y', strtotime($appointment_date)) . " at " . date('g:i A', strtotime($appointment_time)) . ".<br><br>Please review it in the admin panel.";
-                    $mail->send();
+                    $emailTitle = 'New Consultation Request';
+                    $emailMessage = "A new consultation has been booked by <strong>" . htmlentities($firstname . ' ' . $surname) . "</strong> for <strong>" . date('F j, Y', strtotime($appointment_date)) . " at " . date('g:i A', strtotime($appointment_time)) . "</strong>.<br><br>Please review it in the admin panel.";
+                    $emailCtaUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/DC_System/admin/mac.php?filter=pending';
+
+                    $mail->Body = getAdminNotificationEmailBody($emailTitle, $emailMessage, $emailCtaUrl);
+                    $mail->AltBody = "Dear Admin,\n\n" . strip_tags(str_replace('<br>', "\n", $emailMessage));
+
+                    $mail->send(); 
                 }
             } catch (Exception $e) { /* Optional: Log mail error */ }
 
@@ -301,8 +335,14 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 //Content
                 $mail->isHTML(true);
                 $mail->Subject = 'Consultation Cancellation';
-                $mail->Body    = "The consultation for " . htmlentities($_SESSION['sturecmsfirstname'] . ' ' . $_SESSION['sturecmssurname']) . " has been cancelled.<br>Reason: " . htmlentities($cancel_reason) . "<br><br>Please check the admin panel for details.";
-                $mail->send();
+                $emailTitle = 'Consultation Cancellation';
+                $emailMessage = "The consultation for <strong>" . htmlentities($_SESSION['sturecmsfirstname'] . ' ' . $_SESSION['sturecmssurname']) . "</strong> has been cancelled by the patient.<br><strong>Reason:</strong> " . htmlentities($cancel_reason);
+                $emailCtaUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/DC_System/admin/mac.php?filter=cancelled';
+
+                $mail->Body = getAdminNotificationEmailBody($emailTitle, $emailMessage, $emailCtaUrl);
+                $mail->AltBody = "Dear Admin,\n\n" . strip_tags(str_replace('<br>', "\n", $emailMessage));
+
+                $mail->send(); 
             }
         } catch (Exception $e) { /* Optional: Log mail error */ }
         
@@ -365,8 +405,14 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 //Content
                 $mail->isHTML(true);
                 $mail->Subject = 'Service Cancellation Request';
-                $mail->Body    = htmlentities($_SESSION['sturecmsfirstname'] . ' ' . $_SESSION['sturecmssurname']) . " has requested to cancel a service.<br>Reason: " . htmlentities($cancel_reason) . "<br><br>Please review this request in the admin panel.";
-                $mail->send();
+                $emailTitle = 'Service Cancellation Request';
+                $emailMessage = "<strong>" . htmlentities($_SESSION['sturecmsfirstname'] . ' ' . $_SESSION['sturecmssurname']) . "</strong> has requested to cancel a service appointment.<br><strong>Reason:</strong> " . htmlentities($cancel_reason) . "<br><br>Please review this request in the admin panel.";
+                $emailCtaUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/DC_System/admin/mas.php?filter=for_cancellation';
+
+                $mail->Body = getAdminNotificationEmailBody($emailTitle, $emailMessage, $emailCtaUrl);
+                $mail->AltBody = "Dear Admin,\n\n" . strip_tags(str_replace('<br>', "\n", $emailMessage));
+
+                $mail->send(); 
             }
         } catch (Exception $e) { /* Optional: Log mail error */ }
 
