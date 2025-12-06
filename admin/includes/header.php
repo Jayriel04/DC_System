@@ -65,10 +65,15 @@
     $adminName = 'Admin'; // Default
     $adminEmail = '';
     if ($query->rowCount() > 0) {
-        $row = $results[0];
-        $adminName = $row->AdminName;
-        $adminEmail = $row->Email;
+        $admin_row = $results[0];
+        $adminName = $admin_row->AdminName;
+        $adminEmail = $admin_row->Email;
+        $adminImage = 'faces/profile.png'; // Default
+        if (!empty($admin_row->Image)) {
+            $adminImage = $admin_row->Image;
+        }
     }
+
     ?>
     <div class="header-left">
         <button class="mobile-nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
@@ -147,7 +152,7 @@
 
         <div class="user-profile nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
-                    <img class="user-avatar" src="images/faces/profile.png" alt="Profile image">
+                    <img class="user-avatar" src="images/<?php echo htmlentities($adminImage); ?>" alt="Profile image">
                     <div class="user-info">
                         <span class="name"><?php echo htmlentities($adminName); ?></span>
                         <span class="role">Administrator</span>
@@ -156,9 +161,9 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
 
-                <a class="dropdown-item" href="profile.php"><i class="fa-solid fa-user"></i> My Profile</a>
-                <a class="dropdown-item" href="change-password.php"><i class="fa-solid fa-key"></i> Change Password</a>
-                <a class="dropdown-item" href="logout.php"><i class="fa-solid fa-power-off"></i> Sign Out</a>
+                <a class="dropdown-item" href="profile.php"><i class="icon-user"></i> My Profile</a>
+                <a class="dropdown-item" href="change-password.php"><i class="icon-key"></i> Change Password</a>
+                <a class="dropdown-item" href="logout.php"><i class="icon-logout"></i> Sign Out</a>
             </div>
         </div>
 

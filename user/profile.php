@@ -2,6 +2,12 @@
 session_start();
 error_reporting(0);
 include('includes/dbconnection.php');
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../vendor/autoload.php';
+
 if (strlen($_SESSION['sturecmsnumber']) == 0) {
     header('location:logout.php');
     exit();
@@ -196,6 +202,44 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
             $query_notif = $dbh->prepare($sql_notif);
             $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message, ':url' => $notif_url]);
 
+            // Send email to admin
+            try {
+                // Fetch admin email
+                $sql_admin_email = "SELECT Email FROM tbladmin WHERE ID = :admin_id";
+                $query_admin_email = $dbh->prepare($sql_admin_email);
+                $query_admin_email->execute([':admin_id' => $admin_id]);
+                $admin_email = $query_admin_email->fetchColumn();
+
+                if ($admin_email) {
+                    $mail = new PHPMailer(true);
+                    //Server settings
+                    $mail->isSMTP();
+                    $mail->Host       = 'smtp.gmail.com';
+                    $mail->SMTPAuth   = true;
+                    $mail->Username   = 'jezrahconde@gmail.com'; // Your Gmail address
+                    $mail->Password   = 'gzht tvxy vxzx awrt'; // Your Gmail App Password
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port       = 587;
+                    $mail->SMTPOptions = array(
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        )
+                    );
+
+                    //Recipients
+                    $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
+                    $mail->addAddress($admin_email);
+
+                    //Content
+                    $mail->isHTML(true);
+                    $mail->Subject = 'New Consultation Request';
+                    $mail->Body    = "A new consultation has been booked by " . htmlentities($firstname . ' ' . $surname) . " for " . date('F j, Y', strtotime($appointment_date)) . " at " . date('g:i A', strtotime($appointment_time)) . ".<br><br>Please review it in the admin panel.";
+                    $mail->send();
+                }
+            } catch (Exception $e) { /* Optional: Log mail error */ }
+
             $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Appointment booked successfully.'];
             header('Location: profile.php?tab=appointments');
             exit();
@@ -223,6 +267,44 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
         $query_notif = $dbh->prepare($sql_notif);
         $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message, ':url' => $notif_url]);
+
+        // Send email to admin
+        try {
+            // Fetch admin email
+            $sql_admin_email = "SELECT Email FROM tbladmin WHERE ID = :admin_id";
+            $query_admin_email = $dbh->prepare($sql_admin_email);
+            $query_admin_email->execute([':admin_id' => $admin_id]);
+            $admin_email = $query_admin_email->fetchColumn();
+
+            if ($admin_email) {
+                $mail = new PHPMailer(true);
+                //Server settings
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'jezrahconde@gmail.com'; // Your Gmail address
+                $mail->Password   = 'gzht tvxy vxzx awrt'; // Your Gmail App Password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port       = 587;
+                $mail->SMTPOptions = array(
+                    'ssl' => array(
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                        'allow_self_signed' => true
+                    )
+                );
+
+                //Recipients
+                $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
+                $mail->addAddress($admin_email);
+
+                //Content
+                $mail->isHTML(true);
+                $mail->Subject = 'Consultation Cancellation';
+                $mail->Body    = "The consultation for " . htmlentities($_SESSION['sturecmsfirstname'] . ' ' . $_SESSION['sturecmssurname']) . " has been cancelled.<br>Reason: " . htmlentities($cancel_reason) . "<br><br>Please check the admin panel for details.";
+                $mail->send();
+            }
+        } catch (Exception $e) { /* Optional: Log mail error */ }
         
         $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Your appointment has been successfully cancelled.'];
         header('Location: profile.php?tab=appointments');
@@ -249,6 +331,44 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
         $query_notif = $dbh->prepare($sql_notif);
         $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message, ':url' => $notif_url]);
+
+        // Send email to admin
+        try {
+            // Fetch admin email
+            $sql_admin_email = "SELECT Email FROM tbladmin WHERE ID = :admin_id";
+            $query_admin_email = $dbh->prepare($sql_admin_email);
+            $query_admin_email->execute([':admin_id' => $admin_id]);
+            $admin_email = $query_admin_email->fetchColumn();
+
+            if ($admin_email) {
+                $mail = new PHPMailer(true);
+                //Server settings
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'jezrahconde@gmail.com'; // Your Gmail address
+                $mail->Password   = 'gzht tvxy vxzx awrt'; // Your Gmail App Password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port       = 587;
+                $mail->SMTPOptions = array(
+                    'ssl' => array(
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                        'allow_self_signed' => true
+                    )
+                );
+
+                //Recipients
+                $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
+                $mail->addAddress($admin_email);
+
+                //Content
+                $mail->isHTML(true);
+                $mail->Subject = 'Service Cancellation Request';
+                $mail->Body    = htmlentities($_SESSION['sturecmsfirstname'] . ' ' . $_SESSION['sturecmssurname']) . " has requested to cancel a service.<br>Reason: " . htmlentities($cancel_reason) . "<br><br>Please review this request in the admin panel.";
+                $mail->send();
+            }
+        } catch (Exception $e) { /* Optional: Log mail error */ }
 
         $_SESSION['toast_message'] = ['type' => 'info', 'message' => 'Your cancellation request has been submitted for review.'];
         header('Location: profile.php?tab=appointments');
