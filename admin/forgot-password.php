@@ -55,8 +55,28 @@ if(isset($_POST['submit'])) {
 
         //Content
         $mail->isHTML(true);
-        $mail->Subject = 'Your OTP for Password Reset';
-        $mail->Body    = 'Your One-Time Password (OTP) for resetting your password is: <b>' . $otp . '</b>. It is valid for 5 minutes.';
+        $mail->Subject = 'Your OTP for Admin Password Reset';
+        $mail->Body    = '
+            <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+                <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #ddd;">
+                    <h2 style="margin: 0; color: #092c7a;">JF Dental Care - Admin Password Reset</h2>
+                </div>
+                <div style="padding: 20px 0; text-align: center;">
+                    <p style="font-size: 16px;">Hello Admin,</p>
+                    <p style="font-size: 16px;">A password reset was requested for your account. Please use the One-Time Password (OTP) below to proceed.</p>
+                    <div style="font-size: 28px; font-weight: bold; color: #0056b3; background-color: #e7f3ff; padding: 15px 25px; border-radius: 8px; display: inline-block; letter-spacing: 4px; margin: 20px 0; border: 1px dashed #007bff;">
+                        ' . $otp . '
+                    </div>
+                    <p style="font-size: 16px;">This OTP is valid for 5 minutes.</p>
+                    <p style="font-size: 14px; color: #555;">If you did not request a password reset, please ignore this email or contact support immediately.</p>
+                </div>
+                <div style="text-align: center; font-size: 12px; color: #777; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p>Thank you,<br>The JF Dental Care Team</p>
+                    <p>&copy; ' . date("Y") . ' JF Dental Care. All rights reserved.</p>
+                </div>
+            </div>
+        ';
+        $mail->AltBody = 'Your One-Time Password (OTP) for your admin account is: ' . $otp . '. It is valid for 5 minutes. If you did not request this, please ignore this email.';
 
         $mail->send();
         header('location:verify-otp.php');

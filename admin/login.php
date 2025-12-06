@@ -11,60 +11,77 @@ function setToast($message, $type) {
 
 if (isset($_POST['login'])) {
   $username = $_POST['username'];
-  $password = md5($_POST['password']);
-  $sql = "SELECT ID FROM tbladmin WHERE UserName=:username and Password=:password";
+  $password_input = $_POST['password'];
+  $sql = "SELECT ID, Password FROM tbladmin WHERE UserName=:username";
   $query = $dbh->prepare($sql);
   $query->bindParam(':username', $username, PDO::PARAM_STR);
-  $query->bindParam(':password', $password, PDO::PARAM_STR);
   $query->execute();
-  $results = $query->fetchAll(PDO::FETCH_OBJ);
+  $result = $query->fetch(PDO::FETCH_OBJ);
+
+  // Verify password
   if ($query->rowCount() > 0) {
-    foreach ($results as $result) {
-      $_SESSION['sturecmsaid'] = $result->ID;
+    $is_password_correct = false;
+    // Check against modern hash
+    if (password_verify($password_input, $result->Password)) {
+        $is_password_correct = true;
+        // If the hash needs updating (e.g., from an older algorithm), rehash it.
+        if (password_needs_rehash($result->Password, PASSWORD_DEFAULT)) {
+            $new_hash = password_hash($password_input, PASSWORD_DEFAULT);
+            $rehash_sql = "UPDATE tbladmin SET Password = :new_hash WHERE ID = :id";
+            $rehash_query = $dbh->prepare($rehash_sql);
+            $rehash_query->execute([':new_hash' => $new_hash, ':id' => $result->ID]);
+        }
+    }
+    // Fallback for old MD5 passwords
+    elseif (md5($password_input) === $result->Password) {
+        $is_password_correct = true;
+        // Upgrade MD5 to new hash
+        $new_hash = password_hash($password_input, PASSWORD_DEFAULT);
+        $rehash_sql = "UPDATE tbladmin SET Password = :new_hash WHERE ID = :id";
+        $rehash_query = $dbh->prepare($rehash_sql);
+        $rehash_query->execute([':new_hash' => $new_hash, ':id' => $result->ID]);
     }
 
-    if (!empty($_POST["remember"])) {
-      // Set cookies with proper path and secure parameters
-      setcookie(
-        "user_login",
-        $_POST["username"],
-        [
-          'expires' => time() + (10 * 365 * 24 * 60 * 60),
-          'path' => '/',
-          'secure' => true,
-          'httponly' => true,
-          'samesite' => 'Strict'
-        ]
-      );
-      // Store hashed password in cookie
-      setcookie(
-        "userpassword",
-        $password, // Using the hashed password
-        [
-          'expires' => time() + (10 * 365 * 24 * 60 * 60),
-          'path' => '/',
-          'secure' => true,
-          'httponly' => true,
-          'samesite' => 'Strict'
-        ]
-      );
+    if ($is_password_correct) {
+      $_SESSION['sturecmsaid'] = $result->ID;
+
+      if (!empty($_POST["remember"])) {
+        // Set cookies with proper path and secure parameters
+        setcookie(
+          "user_login",
+          $_POST["username"],
+          [
+            'expires' => time() + (10 * 365 * 24 * 60 * 60),
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict'
+          ]
+        );
+        // DO NOT store password in a cookie for security reasons.
+        if (isset($_COOKIE["userpassword"])) {
+            setcookie("userpassword", "", time() - 3600, '/');
+        }
+      } else {
+        // Clear cookies if remember is not checked
+        if (isset($_COOKIE["user_login"])) {
+          setcookie("user_login", "", [
+            'expires' => time() - 3600,
+            'path' => '/',
+          ]);
+        }
+        if (isset($_COOKIE["userpassword"])) {
+          setcookie("userpassword", "", [
+            'expires' => time() - 3600,
+            'path' => '/',
+          ]);
+        }
+      }
+      $_SESSION['login'] = $_POST['username'];
+      echo "<script type='text/javascript'> document.location ='dashboard.php'; </script>";
     } else {
-      // Clear cookies if remember is not checked
-      if (isset($_COOKIE["user_login"])) {
-        setcookie("user_login", "", [
-          'expires' => time() - 3600,
-          'path' => '/',
-        ]);
-      }
-      if (isset($_COOKIE["userpassword"])) {
-        setcookie("userpassword", "", [
-          'expires' => time() - 3600,
-          'path' => '/',
-        ]);
-      }
+      setToast('Invalid Details', 'danger');
     }
-    $_SESSION['login'] = $_POST['username'];
-    echo "<script type='text/javascript'> document.location ='dashboard.php'; </script>";
   } else {
     setToast('Invalid Details', 'danger');
   }

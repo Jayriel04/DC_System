@@ -8,30 +8,32 @@ if (strlen($_SESSION['sturecmsaid']==0)) {
   } else{
 if(isset($_POST['submit']))
 {
-$adminid=$_SESSION['sturecmsaid'];
-$cpassword=md5($_POST['currentpassword']);
-$newpassword=md5($_POST['newpassword']);
-$sql ="SELECT ID FROM tbladmin WHERE ID=:adminid and Password=:cpassword";
-$query= $dbh -> prepare($sql);
-$query-> bindParam(':adminid', $adminid, PDO::PARAM_STR);
-$query-> bindParam(':cpassword', $cpassword, PDO::PARAM_STR);
-$query-> execute();
-$results = $query -> fetchAll(PDO::FETCH_OBJ);
+    $adminid = $_SESSION['sturecmsaid'];
+    $current_password_input = $_POST['currentpassword'];
+    $new_password_input = $_POST['newpassword'];
 
-if($query -> rowCount() > 0)
-{
-$con="update tbladmin set Password=:newpassword where ID=:adminid";
-$chngpwd1 = $dbh->prepare($con);
-$chngpwd1-> bindParam(':adminid', $adminid, PDO::PARAM_STR);
-$chngpwd1-> bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
-$chngpwd1->execute();
+    $sql = "SELECT Password FROM tbladmin WHERE ID=:adminid";
+    $query = $dbh->prepare($sql);
+    $query->bindParam(':adminid', $adminid, PDO::PARAM_STR);
+    $query->execute();
+    $result = $query->fetch(PDO::FETCH_OBJ);
 
-echo '<script>alert("Your password successfully changed. You will be redirected to the dashboard."); window.location.href="dashboard.php";</script>';
-exit(); // Stop further script execution
-} else {
-echo '<script>alert("Your current password is wrong. Please try again."); window.location.href="change-password.php";</script>';
-exit(); // Stop further script execution
-}
+    // Verify current password (checking both new hash and old md5 for backward compatibility)
+    if ($result && (password_verify($current_password_input, $result->Password) || md5($current_password_input) === $result->Password)) {
+        $new_hashed_password = password_hash($new_password_input, PASSWORD_DEFAULT);
+        
+        $con = "UPDATE tbladmin SET Password=:newpassword WHERE ID=:adminid";
+        $chngpwd1 = $dbh->prepare($con);
+        $chngpwd1->bindParam(':adminid', $adminid, PDO::PARAM_STR);
+        $chngpwd1->bindParam(':newpassword', $new_hashed_password, PDO::PARAM_STR);
+        $chngpwd1->execute();
+
+        echo '<script>alert("Your password successfully changed. You will be redirected to the dashboard."); window.location.href="dashboard.php";</script>';
+        exit();
+    } else {
+        echo '<script>alert("Your current password is wrong. Please try again."); window.location.href="change-password.php";</script>';
+        exit();
+    }
 }
   ?>
 <!DOCTYPE html>
