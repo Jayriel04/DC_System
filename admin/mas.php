@@ -3,6 +3,12 @@ session_start();
 error_reporting(0);
 include('includes/dbconnection.php');
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../vendor/autoload.php';
+
+
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
@@ -13,9 +19,10 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $cancel_reason = ($status === 'Cancelled') ? $_POST['cancel_reason'] : NULL;
         
         // Fetch schedule details before updating for notification purposes
-        $sql_fetch_schedule = "SELECT s.patient_number, s.date, svc.name as service_name 
+        $sql_fetch_schedule = "SELECT s.patient_number, s.date, svc.name as service_name, p.email, p.firstname, p.surname 
                                FROM tblschedule s 
                                LEFT JOIN tblservice svc ON s.service_id = svc.number 
+                               LEFT JOIN tblpatient p ON s.patient_number = p.number
                                WHERE s.id = :id";
         $query_fetch_schedule = $dbh->prepare($sql_fetch_schedule);
         $query_fetch_schedule->bindParam(':id', $schedule_id, PDO::PARAM_INT);
@@ -41,6 +48,41 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:recipient_id, 'patient', :message, :url)";
                     $query_notif = $dbh->prepare($sql_notif);
                     $query_notif->execute([':recipient_id' => $patient_id, ':message' => $message, ':url' => $url]);
+
+                    // Send email notification
+                    if (!empty($schedule_data['email'])) {
+                        $mail = new PHPMailer(true);
+                        try {
+                            //Server settings
+                            $mail->isSMTP();
+                            $mail->Host       = 'smtp.gmail.com';
+                            $mail->SMTPAuth   = true;
+                            $mail->Username   = 'jezrahconde@gmail.com'; // Your Gmail address
+                            $mail->Password   = 'gzht tvxy vxzx awrt'; // Your Gmail App Password
+                            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                            $mail->Port       = 587;
+                            $mail->SMTPOptions = array(
+                                'ssl' => array(
+                                    'verify_peer' => false,
+                                    'verify_peer_name' => false,
+                                    'allow_self_signed' => true
+                                )
+                            );
+
+                            //Recipients
+                            $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
+                            $mail->addAddress($schedule_data['email'], $schedule_data['firstname'] . ' ' . $schedule_data['surname']);
+
+                            //Content
+                            $mail->isHTML(true);
+                            $mail->Subject = 'Update on your Service Appointment';
+                            $mail->Body    = "Dear " . htmlentities($schedule_data['firstname']) . ",<br><br>This is to inform you that your service appointment for <b>" . htmlentities($service_name) . "</b> on <b>" . $schedule_date . "</b> has been marked as <b>" . strtolower($status) . "</b>.<br><br>Thank you,<br>JF Dental Care";
+
+                            $mail->send();
+                        } catch (Exception $e) {
+                            // Optional: Log mail error
+                        }
+                    }
                 }
                 $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Schedule status updated successfully.'];
             } else {
@@ -59,6 +101,13 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $cancel_reason = $_POST['cancel_reason'];
         $status = 'Cancelled'; // Set status to Cancelled
 
+        // Fetch schedule details for notification
+        $sql_fetch_schedule = "SELECT s.patient_number, s.date, svc.name as service_name, p.email, p.firstname, p.surname FROM tblschedule s LEFT JOIN tblservice svc ON s.service_id = svc.number LEFT JOIN tblpatient p ON s.patient_number = p.number WHERE s.id = :id";
+        $query_fetch_schedule = $dbh->prepare($sql_fetch_schedule);
+        $query_fetch_schedule->bindParam(':id', $schedule_id, PDO::PARAM_INT);
+        $query_fetch_schedule->execute();
+        $schedule_data = $query_fetch_schedule->fetch(PDO::FETCH_ASSOC);
+
         $sql_cancel = "UPDATE tblschedule SET status = :status, cancel_reason = :cancel_reason WHERE id = :id";
         $query_cancel = $dbh->prepare($sql_cancel);
         $query_cancel->bindParam(':status', $status, PDO::PARAM_STR);
@@ -66,6 +115,43 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query_cancel->bindParam(':id', $schedule_id, PDO::PARAM_INT);
 
         if ($query_cancel->execute()) {
+            // Send email notification to patient
+            if ($schedule_data && !empty($schedule_data['email'])) {
+                $mail = new PHPMailer(true);
+                try {
+                    //Server settings
+                    $mail->isSMTP();
+                    $mail->Host       = 'smtp.gmail.com';
+                    $mail->SMTPAuth   = true;
+                    $mail->Username   = 'jezrahconde@gmail.com'; // Your Gmail address
+                    $mail->Password   = 'gzht tvxy vxzx awrt'; // Your Gmail App Password
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port       = 587;
+                    $mail->SMTPOptions = array(
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        )
+                    );
+
+                    //Recipients
+                    $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
+                    $mail->addAddress($schedule_data['email'], $schedule_data['firstname'] . ' ' . $schedule_data['surname']);
+
+                    //Content
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Your Service Appointment has been Cancelled';
+                    $body = "Dear " . htmlentities($schedule_data['firstname']) . ",<br><br>This is to inform you that your service appointment for <b>" . htmlentities($schedule_data['service_name']) . "</b> on <b>" . date('F j, Y', strtotime($schedule_data['date'])) . "</b> has been cancelled by the admin.";
+                    if (!empty($cancel_reason)) {
+                        $body .= "<br>Reason: " . htmlentities($cancel_reason);
+                    }
+                    $body .= "<br><br>Thank you,<br>JF Dental Care";
+                    $mail->Body = $body;
+
+                    $mail->send();
+                } catch (Exception $e) { /* Optional: Log mail error */ }
+            }
             // Insert notification for admin
             $admin_id = 1; // Assuming admin ID is 1
             $patient_name = $_POST['patient_name_for_notif']; // Hidden input needed in the form

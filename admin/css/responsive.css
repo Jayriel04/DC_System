@@ -97,6 +97,11 @@
     .content-wrapper {
         padding: 15px;
     }
+    .card {
+        padding: 8px;
+        width: 318px;
+        left: -11px;
+    }
 
     /* Stack stat cards */
     .stats-grid {

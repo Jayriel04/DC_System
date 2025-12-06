@@ -360,7 +360,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             </div>
 
                             <!-- Recent Reviews -->
-                            <div class="card">
+                            <div class="card-tall">
                                 <div class="card-header">
                                     <h2 class="card-title">Recent Reviews</h2>
                                     <a href="manage-reviews.php" class="view-link">View All Reviews</a>

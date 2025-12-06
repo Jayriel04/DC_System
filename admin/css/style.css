@@ -8399,6 +8399,12 @@ input[type="button"].btn-block {
   margin-right: 0;
   margin-left: 0;
 }
+.card-tall{
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
 
 .card>.list-group {
   border-top: inherit;
