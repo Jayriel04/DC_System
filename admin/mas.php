@@ -8,6 +8,38 @@ use PHPMailer\PHPMailer\Exception;
 
 require '../vendor/autoload.php';
 
+/**
+ * Renders a professional HTML email template for service appointment status updates.
+ *
+ * @param string $patientName The name of the patient.
+ * @param string $appointmentDate The formatted date of the appointment.
+ * @param string $serviceName The name of the service.
+ * @param string $status The new status (e.g., 'Done', 'Cancelled').
+ * @param string|null $reason The reason for cancellation, if any.
+ * @return string The full HTML body of the email.
+ */
+function getServiceAppointmentEmailBody(string $patientName, string $appointmentDate, string $serviceName, string $status, ?string $reason = null): string
+{
+    ob_start();
+    ?>
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+        <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #ddd;">
+            <h2 style="margin: 0; color: #092c7a;">JF Dental Care - Service Appointment Update</h2>
+        </div>
+        <div style="padding: 20px 0; text-align: left;">
+            <p>Dear <?php echo htmlspecialchars($patientName); ?>,</p>
+            <p>This is to inform you that your service appointment for <strong><?php echo htmlspecialchars($serviceName); ?></strong> on <strong><?php echo htmlspecialchars($appointmentDate); ?></strong> has been marked as <strong><?php echo htmlspecialchars(strtolower($status)); ?></strong>.</p>
+            <?php if (!empty($reason)): ?><p><strong>Reason:</strong> <?php echo htmlspecialchars($reason); ?></p><?php endif; ?>
+            <p>If you have any questions, please feel free to contact us.</p>
+        </div>
+        <div style="text-align: center; font-size: 12px; color: #777; padding-top: 20px; border-top: 1px solid #ddd;">
+            <p>Thank you,<br>The JF Dental Care Team</p>
+            <p>&copy; <?php echo date("Y"); ?> JF Dental Care. All rights reserved.</p>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
 
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
@@ -76,8 +108,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             //Content
                             $mail->isHTML(true);
                             $mail->Subject = 'Update on your Service Appointment';
-                            $mail->Body    = "Dear " . htmlentities($schedule_data['firstname']) . ",<br><br>This is to inform you that your service appointment for <b>" . htmlentities($service_name) . "</b> on <b>" . $schedule_date . "</b> has been marked as <b>" . strtolower($status) . "</b>.<br><br>Thank you,<br>JF Dental Care";
+                            
+                            $patientFullName = htmlentities($schedule_data['firstname'] . ' ' . $schedule_data['surname']);
+                            $mail->Body = getServiceAppointmentEmailBody($patientFullName, $schedule_date, $service_name, $status, $cancel_reason);
 
+                            $altBody = "Dear " . $patientFullName . ",\n\nThis is to inform you that your service appointment for " . htmlentities($service_name) . " on " . $schedule_date . " has been marked as " . strtolower($status) . ".";
+                            if ($status === 'Cancelled' && !empty($cancel_reason)) { $altBody .= "\nReason: " . htmlentities($cancel_reason); }
+                            $altBody .= "\n\nThank you,\nJF Dental Care";
+                            $mail->AltBody = $altBody;
                             $mail->send();
                         } catch (Exception $e) {
                             // Optional: Log mail error
@@ -142,13 +180,16 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     //Content
                     $mail->isHTML(true);
                     $mail->Subject = 'Your Service Appointment has been Cancelled';
-                    $body = "Dear " . htmlentities($schedule_data['firstname']) . ",<br><br>This is to inform you that your service appointment for <b>" . htmlentities($schedule_data['service_name']) . "</b> on <b>" . date('F j, Y', strtotime($schedule_data['date'])) . "</b> has been cancelled by the admin.";
-                    if (!empty($cancel_reason)) {
-                        $body .= "<br>Reason: " . htmlentities($cancel_reason);
-                    }
-                    $body .= "<br><br>Thank you,<br>JF Dental Care";
-                    $mail->Body = $body;
+                    
+                    $patientFullName = htmlentities($schedule_data['firstname'] . ' ' . $schedule_data['surname']);
+                    $appointmentDate = date('F j, Y', strtotime($schedule_data['date']));
+                    $serviceName = htmlentities($schedule_data['service_name']);
+                    $mail->Body = getServiceAppointmentEmailBody($patientFullName, $appointmentDate, $serviceName, 'Cancelled', $cancel_reason);
 
+                    $altBody = "Dear " . $patientFullName . ",\n\nThis is to inform you that your service appointment for " . $serviceName . " on " . $appointmentDate . " has been cancelled by the admin.";
+                    if (!empty($cancel_reason)) { $altBody .= "\nReason: " . htmlentities($cancel_reason); }
+                    $altBody .= "\n\nThank you,\nJF Dental Care";
+                    $mail->AltBody = $altBody;
                     $mail->send();
                 } catch (Exception $e) { /* Optional: Log mail error */ }
             }
