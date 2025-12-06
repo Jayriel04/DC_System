@@ -11,22 +11,28 @@ function setToast($message, $type) {
 
 if (isset($_POST['login'])) {
     $username = $_POST['username']; // Changed to username
-    $password = md5($_POST['password']);
+    $password_input = $_POST['password'];
 
     // Updated SQL query to use tblpatient
-    $sql = "SELECT number, firstname, surname FROM tblpatient WHERE (username = :username OR number = :username) AND password = :password";
+    $sql = "SELECT number, firstname, surname, password FROM tblpatient WHERE (username = :username OR number = :username)";
     $query = $dbh->prepare($sql);
     $query->bindParam(':username', $username, PDO::PARAM_STR);
-    $query->bindParam(':password', $password, PDO::PARAM_STR);
     $query->execute();
-    $results = $query->fetchAll(PDO::FETCH_OBJ);
+    $result = $query->fetch(PDO::FETCH_OBJ);
 
-    if ($query->rowCount() > 0) {
-        foreach ($results as $result) {
+    // Verify password against the stored hash
+    if ($query->rowCount() > 0 && password_verify($password_input, $result->password)) {
+        // Check for legacy md5 passwords and update them to the new hash
+        if (password_needs_rehash($result->password, PASSWORD_DEFAULT)) {
+            $new_hash = password_hash($password_input, PASSWORD_DEFAULT);
+            $rehash_sql = "UPDATE tblpatient SET password = :new_hash WHERE number = :number";
+            $rehash_query = $dbh->prepare($rehash_sql);
+            $rehash_query->execute([':new_hash' => $new_hash, ':number' => $result->number]);
+        }
+
             $_SESSION['sturecmsnumber'] = $result->number;
             $_SESSION['sturecmsfirstname'] = $result->firstname;
             $_SESSION['sturecmssurname'] = $result->surname;
-        }
 
         if (!empty($_POST["remember"])) {
             // COOKIES for username

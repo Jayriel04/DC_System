@@ -1,7 +1,5 @@
 <?php
 session_start();
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 include('includes/dbconnection.php');
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -34,7 +32,7 @@ if(isset($_POST['submit'])) {
     $mail = new PHPMailer(true);
     try {
         //Server settings - Update with your SMTP details
-        $mail->SMTPDebug = 2; // Enable verbose debug output
+        // $mail->SMTPDebug = 2; // Enable verbose debug output
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com'; // Set the SMTP server to send through
         $mail->SMTPAuth   = true;

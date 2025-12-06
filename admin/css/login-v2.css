@@ -5,23 +5,24 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background: linear-gradient(135deg, #4dabf7 0%, #3498db 100%);
     min-height: 100vh;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     padding: 20px;
 }
 
-.container-login {
+.container {
+    display: flex;
     background: white;
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    display: flex;
+    overflow: hidden;
     max-width: 1000px;
     width: 100%;
-    overflow: hidden;
+    min-height: 600px;
 }
 
 .left-section {
@@ -154,93 +155,73 @@ body {
 
 .right-section {
     flex: 1;
-    padding: 60px 50px;
+    padding: 60px;
     display: flex;
     flex-direction: column;
-    background: white;
-    position: relative;
 }
 
-.header {
+.logo-section {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 15px;
     margin-bottom: 40px;
 }
 
 .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    width: 50px;
+    height: 50px;
+}
+
+.logo-text h1 {
+    color: #1e40af;
     font-size: 24px;
-    font-weight: bold;
-    color: #333;
-    text-decoration: none;
+    font-weight: 700;
+    margin-bottom: 2px;
 }
 
-.logo img {
-    width: 35px;
+.welcome-text {
+    margin-bottom: 40px;
 }
 
-.create-account-link {
-    color: #3498db;
-    text-decoration: none;
-    font-size: 14px;
-    padding: 8px 20px;
-    border: 1px solid #3498db;
-    border-radius: 20px;
-    transition: all 0.3s ease;
-}
-
-.create-account-link:hover {
-    background: #3498db;
-    color: white;
-}
-
-.form-container {
-    flex: 1;
-}
-
-.form-container h1 {
+.welcome-text h2 {
     font-size: 32px;
     color: #333;
     margin-bottom: 10px;
 }
 
-.subtitle {
-    color: #999;
-    margin-bottom: 30px;
+.welcome-text p {
+    color: #666;
+    font-size: 16px;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
-label {
+.form-group label {
     display: block;
     color: #333;
-    font-size: 14px;
+    font-weight: 600;
     margin-bottom: 8px;
-    font-weight: 500;
+    font-size: 14px;
 }
 
 .input-wrapper {
     position: relative;
 }
 
-.form-control {
+.form-group input {
     width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: all 0.3s ease;
+    padding: 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all 0.3s;
 }
 
-.form-control:focus {
+.form-group input:focus {
     outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    border-color: #3b82f6;
 }
 
 .toggle-password {
@@ -248,135 +229,82 @@ label {
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
-    cursor: pointer;
-    color: #999;
-}
-.resend-btn {
-    width: 100%;
-    padding: 14px;
-    background: #f0f0f0;
-    color: #333;
+    background: none;
     border: none;
-    border-radius: 25px;
-    font-size: 16px;
-    font-weight: 600;
+    color: #999;
     cursor: pointer;
-    margin-top: 10px;
-    transition: background 0.3s ease;
+    font-size: 18px;
+}
+
+.options-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.checkbox-wrapper label {
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.forgot-password {
+    color: #3b82f6;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
 }
 
 .login-btn {
     width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, #4dabf7 0%, #2980b9 100%);
+    padding: 16px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
     color: white;
     border: none;
-    border-radius: 25px;
+    border-radius: 30px;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
 }
 
 .login-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
-.form-check-label {
-    font-size: 14px !important;
-    font-weight: 400 !important;
-}
-
-.auth-link {
-    font-size: 14px;
-    color: #3498db;
-}
-
-.auth-link:hover {
-    color: #2980b9;
-}
-
-.social-login {
-    margin-top: 30px;
-    text-align: center;
-}
-
-.social-text {
-    color: #999;
-    font-size: 14px;
-    margin-bottom: 15px;
-}
-
-.social-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-}
-
-.social-btn {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    border: 1px solid #e0e0e0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: white;
-    color: #333;
-    text-decoration: none;
-}
-
-.social-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.social-btn.facebook {
-    color: #3b5998;
-}
-
-.social-btn.linkedin {
-    color: #0077b5;
-}
-
-.social-btn.google {
-    color: #db4437;
-}
-
-@media (max-width: 992px) {
-    .left-section {
-        display: none;
-    }
+.login-btn:active {
+    transform: translateY(0);
 }
 
 @media (max-width: 768px) {
-    .container-login {
+    .container {
         flex-direction: column;
+    }
+
+    .left-section {
+        display: none;
     }
 
     .right-section {
         padding: 40px 30px;
     }
-}
-
-.close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 30px;
-    color: #aaa;
-    text-decoration: none;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    outline: none;
-    transition: color 0.3s ease;
-}
-
-.close-btn:hover {
-    color: #333;
 }

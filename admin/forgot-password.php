@@ -1,7 +1,6 @@
 <?php
 session_start();
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+error_reporting(0);
 include('includes/dbconnection.php');
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -34,7 +33,7 @@ if(isset($_POST['submit'])) {
     $mail = new PHPMailer(true);
     try {
         //Server settings - Update with your SMTP details
-        $mail->SMTPDebug = 2; // Enable verbose debug output
+        // $mail->SMTPDebug = 2; // Enable for verbose debug output
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com'; // Set the SMTP server to send through
         $mail->SMTPAuth   = true;
@@ -74,64 +73,68 @@ if(isset($_POST['submit'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password</title>
-    <!-- plugins:css -->
-    <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
-    <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
-    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-    <!-- endinject -->
-    <!-- Plugin css for this page -->
-    <!-- End plugin css for this page -->
-    <!-- inject:css -->
-    <!-- endinject -->
-    <!-- Layout styles -->
-    <link rel="stylesheet" href="css/style.css">
-  </head>
-  <body>
-    <div class="container-scroller">
-      <div class="container-fluid page-body-wrapper full-page-wrapper">
-        <div class="content-wrapper d-flex align-items-center auth">
-          <div class="row flex-grow">
-            <div class="col-lg-4 mx-auto">
-              <div class="auth-form-light text-left p-5">
-                <div class="text-center mb-4">
-                    <i class="icon-lock text-dark" style="font-size: 50px;"></i>
-                    <h4 class="mt-3">Reset Password</h4>
-                    <p class="text-muted">Enter your email address and we'll send you a link to reset your password.</p>
+    <link rel="stylesheet" href="css/forgot-password-v2.css">
+    <link rel="stylesheet" href="css/toast.css">
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="floating-shape shape1"></div>
+            <div class="floating-shape shape2"></div>
+            <div class="floating-shape shape3"></div>
+            
+            <div class="illustration">
+                <div class="tooth">
+                    🦷
+                    <div class="tooth-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
                 </div>
-                <form class="pt-3" name="chngpwd" method="post">
-                    <div class="form-group">
-                        <label>Email Address</label>
-                        <input type="email" class="form-control form-control-lg"style="border-radius: 10px;" placeholder="Enter your email" required="true" name="email">
-                    </div>
-                    <div class="mt-3">
-                        <button type="submit" name="submit" class="btn btn-success btn-block btn-lg font-weight-medium auth-form-btn"style="border-radius: 10px;">Send OTP</button>
-                    </div>
-                    <div class="text-center mt-4 font-weight-light">
-                        Remember your password? <strong><a href="login.php" class="text-black">Back to Login</a></strong>
-                    </div>
-                  
-                </form>
-              </div>
+                <div class="toothbrush-emoji">🪥</div>
+                <div class="syringe-emoji">💉</div>
+                <div class="wrench-emoji">🔧</div>
+                <div class="magnifier-emoji">🔎</div>
             </div>
-          </div>
         </div>
-        <!-- content-wrapper ends -->
-      </div>
-      <!-- page-body-wrapper ends -->
+
+        <div class="right-panel">
+            <a href="login.php" class="close-btn">&times;</a>
+            
+            <div class="header">
+                <div class="logo-section">
+                    <img src="../images/Jf logo.png" alt="JF Dental Care Logo" class="logo">
+                    <div class="brand-name">JF DENTAL<br>CARE</div>
+                </div>
+                
+            </div>
+
+            <div class="form-content">
+                <h1>Forgot Password</h1>
+                <p class="subtitle">Enter your email to receive a One-Time Password (OTP).</p>
+
+                <div id="toast-container"></div>
+                <?php
+                    if ($toast_message) {
+                        echo "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$toast_message['message']}', '{$toast_message['type']}'); });</script>";
+                    }
+                ?>
+
+                <form method="post">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
+
+                    <button type="submit" name="submit" class="send-btn">Send OTP</button>
+                </form>
+            </div>
+        </div>
     </div>
-    <!-- container-scroller -->
-    <!-- plugins:js -->
-    <script src="vendors/js/vendor.bundle.base.js"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
-    <script src="js/off-canvas.js"></script>
-    <script src="js/misc.js"></script>
-    <!-- endinject -->
-  </body>
+
+    <script src="js/toast.js"></script>
+</body>
 </html>

@@ -20,20 +20,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     if ($_POST['newpassword'] !== $_POST['confirmpassword']) {
         setToast('New Password and Confirm Password fields do not match.', 'danger');
     } else {
-        $cpassword = md5($_POST['currentpassword']);
-        $newpassword = md5($_POST['newpassword']);
+        $current_password_input = $_POST['currentpassword'];
+        $new_password_input = $_POST['newpassword'];
 
-        $sql = "SELECT number FROM tblpatient WHERE number=:sid AND password=:cpassword";
+        $sql = "SELECT password FROM tblpatient WHERE number=:sid";
         $query = $dbh->prepare($sql);
         $query->bindParam(':sid', $patient_number, PDO::PARAM_INT);
-        $query->bindParam(':cpassword', $cpassword, PDO::PARAM_STR);
         $query->execute();
+        $result = $query->fetch(PDO::FETCH_OBJ);
 
-        if ($query->rowCount() > 0) {
+        if ($result && password_verify($current_password_input, $result->password)) {
+            $new_hashed_password = password_hash($new_password_input, PASSWORD_DEFAULT);
             $con = "UPDATE tblpatient SET password=:newpassword WHERE number=:sid";
             $chngpwd1 = $dbh->prepare($con);
             $chngpwd1->bindParam(':sid', $patient_number, PDO::PARAM_INT);
-            $chngpwd1->bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
+            $chngpwd1->bindParam(':newpassword', $new_hashed_password, PDO::PARAM_STR);
             if ($chngpwd1->execute()) {
                 $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Your password was successfully changed.'];
                 header('Location: profile.php');

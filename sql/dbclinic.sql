@@ -34,7 +34,8 @@ CREATE TABLE `tbladmin` (
   `MobileNumber` bigint(10) DEFAULT NULL,
   `Email` varchar(200) DEFAULT NULL,
   `Password` varchar(200) DEFAULT NULL,
-  `AdminRegdate` timestamp NULL DEFAULT current_timestamp()
+  `AdminRegdate` timestamp NULL DEFAULT current_timestamp(),
+  `Image` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
