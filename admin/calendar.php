@@ -192,18 +192,16 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                 unset($_SESSION['toast_message']);
             }
             ?>
-            <div class="content-wrapper">
+            <div class="content-wrapper" style="padding: 0.75rem 1.5rem 0;">
                 <div class="header">
                     <div class="header-content">
                         <h1>Calendar</h1>
                         <p>View and manage schedule availability</p>
                     </div>
-                    <a href="#" class="btn-add" id="addScheduleBtn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
-                        </svg>
-                        Add Schedule
-                    </a>
+                    <button class="btn-add" id="addScheduleBtn">
+                                <i class="fas fa-calendar"></i>
+                                Add Schedule
+                    </button>
                 </div>
 
                 <div class="calendar-container">
@@ -283,6 +281,62 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
         </div>
       </div>
     </div>
+
+    <!-- Add Schedule Modal -->
+    <div id="addScheduleModal" class="modal-container" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Schedule</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <form id="addScheduleForm" method="POST">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="add_date">Date</label>
+                        <input type="date" id="add_date" name="date" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="add_start_time">Start Time</label>
+                            <input type="time" id="add_start_time" name="start_time" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_end_time">End Time</label>
+                            <input type="time" id="add_end_time" name="end_time">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel">Cancel</button>
+                    <button type="submit" name="add_schedule" class="btn btn-schedule" style="background-color: #008779 !important; color: white; cursor: pointer;">Add Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Schedule Modal -->
+    <div id="editScheduleModal" class="modal-container" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Schedule</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <form id="editScheduleForm" method="POST">
+                <input type="hidden" name="event_id" id="edit_event_id">
+                <div class="modal-body">
+                    <div class="form-group"><label for="edit_date">Date</label><input type="date" id="edit_date" name="date" required></div>
+                    <div class="form-row">
+                        <div class="form-group"><label for="edit_start_time">Start Time</label><input type="time" id="edit_start_time" name="start_time" required></div>
+                        <div class="form-group"><label for="edit_end_time">End Time</label><input type="time" id="edit_end_time" name="end_time"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel">Cancel</button>
+                    <button type="submit" name="update_calendar" class="btn btn-update">Update Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <!-- plugins:js -->
     <script src="vendors/js/vendor.bundle.base.js"></script>
     <!-- endinject -->
@@ -296,9 +350,54 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     <script src="js/misc.js"></script>
     <!-- endinject -->
     <!-- Custom js for this page --> 
-    <script src="js/new-calendar.js"></script> 
-    <!-- End custom js for this page --> 
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // --- Add Schedule Modal ---
+        const addModal = document.getElementById('addScheduleModal');
+        const addOpenBtn = document.getElementById('addScheduleBtn');
+        const addCloseBtn = addModal.querySelector('.close-button');
+        const addCancelBtn = addModal.querySelector('.btn-cancel');
 
+        addOpenBtn.addEventListener('click', (e) => { e.preventDefault(); addModal.style.display = 'flex'; });
+        addCloseBtn.addEventListener('click', () => { addModal.style.display = 'none'; });
+        addCancelBtn.addEventListener('click', () => { addModal.style.display = 'none'; });
+
+        window.addEventListener('click', function (event) {
+            if (event.target === addModal) {
+                addModal.style.display = 'none';
+            }
+        });
+
+        // --- Edit Schedule Modal ---
+        const editModal = document.getElementById('editScheduleModal');
+        const editCloseBtn = editModal.querySelector('.close-button');
+        const editCancelBtn = editModal.querySelector('.btn-cancel');
+
+        function closeEditModal() {
+            editModal.style.display = 'none';
+        }
+
+        editCloseBtn.addEventListener('click', closeEditModal);
+        editCancelBtn.addEventListener('click', closeEditModal);
+
+        window.addEventListener('click', function (event) {
+            if (event.target === editModal) {
+                closeEditModal();
+            }
+        });
+
+        document.querySelectorAll('.edit-event-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.getElementById('edit_event_id').value = this.dataset.id;
+                document.getElementById('edit_date').value = this.dataset.date;
+                document.getElementById('edit_start_time').value = this.dataset.start;
+                document.getElementById('edit_end_time').value = this.dataset.end;
+                editModal.style.display = 'flex';
+            });
+        });
+    });
+    </script> 
+    <!-- End custom js for this page --> 
   </body>
   </html>
 <?php } ?>

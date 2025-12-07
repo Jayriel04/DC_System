@@ -246,10 +246,10 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             <h2>Patients</h2>
                             <p>Manage your patient records and information</p>
                         </div>
-                        <a href="#" class="add-btn" id="addPatientBtn">
-                            <i class="fas fa-user-plus"></i>
-                            Add New Patient
-                        </a>
+                        <button class="btn-add" id="addPatientBtn">
+                                <i class="fas fa-user"></i>
+                                Add New Patient
+                        </button>
                     </div>
 
                     <form method="POST">

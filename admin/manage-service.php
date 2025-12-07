@@ -134,10 +134,10 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 <h1>Services</h1>
                                 <p>Manage your dental services</p>
                             </div>
-                            <a href="#" class="add-btn" id="addServiceBtn">
+                            <button class="btn-add" id="addServiceBtn">
                                 <i class="fas fa-heartbeat"></i>
                                 Add New Service
-                            </a>
+                            </button>
                         </div>
 
                         <div class="search-filter-section">
@@ -219,11 +219,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                 data-name="<?php echo htmlentities($row->name); ?>" 
                                                 data-category-id="<?php echo htmlentities($row->category_id); ?>"
                                                 data-description="<?php echo htmlentities($row->description); ?>"
-                                                data-image="<?php echo htmlentities($row->image); ?>"><i
-                                                    class="fas fa-edit"></i></button>
+                                                data-image="<?php echo htmlentities($row->image); ?>"><i class="fas fa-edit" style="color:#007bffe3 ;"></i></button>
                                             <a href="manage-service.php?delid=<?php echo ($row->number); ?>" class="action-btn"
-                                                title="Delete" onclick="return confirm('Do you really want to Delete?');"><i
-                                                    class="fas fa-trash"></i></a>
+                                                title="Delete" onclick="return confirm('Do you really want to Delete?');"><i class="fas fa-trash-alt" style="color:red;"></i></a>
                                         </div>
                                         <?php if (!empty($row->image)): ?>
                                             <img src="<?php echo htmlentities($row->image); ?>"

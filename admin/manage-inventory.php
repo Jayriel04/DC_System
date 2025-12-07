@@ -334,8 +334,8 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                                     data-quantity="<?php echo htmlentities($row->quantity); ?>"
                                                     data-expiration="<?php echo htmlentities($row->expiration_date); ?>"
                                                     style="background:none; border:none; cursor:pointer; padding:0; font-size: 1rem;"
-                                                >✎</button>
-                                                <a href="manage-inventory.php?delid=<?php echo ($row->number); ?>" onclick="return confirm('Do you really want to Delete ?');" class="action-btn btn-delete" title="Delete">🗑</a>
+                                                ><i class="fas fa-edit" style="color:#007bffe3 ;"></i></button>
+                                                <a href="manage-inventory.php?delid=<?php echo ($row->number); ?>" onclick="return confirm('Do you really want to Delete ?');" class="action-btn btn-delete" title="Delete"><i class="fas fa-trash-alt" style="color:red;"></i></a>
                                             </div>
                                         </td>
                                     </tr>
