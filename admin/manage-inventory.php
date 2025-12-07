@@ -12,15 +12,28 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
         $category = ucfirst(trim($_POST['category']));
         $quantity = $_POST['quantity'];
         $expiration_date = $_POST['expiration_date'];
+        $admin_id = $_SESSION['sturecmsaid'];
 
         $sql_insert = "INSERT INTO tblinventory (name, brand, category, quantity, expiration_date) VALUES (:name, :brand, :category, :quantity, :exp_date)";
         $query_insert = $dbh->prepare($sql_insert);
         $query_insert->execute([
             ':name' => $name, ':brand' => $brand, ':category' => $category, ':quantity' => $quantity, ':exp_date' => $expiration_date
         ]);
-
+        
         if ($query_insert) {
             $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'New product added successfully.'];
+
+            // Create notification if new item is already low or out of stock
+            if ($quantity == 0) {
+                $notif_message = "New item '" . htmlentities($name) . "' was added and is out of stock.";
+                $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, 'manage-inventory.php')";
+                $dbh->prepare($sql_notif)->execute([':rid' => $admin_id, ':msg' => $notif_message]);
+            } elseif ($quantity <= 2) {
+                $notif_message = "New item '" . htmlentities($name) . "' was added with low stock (" . $quantity . ").";
+                $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, 'manage-inventory.php')";
+                $dbh->prepare($sql_notif)->execute([':rid' => $admin_id, ':msg' => $notif_message]);
+            }
+
             header('Location: manage-inventory.php');
         } else {
             $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while adding the product.'];
@@ -36,6 +49,16 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
         $category = ucfirst(trim($_POST['category']));
         $quantity = $_POST['quantity'];
         $expiration_date = $_POST['expiration_date'];
+        $admin_id = $_SESSION['sturecmsaid'];
+
+        // Get old quantity to check if status changed
+        $sql_old_qty = "SELECT quantity FROM tblinventory WHERE number=:id";
+        $query_old_qty = $dbh->prepare($sql_old_qty);
+        $query_old_qty->execute([':id' => $inventory_id]);
+        $old_quantity = $query_old_qty->fetchColumn();
+
+        $low_stock_threshold = 2;
+
 
         $sql_update = "UPDATE tblinventory SET name=:name, brand=:brand, category=:category, quantity=:quantity, expiration_date=:exp_date WHERE number=:id";
         $query_update = $dbh->prepare($sql_update);
@@ -46,6 +69,21 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
 
         if ($query_update) {
             $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Inventory item updated successfully.'];
+
+            // Create notification if stock becomes low or out of stock
+            $notif_message = null;
+            if ($quantity == 0 && $old_quantity > 0) {
+                $notif_message = "Item '" . htmlentities($name) . "' is now out of stock.";
+            } elseif ($quantity > 0 && $quantity <= $low_stock_threshold && $old_quantity > $low_stock_threshold) {
+                $notif_message = "Item '" . htmlentities($name) . "' is running low on stock (" . $quantity . ").";
+            }
+
+            if ($notif_message) {
+                $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, 'manage-inventory.php')";
+                $query_notif = $dbh->prepare($sql_notif);
+                $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message]);
+            }
+
             header('Location: manage-inventory.php');
         } else {
             $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while updating the item.'];

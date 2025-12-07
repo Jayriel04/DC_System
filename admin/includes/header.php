@@ -93,6 +93,41 @@
     </div>
 
     <div class="header-right">
+        <?php
+            // --- Check for inventory alerts and create notifications if needed ---
+            $admin_id_for_notif = $_SESSION['sturecmsaid'];
+            $low_stock_threshold = 2;
+
+            // 1. Find items that are low or out of stock
+            $sql_stock_check = "SELECT name, quantity FROM tblinventory WHERE quantity <= :threshold";
+            $query_stock_check = $dbh->prepare($sql_stock_check);
+            $query_stock_check->bindParam(':threshold', $low_stock_threshold, PDO::PARAM_INT);
+            $query_stock_check->execute();
+            $problem_items = $query_stock_check->fetchAll(PDO::FETCH_OBJ);
+
+            if ($problem_items) {
+                foreach ($problem_items as $item) {
+                    $message = '';
+                    if ($item->quantity == 0) {
+                        $message = "Item '" . htmlentities($item->name) . "' is out of stock.";
+                    } else {
+                        $message = "Item '" . htmlentities($item->name) . "' is running low on stock (" . $item->quantity . ").";
+                    }
+
+                    // 2. Check if a similar unread notification already exists to avoid duplicates
+                    $sql_check_notif = "SELECT COUNT(*) FROM tblnotif WHERE recipient_id = :rid AND recipient_type = 'admin' AND message = :msg AND is_read = 0";
+                    $query_check_notif = $dbh->prepare($sql_check_notif);
+                    $query_check_notif->execute([':rid' => $admin_id_for_notif, ':msg' => $message]);
+                    $existing_notif_count = $query_check_notif->fetchColumn();
+
+                    // 3. If no similar unread notification exists, create one
+                    if ($existing_notif_count == 0) {
+                        $sql_insert_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, 'manage-inventory.php')";
+                        $dbh->prepare($sql_insert_notif)->execute([':rid' => $admin_id_for_notif, ':msg' => $message]);
+                    }
+                }
+            }
+        ?>
         <a href="javascript:void(0)" id="notifIcon" class="icon-button notif-icon" aria-label="Notifications" aria-haspopup="true" aria-expanded="false">
             <i class="fas fa-bell"></i>
             <?php

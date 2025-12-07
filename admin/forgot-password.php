@@ -127,7 +127,7 @@ if(isset($_POST['submit'])) {
             <div class="header">
                 <div class="logo-section">
                     <img src="../images/Jf logo.png" alt="JF Dental Care Logo" class="logo">
-                    <div class="brand-name">JF DENTAL<br>CARE</div>
+                    <div class="brand-name">JF DENTAL CARE</div>
                 </div>
                 
             </div>

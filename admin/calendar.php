@@ -171,10 +171,11 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     <link rel="stylesheet" href="vendors/chartist/chartist.min.css">
      <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="./css/sidebar.css">
+    <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/toast.css">
     <link rel="stylesheet" href="css/stylev2.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/mas-modal.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   </head>
 
@@ -193,21 +194,24 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
             ?>
             <div class="content-wrapper">
                 <div class="header">
-                        <div class="header-text">
-                            <h2>Calendar</h2>
-                            <p>View and manage schedule </p>
-                        </div>
-                            <a href="#" class="add-btn" id="addScheduleBtn">
-                                <i class="fas fa-calendar"></i>
-                             Add Schedule
-                            </a>
+                    <div class="header-content">
+                        <h1>Calendar</h1>
+                        <p>View and manage schedule availability</p>
                     </div>
+                    <a href="#" class="btn-add" id="addScheduleBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+                        </svg>
+                        Add Schedule
+                    </a>
+                </div>
+
                 <div class="calendar-container">
                     <div class="calendar-header">
                       <div class="header-controls">
-                        <a href="?month=<?php echo ($currentMonth == 1) ? 12 : $currentMonth - 1; ?>&year=<?php echo ($currentMonth == 1) ? $currentYear - 1 : $currentYear; ?>" class="btn btn-outline-dark btn-sm">&gt;</a>
-                        <h2><?php echo $months[$currentMonth - 1] . " " . $currentYear; ?></h2>
-                            <a href="?month=<?php echo ($currentMonth == 12) ? 1 : $currentMonth + 1; ?>&year=<?php echo ($currentMonth == 12) ? $currentYear + 1 : $currentYear; ?>" class="btn btn-outline-dark btn-sm">&gt;</a>
+                        <a href="?month=<?php echo ($currentMonth == 1) ? 12 : $currentMonth - 1; ?>&year=<?php echo ($currentMonth == 1) ? $currentYear - 1 : $currentYear; ?>" class="nav-arrow" title="Previous Month"><i class="fas fa-chevron-left"></i></a>
+                        <h2 class="month-year"><?php echo $months[$currentMonth - 1] . " " . $currentYear; ?></h2>
+                        <a href="?month=<?php echo ($currentMonth == 12) ? 1 : $currentMonth + 1; ?>&year=<?php echo ($currentMonth == 12) ? $currentYear + 1 : $currentYear; ?>" class="nav-arrow" title="Next Month"><i class="fas fa-chevron-right"></i></a>
                         </div>
                     </div>
 
@@ -295,76 +299,6 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     <script src="js/new-calendar.js"></script> 
     <!-- End custom js for this page --> 
 
-    <!-- Edit Event Modal -->
-    <div class="modal fade" id="editEventModal" tabindex="-1" role="dialog" aria-labelledby="editEventModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <form method="post">
-            <div class="modal-header">
-              <h5 class="modal-title" id="editEventModalLabel">Edit Calendar Schedule</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <input type="hidden" name="event_id" id="modal_event_id" value="">
-              <div class="form-group">
-                <label for="modal_date">Date</label>
-                <input type="date" class="form-control" name="date" id="modal_date" required>
-              </div>
-              <div class="form-group">
-                <label for="modal_start">Start Time</label>
-                <input type="time" class="form-control" name="start_time" id="modal_start" required>
-              </div>
-              <div class="form-group">
-                <label for="modal_end">End Time</label>
-                <input type="time" class="form-control" name="end_time" id="modal_end" required>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="submit" name="update_calendar" class="btn btn-schedule" style=" background-color: #008779 !important; color: white;">Save changes</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Add Schedule Modal -->
-    <div class="modal fade" id="addScheduleModal" tabindex="-1" role="dialog" aria-labelledby="addScheduleModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <form method="post">
-            <div class="modal-header">
-              <h5 class="modal-title" id="addScheduleModalLabel">Add New Schedule</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <div class="form-group">
-                <label for="add_date">Date</label>
-                <input type="date" class="form-control" name="date" id="add_date" required>
-              </div>
-              <div class="form-group">
-                <label for="add_start">Start Time</label>
-                <input type="time" class="form-control" name="start_time" id="add_start" required>
-              </div>
-              <div class="form-group">
-                <label for="add_end">End Time</label>
-                <input type="time" class="form-control" name="end_time" id="add_end">
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="submit" name="add_schedule" class="btn btn-primary" style=" background-color: #008779 !important; color: white;">Add Schedule</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
   </body>
   </html>
 <?php } ?>
