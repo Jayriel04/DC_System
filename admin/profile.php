@@ -9,13 +9,33 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
   {
     $adminid=$_SESSION['sturecmsaid'];
     $AName=$_POST['adminname'];
-  $mobno=$_POST['mobilenumber'];
-  $email=$_POST['email'];
-  $sql="update tbladmin set AdminName=:adminname,MobileNumber=:mobilenumber,Email=:email where ID=:aid";
-     $query = $dbh->prepare($sql);
+    $mobno=$_POST['mobilenumber'];
+    $email=$_POST['email'];
+
+    // Handle file upload
+    $image = $_POST['current_image']; // Keep current image by default
+    if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+        $target_dir = "images/";
+        // Create a unique filename
+        $image_name = time() . '_' . basename($_FILES["image"]["name"]);
+        $target_file = $target_dir . $image_name;
+        
+        // Move the uploaded file
+        if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+            $image = $image_name; // Set new image name for DB update
+            // Optionally, delete the old image if it's not the default
+            if ($_POST['current_image'] != 'doctor.png' && file_exists($target_dir . $_POST['current_image'])) {
+                unlink($target_dir . $_POST['current_image']);
+            }
+        }
+    }
+
+    $sql="update tbladmin set AdminName=:adminname, MobileNumber=:mobilenumber, Email=:email, image=:image where ID=:aid";
+    $query = $dbh->prepare($sql);
     $query->bindParam(':adminname', $AName, PDO::PARAM_STR);
     $query->bindParam(':email', $email, PDO::PARAM_STR);
     $query->bindParam(':mobilenumber', $mobno, PDO::PARAM_STR);
+    $query->bindParam(':image', $image, PDO::PARAM_STR);
     $query->bindParam(':aid', $adminid, PDO::PARAM_STR);
     $query->execute();
 
@@ -79,7 +99,13 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                 <!-- Profile Header -->
                 <div class="profile-header">
                     <div class="profile-info">
-                        <div class="avatar"><?php echo htmlentities($initials); ?></div>
+                        <div class="avatar">
+                            <?php if (!empty($row->image) && file_exists('images/' . $row->image)) { ?>
+                                <img src="images/<?php echo htmlentities($row->image); ?>" alt="Profile Image">
+                            <?php } else { ?>
+                                <?php echo htmlentities($initials); ?>
+                            <?php } ?>
+                        </div>
                         <div class="profile-details">
                             <h1><?php echo htmlentities($row->AdminName); ?></h1>
                             <p>Administrator</p>
@@ -135,8 +161,20 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                 <h2>Edit Profile</h2>
                 <button class="close-button">&times;</button>
             </div>
-            <form id="editProfileForm" method="POST">
+            <form id="editProfileForm" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
+                    <div class="form-group">
+                        <label for="image">Profile Picture</label>
+                        <div class="image-upload-container">
+                            <img src="images/<?php echo htmlentities($row->image); ?>" alt="Profile Preview" class="profile-pic-preview" id="imagePreview">
+                            <div class="file-input-wrapper">
+                                <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(event)">
+                            </div>
+                        </div>
+                        <!-- Hidden field to keep track of the current image -->
+                        <input type="hidden" name="current_image" value="<?php echo htmlentities($row->image); ?>">
+                    </div>
+
                     <div class="form-group">
                         <label for="adminname">Admin Name</label>
                         <input type="text" id="adminname" name="adminname" value="<?php echo htmlentities($row->AdminName); ?>" required>
@@ -186,7 +224,16 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                 editModal.style.display = 'none';
             }
         });
+
     });
+    function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function(){
+            const output = document.getElementById('imagePreview');
+            output.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
     </script>
   </body>
 </html><?php }  ?>

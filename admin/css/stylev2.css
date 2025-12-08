@@ -763,6 +763,24 @@ td {
     font-weight: bold;
 }
 
+.profile-avatar img, .profile-pic-preview {
+    width: 100%;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+.user-avatar-initials {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
 .profile-avatar img {
     width: 100%;
     height: 100%;
@@ -825,6 +843,13 @@ td {
     font-size: 15px;
     color: #1e293b;
     font-weight: 500;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .edit-icon {
@@ -1551,6 +1576,29 @@ input:focus, select:focus {
 input:read-only {
     background-color: #f9f9f9;
     cursor: not-allowed;
+}
+.form-group .image-upload-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.form-group .profile-pic-preview {
+    width: 150px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e0e0e0;
+}
+
+.form-group .file-input-wrapper {
+    flex-grow: 1;
+}
+
+.form-group input[type="file"] {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 .profile-value {

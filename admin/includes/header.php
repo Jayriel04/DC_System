@@ -68,9 +68,10 @@
         $admin_row = $results[0];
         $adminName = $admin_row->AdminName;
         $adminEmail = $admin_row->Email;
-        $adminImage = 'faces/profile.png'; // Default
-        if (!empty($admin_row->Image)) {
-            $adminImage = $admin_row->Image;
+        $adminImage = '';
+        // Check if image is set and the file exists
+        if (!empty($admin_row->image) && file_exists('images/' . $admin_row->image)) {
+            $adminImage = 'images/' . $admin_row->image;
         }
     }
 
@@ -187,7 +188,11 @@
 
         <div class="user-profile nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
-                    <img class="user-avatar" src="images/<?php echo htmlentities($adminImage); ?>" alt="Profile image">
+                    <?php if (!empty($adminImage)) { ?>
+                        <img class="user-avatar" src="<?php echo htmlentities($adminImage); ?>" alt="Profile image">
+                    <?php } else { ?>
+                        <div class="user-avatar-initials"><?php echo substr($adminName, 0, 1); ?></div>
+                    <?php } ?>
                     <div class="user-info">
                         <span class="name"><?php echo htmlentities($adminName); ?></span>
                         <span class="role">Administrator</span>
