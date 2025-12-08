@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 29, 2025 at 12:40 PM
+-- Generation Time: Dec 08, 2025 at 08:05 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -34,16 +34,16 @@ CREATE TABLE `tbladmin` (
   `MobileNumber` bigint(10) DEFAULT NULL,
   `Email` varchar(200) DEFAULT NULL,
   `Password` varchar(200) DEFAULT NULL,
-  `AdminRegdate` timestamp NULL DEFAULT current_timestamp(),
-  `Image` varchar(255) DEFAULT NULL
+  `image` varchar(250) DEFAULT NULL,
+  `AdminRegdate` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `tbladmin`
 --
 
-INSERT INTO `tbladmin` (`ID`, `AdminName`, `UserName`, `MobileNumber`, `Email`, `Password`, `AdminRegdate`) VALUES
-(1, 'Admin', 'admin', 8979555558, 'admin@gmail.com', 'f925916e2754e5e03f75dd58a5733251', '2025-01-01 04:36:52');
+INSERT INTO `tbladmin` (`ID`, `AdminName`, `UserName`, `MobileNumber`, `Email`, `Password`, `image`, `AdminRegdate`) VALUES
+(1, 'Admin', 'admin', 9564780461, 'canoniokevin@gmail.com', '$2y$10$fdyJgvrdq3O0y9YM0OhDV.FGnhh7iZYCvCESl0YUEOZ/wzkIMpz3O', 'doctor.png', '2025-06-01 04:36:52');
 
 -- --------------------------------------------------------
 
@@ -79,8 +79,11 @@ INSERT INTO `tblappointment` (`id`, `firstname`, `surname`, `date`, `start_time`
 (7, 'Nimfa', 'Conde', '2025-10-05', '17:39:00', '18:40:00', 10, '2025-10-05 09:40:49', 'walk-in', NULL, NULL),
 (8, 'Sig', 'Canonio', '2025-10-05', '17:29:00', NULL, 13, '2025-10-20 10:36:59', 'Cancelled', 'sample cancel!', NULL),
 (9, 'Jaynard', 'Senilla', '2025-11-29', '12:08:00', NULL, 14, '2025-11-29 04:41:14', 'Approved', NULL, NULL),
-(17, 'Jezrah Faith', 'Canonio', '2025-11-29', '15:11:00', '16:11:00', 5, '2025-11-29 10:07:41', 'Cancelled', 'sample notif', '2025-11-29 18:37:58'),
-(18, 'Jezrah Faith', 'Canonio', '2025-11-29', '18:38:00', '19:39:00', 5, '2025-11-29 10:39:21', 'Pending', NULL, NULL);
+(17, 'Jezrah Faith', 'Canonio', '2025-11-29', '15:11:00', '16:11:00', 5, '2025-11-29 10:07:41', 'Cancelled', 'emergency', '2025-12-06 11:48:09'),
+(18, 'Jezrah Faith', 'Canonio', '2025-11-29', '18:38:00', '19:39:00', 5, '2025-11-29 10:39:21', 'Cancelled', 'emergecny', '2025-12-06 11:59:01'),
+(19, 'Pio', 'Canonio', '2025-12-06', '13:00:00', '13:30:00', 15, '2025-12-06 03:16:54', 'Cancelled', 'emergency', '2025-12-06 18:15:38'),
+(20, 'Jezrah Faith', 'Canonio', '2025-12-07', '10:00:00', '10:30:00', 5, '2025-12-06 04:00:24', 'Cancelled', 'emergwncy', '2025-12-06 12:01:27'),
+(21, 'Pio', 'Canonio', '2025-12-08', '10:00:00', '10:30:00', 15, '2025-12-06 10:19:47', 'Cancelled', 'emergency', '2025-12-06 18:20:55');
 
 -- --------------------------------------------------------
 
@@ -113,7 +116,12 @@ INSERT INTO `tblcalendar` (`id`, `date`, `start_time`, `end_time`) VALUES
 (11, '2025-11-27', '22:06:00', '23:06:00'),
 (12, '2025-11-29', '12:08:00', '13:08:00'),
 (13, '2025-11-29', '15:11:00', '16:11:00'),
-(14, '2025-11-29', '18:38:00', '19:39:00');
+(14, '2025-11-29', '18:38:00', '19:39:00'),
+(15, '2025-12-06', '13:00:00', '13:30:00'),
+(16, '2025-12-07', '10:00:00', '10:30:00'),
+(17, '2025-12-08', '10:00:00', '10:30:00'),
+(18, '2025-12-08', '14:23:00', '15:23:00'),
+(19, '2025-12-11', '10:00:00', '10:30:00');
 
 -- --------------------------------------------------------
 
@@ -171,7 +179,7 @@ CREATE TABLE `tblinventory` (
 
 INSERT INTO `tblinventory` (`number`, `name`, `brand`, `expiration_date`, `quantity`, `category`, `status`) VALUES
 (1, 'Etchant', 'FGM', '2025-09-19', 1, 'Medicine', 'Available'),
-(2, 'fsd', 'dsd', '2026-01-24', 0, 'Supply', 'Available'),
+(2, 'Fsd', 'Dsd', '2026-01-24', 1, 'Supply', 'Available'),
 (3, 'Isoprophyl Alcohol', 'Doctor J', '2028-06-25', 3, 'Supply', 'Available');
 
 -- --------------------------------------------------------
@@ -197,32 +205,59 @@ CREATE TABLE `tblnotif` (
 INSERT INTO `tblnotif` (`id`, `recipient_id`, `recipient_type`, `message`, `url`, `is_read`, `created_at`) VALUES
 (1, 1, 'admin', 'Jezrah Faith Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 0, '2025-11-29 10:37:58'),
 (2, 1, 'admin', 'New consultation request from Jezrah Faith Canonio.', 'mac.php?filter=pending', 1, '2025-11-29 10:39:21'),
-(3, 1, 'admin', 'Jezrah Faith Canonio requested to cancel a service.', 'mas.php?filter=for_cancellation', 0, '2025-11-29 10:39:56'),
-(4, 1, 'admin', 'New feedback received from Jezrah Faith Canonio.', 'manage-reviews.php', 1, '2025-11-29 10:45:12');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tblpage`
---
-
-CREATE TABLE `tblpage` (
-  `ID` int(10) NOT NULL,
-  `PageType` varchar(200) DEFAULT NULL,
-  `PageTitle` mediumtext DEFAULT NULL,
-  `PageDescription` mediumtext DEFAULT NULL,
-  `Email` varchar(200) DEFAULT NULL,
-  `MobileNumber` bigint(10) DEFAULT NULL,
-  `UpdationDate` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
---
--- Dumping data for table `tblpage`
---
-
-INSERT INTO `tblpage` (`ID`, `PageType`, `PageTitle`, `PageDescription`, `Email`, `MobileNumber`, `UpdationDate`) VALUES
-(1, 'aboutus', 'About Us', '<div style=\"text-align: start;\"><font color=\"#7b8898\" face=\"Mercury SSm A, Mercury SSm B, Georgia, Times, Times New Roman, Microsoft YaHei New, Microsoft Yahei, ????, ??, SimSun, STXihei, ????, serif\"><span style=\"font-size: 26px;\">Student Management System Developed using PHP and MySQL</span></font><br></div>', NULL, NULL, NULL),
-(2, 'contactus', 'Contact Us', '890,Sector 62, Gyan Sarovar, GAIL Noida(Delhi/NCR)', 'studentms@test.com', 1234567890, NULL);
+(3, 1, 'admin', 'Jezrah Faith Canonio requested to cancel a service.', 'mas.php?filter=for_cancellation', 1, '2025-11-29 10:39:56'),
+(4, 1, 'admin', 'New feedback received from Jezrah Faith Canonio.', 'manage-reviews.php', 1, '2025-11-29 10:45:12'),
+(5, 5, 'patient', 'Your consultation on November 29, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-06 02:59:45'),
+(6, 5, 'patient', 'Your consultation on November 29, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-06 03:00:10'),
+(7, 5, 'patient', 'Your consultation on November 29, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-06 03:00:39'),
+(8, 1, 'admin', 'Jezrah Faith Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 0, '2025-12-06 03:04:27'),
+(9, 5, 'patient', 'Your consultation on November 29, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-06 03:05:16'),
+(10, 5, 'patient', 'Your consultation on November 29, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-06 03:05:21'),
+(11, 5, 'patient', 'Your consultation on November 29, 2025 has been declined.', 'profile.php?tab=appointments', 1, '2025-12-06 03:05:53'),
+(12, 5, 'patient', 'Your appointment for Etchant on September 27, 2025 has been marked as cancelled.', 'profile.php?tab=appointments', 1, '2025-12-06 03:11:15'),
+(13, 5, 'patient', 'Your appointment for Etchant on September 27, 2025 has been marked as done.', 'profile.php?tab=appointments', 1, '2025-12-06 03:13:01'),
+(14, 1, 'admin', 'New feedback received from Pio Canonio.', 'manage-reviews.php', 1, '2025-12-06 03:14:23'),
+(15, 1, 'admin', 'New consultation request from Pio Canonio.', 'mac.php?filter=pending', 1, '2025-12-06 03:16:54'),
+(16, 15, 'patient', 'Your consultation on December 6, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-06 03:22:37'),
+(17, 15, 'patient', 'Your consultation on December 6, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-06 03:22:40'),
+(18, 15, 'patient', 'Your consultation on December 6, 2025 has been declined.', 'profile.php?tab=appointments', 1, '2025-12-06 03:24:30'),
+(19, 15, 'patient', 'Your consultation on December 6, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-06 03:25:07'),
+(20, 5, 'patient', 'Your appointment for Etchant on September 27, 2025 has been marked as cancelled.', 'profile.php?tab=appointments', 1, '2025-12-06 03:26:21'),
+(21, 1, 'admin', 'A service for Jezrah Faith Canonio was cancelled by an admin.', 'mas.php?filter=cancelled', 1, '2025-12-06 03:27:48'),
+(22, 5, 'patient', 'Your appointment for Etchant on September 27, 2025 has been marked as cancelled.', 'profile.php?tab=appointments', 1, '2025-12-06 03:31:47'),
+(23, 1, 'admin', 'Jezrah Faith Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 0, '2025-12-06 03:40:47'),
+(24, 1, 'admin', 'Jezrah Faith Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 0, '2025-12-06 03:42:53'),
+(25, 1, 'admin', 'Jezrah Faith Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 0, '2025-12-06 03:48:09'),
+(26, 1, 'admin', 'Jezrah Faith Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 0, '2025-12-06 03:52:27'),
+(27, 5, 'patient', 'Your consultation on November 29, 2025 has been declined.', 'profile.php?tab=appointments', 1, '2025-12-06 03:54:22'),
+(28, 1, 'admin', 'Jezrah Faith Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 0, '2025-12-06 03:59:01'),
+(29, 1, 'admin', 'New consultation request from Jezrah Faith Canonio.', 'mac.php?filter=pending', 0, '2025-12-06 04:00:24'),
+(30, 1, 'admin', 'Jezrah Faith Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 0, '2025-12-06 04:01:27'),
+(31, 1, 'admin', 'Jezrah Faith Canonio requested to cancel a service.', 'mas.php?filter=for_cancellation', 0, '2025-12-06 04:02:33'),
+(32, 5, 'patient', 'Your appointment for Etchant on September 27, 2025 has been marked as cancelled.', 'profile.php?tab=appointments', 1, '2025-12-06 04:03:38'),
+(33, 15, 'patient', 'Your consultation on December 6, 2025 has been declined.', 'profile.php?tab=appointments', 1, '2025-12-06 09:09:54'),
+(34, 15, 'patient', 'Your consultation on December 6, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-06 09:40:30'),
+(35, 14, 'patient', 'Your appointment for Ibot ngipon on November 29, 2025 has been marked as cancelled.', 'profile.php?tab=appointments', 0, '2025-12-06 09:43:32'),
+(36, 5, 'patient', 'Your appointment for Etchant on September 27, 2025 has been marked as cancelled.', 'profile.php?tab=appointments', 0, '2025-12-06 09:44:20'),
+(37, 1, 'admin', 'A service for Jezrah Faith Canonio was cancelled by an admin.', 'mas.php?filter=cancelled', 0, '2025-12-06 09:45:26'),
+(38, 1, 'admin', 'A service for Jezrah Faith Canonio was cancelled by an admin.', 'mas.php?filter=cancelled', 0, '2025-12-06 09:47:26'),
+(39, 1, 'admin', 'Pio Canonio requested to cancel a service.', 'mas.php?filter=for_cancellation', 0, '2025-12-06 09:50:56'),
+(40, 1, 'admin', 'Pio Canonio requested to cancel a service.', 'mas.php?filter=for_cancellation', 0, '2025-12-06 09:54:58'),
+(41, 1, 'admin', 'Pio Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 0, '2025-12-06 09:55:35'),
+(42, 15, 'patient', 'Your appointment for Etchant on December 11, 2025 has been marked as cancelled.', 'profile.php?tab=appointments', 1, '2025-12-06 09:56:33'),
+(43, 15, 'patient', 'Your consultation on December 6, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-06 10:01:48'),
+(44, 15, 'patient', 'Your consultation on December 6, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-06 10:01:53'),
+(45, 1, 'admin', 'Pio Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 0, '2025-12-06 10:02:35'),
+(46, 1, 'admin', 'Pio Canonio requested to cancel a service.', 'mas.php?filter=for_cancellation', 0, '2025-12-06 10:03:25'),
+(47, 15, 'patient', 'Your consultation on December 6, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-06 10:15:26'),
+(48, 1, 'admin', 'Pio Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 1, '2025-12-06 10:15:38'),
+(49, 15, 'patient', 'Your appointment for Etchant on December 11, 2025 has been marked as cancelled.', 'profile.php?tab=appointments', 1, '2025-12-06 10:16:16'),
+(50, 1, 'admin', 'New consultation request from Pio Canonio.', 'mac.php?filter=pending', 0, '2025-12-06 10:19:47'),
+(51, 1, 'admin', 'Pio Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 0, '2025-12-06 10:20:55'),
+(52, 1, 'admin', 'Item \'Etchant\' is running low on stock (1).', 'manage-inventory.php', 1, '2025-12-07 03:57:51'),
+(53, 1, 'admin', 'Item \'fsd\' is out of stock.', 'manage-inventory.php', 1, '2025-12-07 03:57:51'),
+(54, 1, 'admin', 'Item \'Etchant\' is running low on stock (1).', 'manage-inventory.php', 0, '2025-12-07 03:59:48'),
+(55, 1, 'admin', 'Item \'Fsd\' is running low on stock (1).', 'manage-inventory.php', 0, '2025-12-07 03:59:48');
 
 -- --------------------------------------------------------
 
@@ -257,14 +292,15 @@ CREATE TABLE `tblpatient` (
 
 INSERT INTO `tblpatient` (`number`, `firstname`, `surname`, `date_of_birth`, `sex`, `status`, `occupation`, `age`, `contact_number`, `address`, `email`, `Image`, `health_conditions`, `created_at`, `username`, `password`, `rating`, `feedback`) VALUES
 (4, 'John Mar', 'Ypil', '2002-12-21', 'Male', 'Married', 'Student', 22, '09374939832', 'idk', 'ypil.johnmar.mcc@gmail.com', 'anonymous-girl.png', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Increase intake of food or water\"],\"thyroid\":[\"Apprehension\"],\"nervous\":[\"Headache\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Persistent cough\"],\"urinary\":[]}', '2025-09-27 11:02:35', 'jm', '763c3f1b6fe4707b8c39df149788c70b', 5, 'lami kayu'),
-(5, 'Jezrah Faith', 'Canonio', '2004-05-13', 'Female', 'Single', 'Princess', 21, '09876543211', 'yati liloan', 'canonio.jezrahfaith.mcc@gmail.com', 'pfpjez.jfif', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Family history of diabetes\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Numbness\\/Tingling\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}', '2025-09-27 11:03:26', 'jezrah', '3b02af71589ec5ea4138a1ece1866008', 4, 'nice service my nigga'),
+(5, 'Jezrah Faith', 'Canonio', '2004-05-13', 'Female', 'Single', 'Princess', 21, '09876543211', 'Yati liloan', 'canonio.jezrahfaith.mcc@gmail.com', '1.jpg', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Family history of diabetes\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Numbness\\/Tingling\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}', '2025-09-27 11:03:26', 'jezrah', '3b02af71589ec5ea4138a1ece1866008', 4, 'nice service my nigga'),
 (8, 'Rodelyn', 'Estrera', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'estrera.rodelyn.mcc@gmail.com', NULL, '{\"general\":[\"Marked weight change\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Delayed healing of wounds\"],\"thyroid\":[\"Perspire easily\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Headache\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Difficulty in breathing\"]}', '2025-09-27 11:04:04', 'rodelyn', 'bc65be184bd685684a786ac70c6d2ef7', NULL, NULL),
 (9, 'Justine', 'Aguinaldo', '0000-00-00', '', '', '', 0, '', '', 'aguinaldo.justinelouise.mcc@gmail.com', NULL, NULL, '2025-09-27 11:04:46', 'justine', 'f6f3e757ac491a3511a5198a39c5ce29', NULL, NULL),
 (10, 'Nimfa', 'Conde', '1956-03-09', 'Female', 'Single', 'Mother', 69, '09876543211', 'idk', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (11, 'Seg', 'Canonio', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'seg@gmail.com', NULL, NULL, NULL, 'seg', '54151f5b2b56a1345561afde6059ac63', NULL, NULL),
 (12, 'Crazy', 'Rapidboots', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'crazy@test.com', NULL, NULL, NULL, 'crazy', 'fa2ee41779ef60891cbfdfcd0dccaa7c', NULL, NULL),
 (13, 'Sig', 'Canonio', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'sig@test.com', NULL, '{\"general\":[\"Increase frequency of urination\",\"Burning sensation on urination\"],\"liver\":[\"History of liver ailment\"],\"diabetes\":[\"Delayed healing of wounds\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Headache\",\"Dizziness\\/Fainting\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Persistent cough\"]}', NULL, 'Sig', '252e0253e865dec297431b97709794d5', NULL, NULL),
-(14, 'Jaynard', 'Senilla', '0000-00-00', 'Male', '', '', 0, '', '', 'saging@gmail.com', NULL, NULL, '2025-11-29 04:07:01', 'jaynard', 'fa2c395447a8ad82849d3a7129830102', NULL, NULL);
+(14, 'Jaynard', 'Senilla', '0000-00-00', 'Male', '', '', 0, '', '', 'saging@gmail.com', NULL, NULL, '2025-11-29 04:07:01', 'jaynard', 'fa2c395447a8ad82849d3a7129830102', NULL, NULL),
+(15, 'Pio', 'Canonio', '0000-00-00', '', '', '', 0, '', '', 'canoniopio@gmail.com', NULL, NULL, '2025-12-06 03:09:32', 'pio', '$2y$10$6R9t1Nyj1aN6IimOTh5jfudMGS985UGAOg9tjrMAolKjstVhemBXu', 4, 'amazing!');
 
 -- --------------------------------------------------------
 
@@ -294,12 +330,13 @@ CREATE TABLE `tblschedule` (
 
 INSERT INTO `tblschedule` (`id`, `appointment_id`, `patient_number`, `firstname`, `surname`, `date`, `time`, `service_id`, `created_at`, `duration`, `status`, `cancel_reason`, `cancelled_at`) VALUES
 (1, 1, 4, 'John Mar', 'Ypil', '2025-09-26', '21:32:00', 3, '2025-09-26 05:32:21', 30, 'Ongoing', 'idk', '2025-10-05 19:05:16'),
-(2, 2, 5, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:39:00', 1, '2025-09-26 22:39:38', 45, 'For Cancellation', 'sample notif', '2025-11-29 18:39:56'),
+(2, 2, 5, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:39:00', 1, '2025-09-26 22:39:38', 45, 'Cancelled', 'emergency', '2025-12-06 12:02:33'),
 (3, 3, 8, 'Rodelyn', 'Estrera', '2025-09-27', '18:44:00', 4, '2025-09-27 02:44:52', 67, 'Ongoing', NULL, NULL),
 (4, 4, 4, 'John Mar', 'Ypil', '2025-10-05', '16:29:00', 5, '2025-10-05 08:29:34', 50, 'Ongoing', NULL, NULL),
 (5, 5, 4, 'John Mar', 'Ypil', '2025-10-05', '16:39:00', 6, '2025-10-05 08:39:17', 34, 'Ongoing', NULL, NULL),
 (6, 6, 4, 'John Mar', 'Ypil', '2025-10-05', '16:39:00', 2, '2025-10-05 08:39:42', 56, 'Cancelled', 'cancel', NULL),
-(7, NULL, 14, 'Jaynard', 'Senilla', '2025-11-29', '17:46:00', 2, '2025-11-29 08:46:54', 45, 'Ongoing', NULL, NULL);
+(7, NULL, 14, 'Jaynard', 'Senilla', '2025-11-29', '17:46:00', 2, '2025-11-29 08:46:54', 45, 'Ongoing', NULL, NULL),
+(8, NULL, 15, 'Pio', 'Canonio', '2025-12-11', '07:30:00', 1, '2025-12-06 09:49:40', 160, 'Cancelled', 'emergency', '2025-12-06 18:03:25');
 
 -- --------------------------------------------------------
 
@@ -371,12 +408,6 @@ ALTER TABLE `tblnotif`
   ADD KEY `idx_recipient` (`recipient_id`,`recipient_type`,`is_read`);
 
 --
--- Indexes for table `tblpage`
---
-ALTER TABLE `tblpage`
-  ADD PRIMARY KEY (`ID`);
-
---
 -- Indexes for table `tblpatient`
 --
 ALTER TABLE `tblpatient`
@@ -410,13 +441,13 @@ ALTER TABLE `tbladmin`
 -- AUTO_INCREMENT for table `tblappointment`
 --
 ALTER TABLE `tblappointment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `tblcalendar`
 --
 ALTER TABLE `tblcalendar`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `tblcategory`
@@ -434,25 +465,19 @@ ALTER TABLE `tblinventory`
 -- AUTO_INCREMENT for table `tblnotif`
 --
 ALTER TABLE `tblnotif`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `tblpage`
---
-ALTER TABLE `tblpage`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `tblpatient`
 --
 ALTER TABLE `tblpatient`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `tblschedule`
 --
 ALTER TABLE `tblschedule`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1878;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1879;
 
 --
 -- AUTO_INCREMENT for table `tblservice`
