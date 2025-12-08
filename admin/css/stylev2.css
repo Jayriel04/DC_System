@@ -1108,7 +1108,7 @@ td {
 
 .calendar-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     gap: 15px;
     margin-bottom: 20px;
@@ -1611,4 +1611,27 @@ input:read-only {
     min-height: 43px; /* Match input height */
     display: flex;
     align-items: center;
+}
+
+/* Calendar Navigation Buttons */
+.nav-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background-color: #f0f2f5;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    color: #4a5568;
+    font-size: 18px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.nav-button:hover {
+    background-color: #e2e8f0;
+    border-color: #cbd5e1;
+    color: #1a202c;
 }

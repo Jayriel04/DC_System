@@ -146,7 +146,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query_cancel->bindParam(':cancel_reason', $cancel_reason, PDO::PARAM_STR);
         $query_cancel->bindParam(':id', $appointment_id, PDO::PARAM_INT);
 
-        if ($query_cancel->execute()) {
+        if ($query_cancel->execute()) { 
             // Insert notification for patient
             if ($appointment_data) {
                 $patient_id = $appointment_data['patient_number'];

@@ -206,10 +206,10 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
 
                 <div class="calendar-container">
                     <div class="calendar-header">
-                      <div class="header-controls">
-                        <a href="?month=<?php echo ($currentMonth == 1) ? 12 : $currentMonth - 1; ?>&year=<?php echo ($currentMonth == 1) ? $currentYear - 1 : $currentYear; ?>" class="nav-arrow" title="Previous Month"><i class="fas fa-chevron-left"></i></a>
+                      <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
+                        <a href="?month=<?php echo ($currentMonth == 1) ? 12 : $currentMonth - 1; ?>&year=<?php echo ($currentMonth == 1) ? $currentYear - 1 : $currentYear; ?>" class="nav-button" title="Previous Month">&lt;</a>
                         <h2 class="month-year"><?php echo $months[$currentMonth - 1] . " " . $currentYear; ?></h2>
-                        <a href="?month=<?php echo ($currentMonth == 12) ? 1 : $currentMonth + 1; ?>&year=<?php echo ($currentMonth == 12) ? $currentYear + 1 : $currentYear; ?>" class="nav-arrow" title="Next Month"><i class="fas fa-chevron-right"></i></a>
+                        <a href="?month=<?php echo ($currentMonth == 12) ? 1 : $currentMonth + 1; ?>&year=<?php echo ($currentMonth == 12) ? $currentYear + 1 : $currentYear; ?>" class="nav-button" title="Next Month">&gt;</a>
                         </div>
                     </div>
 
