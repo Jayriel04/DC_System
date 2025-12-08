@@ -433,9 +433,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <a href="mas.php?filter=upcoming&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'upcoming') echo 'active'; ?>" data-filter="upcoming">
                                         Upcoming <span class="filter-count"><?php echo $count_upcoming; ?></span>
                                     </a>
-                                    <a href="mas.php?filter=pending&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'pending') echo 'active'; ?>" data-filter="pending">
-                                        Ongoing <span class="filter-count"><?php echo $count_pending; ?></span>
-                                    </a>
                                     <a href="mas.php?filter=completed&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'completed') echo 'active'; ?>" data-filter="completed">
                                         Completed <span class="filter-count"><?php echo $count_completed; ?></span>
                                     </a>

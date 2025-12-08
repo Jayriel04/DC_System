@@ -237,7 +237,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                         <div class="search-filter-bar">
                             <div class="search-box">
                                 <span class="search-icon"></span>
-                                <input type="text" class="search-input" name="search_query" placeholder="Search patients by name..." value="<?php echo htmlentities($search); ?>" id="searchInput">
+                                <input type="text" class="search-input" name="search_query" placeholder="Search for products ..." value="<?php echo htmlentities($search); ?>" id="searchInput">
                             </div>
                             
                         </div>
