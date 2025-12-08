@@ -140,7 +140,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
   // Fetch events
   // Fetch calendar events and mark as booked when a matching appointment exists (join on date and time)
   // Only consider appointments that are not Declined when calculating booked flag
-  $sql = "SELECT c.*, CASE WHEN a.id IS NULL THEN 0 ELSE 1 END AS booked_flag FROM tblcalendar c LEFT JOIN tblappointment a ON a.date = c.date AND a.start_time = c.start_time AND (a.status IS NULL OR a.status != 'Declined') WHERE MONTH(c.date) = :month AND YEAR(c.date) = :year";
+  $sql = "SELECT c.*, CASE WHEN a.id IS NULL THEN 0 ELSE 1 END AS booked_flag FROM tblcalendar c LEFT JOIN tblappointment a ON a.date = c.date AND a.start_time = c.start_time AND (a.status IS NULL OR a.status NOT IN ('Declined', 'Cancelled')) WHERE MONTH(c.date) = :month AND YEAR(c.date) = :year";
   $query = $dbh->prepare($sql);
   $query->bindParam(':month', $currentMonth, PDO::PARAM_INT);
   $query->bindParam(':year', $currentYear, PDO::PARAM_INT);
@@ -206,10 +206,10 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
 
                 <div class="calendar-container">
                     <div class="calendar-header">
-                      <div class="header-controls">
-                        <a href="?month=<?php echo ($currentMonth == 1) ? 12 : $currentMonth - 1; ?>&year=<?php echo ($currentMonth == 1) ? $currentYear - 1 : $currentYear; ?>" class="nav-arrow" title="Previous Month"><i class="fas fa-chevron-left"></i></a>
+                      <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
+                        <a href="?month=<?php echo ($currentMonth == 1) ? 12 : $currentMonth - 1; ?>&year=<?php echo ($currentMonth == 1) ? $currentYear - 1 : $currentYear; ?>" class="nav-button" title="Previous Month">&lt;</a>
                         <h2 class="month-year"><?php echo $months[$currentMonth - 1] . " " . $currentYear; ?></h2>
-                        <a href="?month=<?php echo ($currentMonth == 12) ? 1 : $currentMonth + 1; ?>&year=<?php echo ($currentMonth == 12) ? $currentYear + 1 : $currentYear; ?>" class="nav-arrow" title="Next Month"><i class="fas fa-chevron-right"></i></a>
+                        <a href="?month=<?php echo ($currentMonth == 12) ? 1 : $currentMonth + 1; ?>&year=<?php echo ($currentMonth == 12) ? $currentYear + 1 : $currentYear; ?>" class="nav-button" title="Next Month">&gt;</a>
                         </div>
                     </div>
 

@@ -146,7 +146,17 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query_cancel->bindParam(':cancel_reason', $cancel_reason, PDO::PARAM_STR);
         $query_cancel->bindParam(':id', $appointment_id, PDO::PARAM_INT);
 
-        if ($query_cancel->execute()) {
+        if ($query_cancel->execute()) { 
+            // Insert notification for patient
+            if ($appointment_data) {
+                $patient_id = $appointment_data['patient_number'];
+                $appointment_date = date('F j, Y', strtotime($appointment_data['date']));
+                $message = "Your consultation on " . $appointment_date . " has been cancelled by the admin.";
+                if (!empty($cancel_reason)) { $message .= " Reason: " . $cancel_reason; }
+                $url = "profile.php?tab=appointments";
+                $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:recipient_id, 'patient', :message, :url)";
+                $dbh->prepare($sql_notif)->execute([':recipient_id' => $patient_id, ':message' => $message, ':url' => $url]);
+            }
             if ($appointment_data && !empty($appointment_data['email'])) {
                 $mail = new PHPMailer(true);
                 try {

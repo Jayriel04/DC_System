@@ -498,6 +498,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <link href="css/profile.css" rel="stylesheet">
     <link href="../css/style.v2.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../admin/css/mas-modal.css">
     <link rel="stylesheet" href="../css/toast.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
@@ -788,10 +789,10 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
     <!-- Book Appointment Modal -->
     <div id="bookAppointmentModal" class="modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content" style="max-width: 500px; left: 230px;">
+        <div class="modal-dialog" role="document" style="max-width: 400px;">
+            <div class="modal-content" style="max-width: 500px; left: 50px;">
                 <div class="modal-header">
-                    <h4 class="modal-title">Book a New Appointment</h4>
+                    <h4 class="modal-title">Book New Appointment</h4>
                     <span class="close" data-dismiss="modal">&times;</span>
                 </div>
                 <div class="modal-body" style="padding: 15px;">
