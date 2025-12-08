@@ -140,7 +140,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
   // Fetch events
   // Fetch calendar events and mark as booked when a matching appointment exists (join on date and time)
   // Only consider appointments that are not Declined when calculating booked flag
-  $sql = "SELECT c.*, CASE WHEN a.id IS NULL THEN 0 ELSE 1 END AS booked_flag FROM tblcalendar c LEFT JOIN tblappointment a ON a.date = c.date AND a.start_time = c.start_time AND (a.status IS NULL OR a.status != 'Declined') WHERE MONTH(c.date) = :month AND YEAR(c.date) = :year";
+  $sql = "SELECT c.*, CASE WHEN a.id IS NULL THEN 0 ELSE 1 END AS booked_flag FROM tblcalendar c LEFT JOIN tblappointment a ON a.date = c.date AND a.start_time = c.start_time AND (a.status IS NULL OR a.status NOT IN ('Declined', 'Cancelled')) WHERE MONTH(c.date) = :month AND YEAR(c.date) = :year";
   $query = $dbh->prepare($sql);
   $query->bindParam(':month', $currentMonth, PDO::PARAM_INT);
   $query->bindParam(':year', $currentYear, PDO::PARAM_INT);
