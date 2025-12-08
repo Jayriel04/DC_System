@@ -508,8 +508,8 @@ h2.section-title {
 }
 
 .filter-buttons {
-    display: flex !important;
-    gap: 8px !important;
+    display: flex;
+    gap: 8px;
 }
 
 .filter-btn {
@@ -546,6 +546,11 @@ h2.section-title {
 
 .filter-btn.active .filter-count {
     background-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Hide the mobile-only sort dropdown toggle on desktop */
+.filter-dropdown-toggle {
+    display: none;
 }
 
 /* --- Patient List Section --- */

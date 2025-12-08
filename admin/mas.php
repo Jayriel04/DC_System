@@ -385,6 +385,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/mas-modal.css">
     <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="css/responsive.css">
     <style>
         
     </style>
@@ -423,28 +424,34 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                         <input type="text" name="search_query" placeholder="Search by patient or service name..." value="<?php echo htmlentities($search); ?>" aria-label="Search appointments">
                                     </div>
                                 </form>
-                                <div class="filter-buttons">
-                                    <a href="mas.php?filter=all&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'all') echo 'active'; ?>" data-filter="all">
-                                        All Appointments <span class="filter-count"><?php echo $count_all; ?></span>
-                                    </a>
-                                    <a href="mas.php?filter=today&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'today') echo 'active'; ?>" data-filter="today">
-                                        Today <span class="filter-count"><?php echo $count_today; ?></span>
-                                    </a>
-                                    <a href="mas.php?filter=upcoming&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'upcoming') echo 'active'; ?>" data-filter="upcoming">
-                                        Upcoming <span class="filter-count"><?php echo $count_upcoming; ?></span>
-                                    </a>
-                                    <a href="mas.php?filter=pending&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'pending') echo 'active'; ?>" data-filter="pending">
-                                        Ongoing <span class="filter-count"><?php echo $count_pending; ?></span>
-                                    </a>
-                                    <a href="mas.php?filter=completed&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'completed') echo 'active'; ?>" data-filter="completed">
-                                        Completed <span class="filter-count"><?php echo $count_completed; ?></span>
-                                    </a>
-                                    <a href="mas.php?filter=cancelled&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'cancelled') echo 'active'; ?>" data-filter="cancelled">
-                                        Cancelled <span class="filter-count"><?php echo $count_cancelled; ?></span>
-                                    </a>
-                                    <a href="mas.php?filter=for_cancellation&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'for_cancellation') echo 'active'; ?>" data-filter="for_cancellation">
-                                        Request Cancellation <span class="filter-count"><?php echo $count_for_cancellation; ?></span>
-                                    </a>
+                                <div class="filter-dropdown">
+                                    <button class="filter-dropdown-toggle" id="filterDropdownToggle">
+                                        <i class="fas fa-sort-amount-down-alt"></i>
+                                        <span>Sort</span>
+                                    </button>
+                                    <div class="filter-buttons" id="filterButtons">
+                                        <a href="mas.php?filter=all&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'all') echo 'active'; ?>" data-filter="all">
+                                            All Appointments <span class="filter-count"><?php echo $count_all; ?></span>
+                                        </a>
+                                        <a href="mas.php?filter=today&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'today') echo 'active'; ?>" data-filter="today">
+                                            Today <span class="filter-count"><?php echo $count_today; ?></span>
+                                        </a>
+                                        <a href="mas.php?filter=upcoming&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'upcoming') echo 'active'; ?>" data-filter="upcoming">
+                                            Upcoming <span class="filter-count"><?php echo $count_upcoming; ?></span>
+                                        </a>
+                                        <a href="mas.php?filter=pending&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'pending') echo 'active'; ?>" data-filter="pending">
+                                            Ongoing <span class="filter-count"><?php echo $count_pending; ?></span>
+                                        </a>
+                                        <a href="mas.php?filter=completed&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'completed') echo 'active'; ?>" data-filter="completed">
+                                            Completed <span class="filter-count"><?php echo $count_completed; ?></span>
+                                        </a>
+                                        <a href="mas.php?filter=cancelled&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'cancelled') echo 'active'; ?>" data-filter="cancelled">
+                                            Cancelled <span class="filter-count"><?php echo $count_cancelled; ?></span>
+                                        </a>
+                                        <a href="mas.php?filter=for_cancellation&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'for_cancellation') echo 'active'; ?>" data-filter="for_cancellation">
+                                            Request Cancellation <span class="filter-count"><?php echo $count_for_cancellation; ?></span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -837,6 +844,33 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         });
     </script>
     <script src="js/mas-modal.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdownToggle = document.getElementById('filterDropdownToggle');
+            const filterButtons = document.getElementById('filterButtons');
+
+            if (dropdownToggle && filterButtons) {
+                dropdownToggle.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    filterButtons.classList.toggle('show');
+                });
+
+                // Close the dropdown if the user clicks outside of it
+                window.addEventListener('click', function (event) {
+                    if (!dropdownToggle.contains(event.target) && !filterButtons.contains(event.target)) {
+                        filterButtons.classList.remove('show');
+                    }
+                });
+
+                // Close on escape key
+                document.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape') {
+                        filterButtons.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

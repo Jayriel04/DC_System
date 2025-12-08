@@ -222,7 +222,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 
                                 <div class="stat-card">
                                     <div class="stat-content">
-                                        <h3>Total Services Available</h3>
+                                        <h3>Total Services</h3>
                                         <div class="stat-number"><?php echo number_format($total_services); ?></div>
                                         
                                     </div>

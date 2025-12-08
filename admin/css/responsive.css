@@ -105,8 +105,23 @@
 
     /* Stack stat cards */
     .stats-grid {
-        grid-template-columns: 1fr; /* Stack cards vertically */
+        grid-template-columns: repeat(2, 1fr); /* 2x2 grid on mobile */
         gap: 15px;
+    }
+
+    .stats-grid .stat-card {
+        padding: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .stats-grid .stat-content h3 {
+        font-size: 0.8rem;
+    }
+
+    .stats-grid .stat-content .stat-number {
+        font-size: 1.5rem;
     }
 
     /* Adjust chart section header for mobile */
@@ -350,6 +365,53 @@
     .er-table td {
         padding: 10px 15px;
         border: none;
-        text-align: left;
+        text-align: left !important;
+    }
+}
+
+/* Appointment (mac.php) responsive styles */
+@media (max-width: 768px) {
+    .filter-buttons {
+        display: none; /* Hide by default on mobile */
+        position: absolute;
+        top: calc(100% + 5px);
+        right: 0;
+        background-color: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        z-index: 100;
+        width: 220px;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 8px;
+    }
+
+    .filter-buttons.show {
+        display: flex; /* Show when toggled */
+    }
+
+    .filter-buttons .filter-btn {
+        justify-content: space-between;
+        width: 100%;
+        margin: 2px 0;
+    }
+
+    .filter-dropdown {
+        position: relative;
+    }
+
+    .filter-dropdown-toggle {
+        display: flex; /* Show toggle button on mobile */
+        align-items: center;
+        gap: 8px;
+        background-color: #fff;
+        border: 1px solid #e2e8f0;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        width: 100%;
+        justify-content: center;
     }
 }
