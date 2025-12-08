@@ -1559,7 +1559,7 @@ label {
 }
 
 input, select {
-    padding: 12px;
+    padding: 7px;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 14px;

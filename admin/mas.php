@@ -424,6 +424,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                         <input type="text" name="search_query" placeholder="Search by patient or service name..." value="<?php echo htmlentities($search); ?>" aria-label="Search appointments">
                                     </div>
                                 </form>
+<<<<<<< HEAD
                                 <div class="filter-dropdown">
                                     <button class="filter-dropdown-toggle" id="filterDropdownToggle">
                                         <i class="fas fa-sort-amount-down-alt"></i>
@@ -452,6 +453,27 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                             Request Cancellation <span class="filter-count"><?php echo $count_for_cancellation; ?></span>
                                         </a>
                                     </div>
+=======
+                                <div class="filter-buttons">
+                                    <a href="mas.php?filter=all&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'all') echo 'active'; ?>" data-filter="all">
+                                        All Appointments <span class="filter-count"><?php echo $count_all; ?></span>
+                                    </a>
+                                    <a href="mas.php?filter=today&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'today') echo 'active'; ?>" data-filter="today">
+                                        Today <span class="filter-count"><?php echo $count_today; ?></span>
+                                    </a>
+                                    <a href="mas.php?filter=upcoming&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'upcoming') echo 'active'; ?>" data-filter="upcoming">
+                                        Upcoming <span class="filter-count"><?php echo $count_upcoming; ?></span>
+                                    </a>
+                                    <a href="mas.php?filter=completed&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'completed') echo 'active'; ?>" data-filter="completed">
+                                        Completed <span class="filter-count"><?php echo $count_completed; ?></span>
+                                    </a>
+                                    <a href="mas.php?filter=cancelled&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'cancelled') echo 'active'; ?>" data-filter="cancelled">
+                                        Cancelled <span class="filter-count"><?php echo $count_cancelled; ?></span>
+                                    </a>
+                                    <a href="mas.php?filter=for_cancellation&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'for_cancellation') echo 'active'; ?>" data-filter="for_cancellation">
+                                        Request Cancellation <span class="filter-count"><?php echo $count_for_cancellation; ?></span>
+                                    </a>
+>>>>>>> dfe76b599e23962fb31a45d9584cd07c0fdb612f
                                 </div>
                             </div>
                         </div>
