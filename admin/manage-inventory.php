@@ -4,8 +4,7 @@ error_reporting(0);
 include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid'])==0) {
     header('location:logout.php');
-} else { // Add a closing brace for this else at the end of the file
-    // Handle new inventory creation from modal
+} else { 
     if (isset($_POST['add_inventory'])) {
         $name = ucfirst(trim($_POST['name']));
         $brand = ucfirst(trim($_POST['brand']));
@@ -23,7 +22,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
         if ($query_insert) {
             $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'New product added successfully.'];
 
-            // Create notification if new item is already low or out of stock
+            // notify if new item is already low or out of stock
             if ($quantity == 0) {
                 $notif_message = "New item '" . htmlentities($name) . "' was added and is out of stock.";
                 $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, 'manage-inventory.php')";
@@ -41,7 +40,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
         }
         exit();
     }
-    // Handle inventory update from modal
+    // inventory update from modal
     if (isset($_POST['update_inventory'])) {
         $inventory_id = $_POST['inventory_id'];
         $name = ucfirst(trim($_POST['name']));
@@ -70,7 +69,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
         if ($query_update) {
             $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Inventory item updated successfully.'];
 
-            // Create notification if stock becomes low or out of stock
+            // notify if stock becomes low or out of stock
             $notif_message = null;
             if ($quantity == 0 && $old_quantity > 0) {
                 $notif_message = "Item '" . htmlentities($name) . "' is now out of stock.";
@@ -91,12 +90,12 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
         }
         exit();
     }
-    // Initialize search and filter variables
+    
     $search = '';
     $category_filter = '';
 
-    // Handle the search and category filter
-    if (isset($_POST['search_query'])) { // Changed from 'search' to 'search_query'
+    
+    if (isset($_POST['search_query'])) { 
         $search = $_POST['search_query'];
     } 
     if (isset($_POST['category_filter'])) {
@@ -162,7 +161,6 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                         </div>
 
                         <?php
-                        // This block is moved up to be able to render the banner before the stats
                         $low_stock_items_check = [];
                         $out_of_stock_items_check = [];
                         $all_items_query = $dbh->query("SELECT name, quantity FROM tblinventory");
@@ -191,8 +189,6 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                         <?php } ?>
 
                         <?php
-                        // --- STATS CALCULATION ---
-                        // Total Products
                         $total_products = $dbh->query("SELECT COUNT(*) FROM tblinventory")->fetchColumn();
                         // In Stock (quantity > 2)
                         $in_stock = $dbh->query("SELECT COUNT(*) FROM tblinventory WHERE quantity > 2")->fetchColumn();
@@ -259,7 +255,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                 </thead>
                                 <tbody id="tableBody">
                                     <?php
-                                    // Pagination setup
+                                    
                                     $low_stock_items = [];
                                     $out_of_stock_items = [];
 
@@ -267,7 +263,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                     $pageno = isset($_GET['pageno']) ? intval($_GET['pageno']) : 1;
                                     $offset = ($pageno - 1) * $no_of_records_per_page;
 
-                                    // Build the query for fetching data
+                                    
                                     $sql = "SELECT * FROM tblinventory WHERE 1=1";
                                     $count_sql = "SELECT COUNT(*) FROM tblinventory WHERE 1=1";
                                     $params = [];
@@ -350,7 +346,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                         </div>
                         <div align="left" class="mt-4">
                             <?php
-                            // Build the query string for pagination links
+                            
                             $query_params = [];
                             if ($search)
                                 $query_params['search_query'] = $search;
@@ -455,7 +451,6 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
     <script src="js/dashboard.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // --- Add Product Modal ---
         const addModal = document.getElementById('addInventoryModal');
         const addOpenBtn = document.getElementById('addProductBtn');
         const addCloseBtn = addModal.querySelector('.close-button');
@@ -504,7 +499,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
             });
         });
 
-        // --- Inventory Alert Banner ---
+        // --- Inventory Alert  ---
         const alertBanner = document.getElementById('inventoryAlertBanner');
         const alertCloseBtn = document.getElementById('alertCloseBtn');
 
@@ -514,7 +509,6 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
             });
         }
 
-        // Auto-capitalize first letter for inventory fields
         function capitalizeFirstLetter(inputId) {
             const input = document.getElementById(inputId);
             if (input) {

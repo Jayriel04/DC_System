@@ -287,6 +287,28 @@
     }
 }
 
+/* Manage Service (manage-service.php) responsive styles */
+@media (max-width: 768px) {
+    .search-filter-section .search-form {
+        flex-direction: column;
+        align-items: stretch !important; /* Override inline style */
+        gap: 8px !important;
+    }
+
+    .search-filter-section .search-box,
+    .search-filter-section .category-box {
+        width: 100%;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr; /* Stack service cards on mobile */
+    }
+
+    .service-card {
+        width: auto; /* Let it fill the container */
+    }
+}
+
 /* Patient History (view-ph.php) responsive styles */
 @media (max-width: 768px) {
     .patient-name-header {
@@ -414,4 +436,70 @@
         width: 100%;
         justify-content: center;
     }
+}
+
+/* Service Appointment (mas.php) responsive styles */
+@media (max-width: 768px) {
+    #appointment-table-container .patient-table {
+        display: block;
+        width: 100%;
+    }
+
+    #appointment-table-container .patient-table thead {
+        display: none; /* Hide table headers on mobile */
+    }
+
+    #appointment-table-container .patient-table tbody,
+    #appointment-table-container .patient-table tr,
+    #appointment-table-container .patient-table td {
+        display: block;
+        width: 100%;
+    }
+
+    #appointment-table-container .patient-table tr {
+        margin-bottom: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        overflow: hidden;
+        padding: 0.75rem;
+    }
+
+    #appointment-table-container .patient-table td {
+        padding: 0.5rem 0.25rem;
+        border: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+    }
+
+    #appointment-table-container .patient-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #4a5568;
+        text-align: left;
+        margin-right: 1rem;
+    }
+
+    #appointment-table-container .patient-table td.actions-icons {
+        justify-content: flex-end;
+    }
+
+    #appointment-table-container .patient-table td.cancel-reason-cell {
+        justify-content: flex-end;
+    }
+
+    #appointment-table-container .patient-table td:nth-child(1)::before { content: "ID"; }
+    #appointment-table-container .patient-table td:nth-child(2)::before { content: "First Name"; }
+    #appointment-table-container .patient-table td:nth-child(3)::before { content: "Surname"; }
+    #appointment-table-container .patient-table td:nth-child(4)::before { content: "Category"; }
+    #appointment-table-container .patient-table td:nth-child(5)::before { content: "Service"; }
+    #appointment-table-container .patient-table td:nth-child(6)::before { content: "Date"; }
+    #appointment-table-container .patient-table td:nth-child(7)::before { content: "Time"; }
+    #appointment-table-container .patient-table td:nth-child(8)::before { content: "Duration"; }
+    #appointment-table-container .patient-table td:nth-child(9)::before { content: "Reason"; }
+    #appointment-table-container .patient-table td:nth-child(10)::before { content: "Status"; }
+    #appointment-table-container .patient-table td:nth-child(11)::before { content: "Action"; }
 }

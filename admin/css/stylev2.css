@@ -764,7 +764,7 @@ td {
 }
 
 .profile-avatar img, .profile-pic-preview {
-    width: 100%;
+    width: 38%;
     height: 100% !important;
     object-fit: cover !important;
 }
@@ -1559,7 +1559,7 @@ label {
 }
 
 input, select {
-    padding: 7px;
+    padding: 12px;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 14px;
@@ -1577,29 +1577,6 @@ input:read-only {
     background-color: #f9f9f9;
     cursor: not-allowed;
 }
-.form-group .image-upload-container {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.form-group .profile-pic-preview {
-    width: 150px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #e0e0e0;
-}
-
-.form-group .file-input-wrapper {
-    flex-grow: 1;
-}
-
-.form-group input[type="file"] {
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
-}
 
 .profile-value {
     padding: 12px;
@@ -1613,25 +1590,4 @@ input:read-only {
     align-items: center;
 }
 
-/* Calendar Navigation Buttons */
-.nav-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    background-color: #f0f2f5;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    color: #4a5568;
-    font-size: 18px;
-    font-weight: bold;
-    text-decoration: none;
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-}
 
-.nav-button:hover {
-    background-color: #e2e8f0;
-    border-color: #cbd5e1;
-    color: #1a202c;
-}

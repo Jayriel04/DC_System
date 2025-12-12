@@ -21,10 +21,10 @@ if (isset($_POST['login'])) {
   // Verify password
   if ($query->rowCount() > 0) {
     $is_password_correct = false;
-    // Check against modern hash
+    
     if (password_verify($password_input, $result->Password)) {
         $is_password_correct = true;
-        // If the hash needs updating (e.g., from an older algorithm), rehash it.
+        // Rehash password if needed
         if (password_needs_rehash($result->Password, PASSWORD_DEFAULT)) {
             $new_hash = password_hash($password_input, PASSWORD_DEFAULT);
             $rehash_sql = "UPDATE tbladmin SET Password = :new_hash WHERE ID = :id";
@@ -32,10 +32,8 @@ if (isset($_POST['login'])) {
             $rehash_query->execute([':new_hash' => $new_hash, ':id' => $result->ID]);
         }
     }
-    // Fallback for old MD5 passwords
     elseif (md5($password_input) === $result->Password) {
         $is_password_correct = true;
-        // Upgrade MD5 to new hash
         $new_hash = password_hash($password_input, PASSWORD_DEFAULT);
         $rehash_sql = "UPDATE tbladmin SET Password = :new_hash WHERE ID = :id";
         $rehash_query = $dbh->prepare($rehash_sql);
@@ -46,7 +44,6 @@ if (isset($_POST['login'])) {
       $_SESSION['sturecmsaid'] = $result->ID;
 
       if (!empty($_POST["remember"])) {
-        // Set cookies with proper path and secure parameters
         setcookie(
           "user_login",
           $_POST["username"],
@@ -95,15 +92,11 @@ if (isset($_POST['login'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta charset="utf-8">
   <title>Login Admin</title>
-  <!-- plugins:css -->
   <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
   <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
   <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-  <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <!-- Layout styles -->
-  
-  <link rel="stylesheet" href="css/login-v2.css">
+  <link rel="stylesheet" href="css/login.css">
   <link rel="stylesheet" href="css/toast.css">
   <link rel="stylesheet" href="css/responsive.css">
 </head>

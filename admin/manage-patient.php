@@ -5,10 +5,10 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
-    // AJAX handler for fetching services by category
+    
     if (isset($_GET['get_services_by_category']) && !empty($_GET['category_id'])) {
         header('Content-Type: application/json');
-        $category_id = $_GET['category_id']; // Changed to category_id
+        $category_id = $_GET['category_id']; 
         $sql = "SELECT number, name FROM tblservice WHERE category_id = :category_id ORDER BY name ASC"; // Filter by category_id
         $query = $dbh->prepare($sql);
         $query->bindParam(':category_id', $category_id, PDO::PARAM_INT); // Bind as INT
@@ -18,7 +18,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         exit(); // Stop further execution
     }
 
-    // AJAX handler for fetching month availability from tblcalendar
+
     if (isset($_GET['get_month_availability']) && !empty($_GET['year']) && !empty($_GET['month'])) {
         header('Content-Type: application/json');
         $year = intval($_GET['year']);
@@ -28,7 +28,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $firstDay = date('Y-m-d', mktime(0, 0, 0, $month, 1, $year));
         $lastDay = date('Y-m-t', mktime(0, 0, 0, $month, 1, $year));
 
-        // Query to get AVAILABLE dates from tblcalendar (dates with defined slots)
         $sql = "SELECT DISTINCT DATE(date) as available_date FROM tblcalendar 
                 WHERE YEAR(date) = :year AND MONTH(date) = :month 
                 ORDER BY date ASC";
@@ -44,7 +43,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         exit();
     }
 
-    // Handle patient update from edit modal
+    // patient update from edit modal
     if (isset($_POST['update_patient'])) {
         $patient_id = $_POST['patient_id'];
         $firstname = $_POST['firstname'];
@@ -74,14 +73,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 ':email' => $email, ':pid' => $patient_id
             ]);
 
-            // Check for and create new appointment if details are provided
+            
             $service_id = $_POST['service_id'];
             $app_date = $_POST['app_date'];
             $start_time = $_POST['start_time'];
             $duration = $_POST['duration'];
 
             if (!empty($service_id) && !empty($app_date) && !empty($start_time)) {
-                $app_status = 'Ongoing'; // Default status for service schedules
+                $app_status = 'Ongoing'; 
 
                 $sql_schedule = "INSERT INTO tblschedule (patient_number, firstname, surname, service_id, date, time, duration, status) VALUES (:pnum, :fname, :sname, :service_id, :app_date, :start_time, :duration, :status)";
                 $query_schedule = $dbh->prepare($sql_schedule);
@@ -109,11 +108,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         }
         exit();
     }
-    // Handle new patient creation from modal
+    
     if (isset($_POST['add_patient'])) {
         $dbh->beginTransaction();
         try {
-            // 1. Create new patient
+            //  Create new patient
             $firstname = ucfirst(trim($_POST['firstname']));
             $surname = ucfirst(trim($_POST['surname']));
             $dob = $_POST['date_of_birth'];
@@ -123,9 +122,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             $contact_number = $_POST['contact_number'];
             $address = ucfirst(trim($_POST['address']));
             $email = $_POST['email'];
-            $password = md5('password'); // Default password
+            $password = md5('password'); 
 
-            // Auto-generate a unique username
+            
             $base_username = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $firstname . $surname));
             $username = $base_username;
             $counter = 1;
@@ -145,13 +144,13 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             $query_patient->execute([':fname' => $firstname, ':sname' => $surname, ':dob' => $dob, ':sex' => $sex, ':status' => $civil_status, ':occupation' => $occupation, ':age' => $age, ':contact' => $contact_number, ':address' => $address, ':email' => $email, ':uname' => $username, ':password' => $password]);
             $patient_id = $dbh->lastInsertId();
 
-            // 2. Check for and create new appointment if details are provided
+            //  Check for and create new appointment if details are provided
             $app_date = $_POST['app_date'];
             $start_time = $_POST['start_time'];
             $end_time = $_POST['end_time'];
 
             if (!empty($app_date) && !empty($start_time)) {
-                $app_status = 'walkin'; // Default status for appointments created this way
+                $app_status = 'walkin'; 
 
                 $sql_appointment = "INSERT INTO tblappointment (patient_number, firstname, surname, date, start_time, end_time, status) VALUES (:pnum, :fname, :sname, :app_date, :start_time, :end_time, :status)";
                 $query_appointment = $dbh->prepare($sql_appointment);
@@ -180,15 +179,15 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         exit();
     }
 
-    // Initialize search variable
+    
     $search = '';
 
-    // Handle the search
+    
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_query'])) {
         $search = trim($_POST['search_query']); // Search is triggered on form submit
     }
 
-    // Code for deletion - this remains the same
+    // Code for deletion 
     if (isset($_GET['delid'])) {
         $rid = intval($_GET['delid']);
         $sql = "DELETE FROM tblpatient WHERE number = :rid";
@@ -214,7 +213,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <link rel="stylesheet" href="css/style.css">
      <link rel="stylesheet" href="css/sidebar.css">
      <link rel="stylesheet" href="css/mas-modal.css">   
-    <link rel="stylesheet" href="css/admin-calendar-availability.css">
+    <link rel="stylesheet" href="css/calendar-avail.css">
     <link rel="stylesheet" href="css/toast.css">
     <link rel="stylesheet" href="css/admin-calendar-availability.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -263,7 +262,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     </form>
 
                     <?php
-                        // Pagination setup
+                        
                         $pageno = isset($_GET['pageno']) ? intval($_GET['pageno']) : 1;
                         $no_of_records_per_page = 10;
                         $offset = ($pageno - 1) * $no_of_records_per_page;

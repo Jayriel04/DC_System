@@ -44,12 +44,11 @@ function getAppointmentEmailBody(string $patientName, string $appointmentDate, s
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
-    // Handle appointment update from edit modal
     if (isset($_POST['update_appointment'])) {
         $appointment_id = $_POST['appointment_id'];
         $status = $_POST['status'];
 
-        // Fetch appointment details before updating for notification purposes
+        // Fetch appointment details for notification
         $sql_fetch_appt = "SELECT a.patient_number, a.date, p.email, p.firstname, p.surname FROM tblappointment a JOIN tblpatient p ON a.patient_number = p.number WHERE a.id = :id";
         $query_fetch_appt = $dbh->prepare($sql_fetch_appt);
         $query_fetch_appt->bindParam(':id', $appointment_id, PDO::PARAM_INT);
@@ -78,12 +77,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     if (!empty($appointment_data['email'])) {
                         $mail = new PHPMailer(true);
                         try {
-                            //Server settings
+                            
                             $mail->isSMTP();
                             $mail->Host       = 'smtp.gmail.com';
                             $mail->SMTPAuth   = true;
-                            $mail->Username   = 'jezrahconde@gmail.com'; // Your Gmail address
-                            $mail->Password   = 'gzht tvxy vxzx awrt'; // Your Gmail App Password
+                            $mail->Username   = 'canoniokevin@gmail.com'; 
+                            $mail->Password   = 'qfkr wesz vhkm tydc'; 
                             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                             $mail->Port       = 587;
                             $mail->SMTPOptions = array(
@@ -94,25 +93,25 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 )
                             );
 
-                            //Recipients
+                            
                             $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
                             $mail->addAddress($appointment_data['email'], $appointment_data['firstname'] . ' ' . $appointment_data['surname']);
 
-                            //Content
+                            
                             $mail->isHTML(true);
                             $mail->Subject = 'Update on your Consultation Appointment';
                             
                             $patientFullName = htmlentities($appointment_data['firstname'] . ' ' . $appointment_data['surname']);
                             $mail->Body = getAppointmentEmailBody($patientFullName, $appointment_date, $status);
 
-                            // Plain text version for non-HTML email clients
+                            
                             $altBody = "Dear " . $patientFullName . ",\n\n";
                             $altBody .= "This is to inform you that your consultation appointment scheduled for " . $appointment_date . " has been " . strtolower($status) . ".\n\n";
                             $altBody .= "Thank you,\nJF Dental Care";
                             $mail->AltBody = $altBody;
                             $mail->send();
                         } catch (Exception $e) {
-                            // Optional: Log mail error
+                            
                         }
                     }
                 }
@@ -160,12 +159,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             if ($appointment_data && !empty($appointment_data['email'])) {
                 $mail = new PHPMailer(true);
                 try {
-                    //Server settings
+                    
                     $mail->isSMTP();
                     $mail->Host       = 'smtp.gmail.com';
                     $mail->SMTPAuth   = true;
-                    $mail->Username   = 'jezrahconde@gmail.com'; // Your Gmail address
-                    $mail->Password   = 'gzht tvxy vxzx awrt'; // Your Gmail App Password
+                    $mail->Username   = 'canoniokevin@gmail.com'; 
+                    $mail->Password   = 'qfkr wesz vhkm tydc'; 
                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                     $mail->Port       = 587;
                     $mail->SMTPOptions = array(
@@ -176,11 +175,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         )
                     );
 
-                    //Recipients
+                    
                     $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
                     $mail->addAddress($appointment_data['email'], $appointment_data['firstname'] . ' ' . $appointment_data['surname']);
 
-                    //Content
+                    
                     $mail->isHTML(true);
                     $mail->Subject = 'Your Consultation Appointment has been Cancelled';
                     
@@ -193,7 +192,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     $altBody .= "\n\nThank you,\nJF Dental Care";
                     $mail->AltBody = $altBody;
                     $mail->send();
-                } catch (Exception $e) { /* Optional: Log mail error */ }
+                } catch (Exception $e) {  }
             }
             $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Appointment cancelled successfully.'];
         } else {
@@ -202,11 +201,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         header('Location: mac.php');
         exit();
     }
-    // Handle new appointment and patient creation from modal
+    
     if (isset($_POST['schedule_appointment'])) {
         $dbh->beginTransaction();
         try {
-            // 1. Create new patient
+            // Create new patient
             $firstname = ucfirst(trim($_POST['firstname']));
             $surname = ucfirst(trim($_POST['surname']));
             $dob = $_POST['date_of_birth'];
@@ -216,7 +215,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             $contact_number = $_POST['contact_number'];
             $address = ucfirst(trim($_POST['address']));
             $email = $_POST['email'];
-            $password = md5('password'); // Default password
+            $password = md5('password'); 
 
             // Auto-generate a unique username
             $base_username = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $firstname . $surname));
@@ -238,18 +237,18 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             $query_patient->execute([':fname' => $firstname, ':sname' => $surname, ':dob' => $dob, ':sex' => $sex, ':status' => $civil_status, ':occupation' => $occupation, ':age' => $age, ':contact' => $contact_number, ':address' => $address, ':email' => $email, ':uname' => $username, ':password' => $password]);
             $patient_id = $dbh->lastInsertId();
 
-            // 2. Create new appointment
-            $app_date = $_POST['date']; // from the form
-            $start_time = $_POST['start_time']; // from the form
-            $end_time = $_POST['end_time']; // from the form
-            $app_status = 'walkin'; // Set default status to walk-in for appointments created this way
+            //  Create new appointment
+            $app_date = $_POST['date']; 
+            $start_time = $_POST['start_time'];
+            $end_time = $_POST['end_time']; 
+            $app_status = 'walkin'; 
 
             $sql_appointment = "INSERT INTO tblappointment (patient_number, firstname, surname, date, start_time, end_time, status) VALUES (:pnum, :fname, :sname, :app_date, :start_time, :end_time, :status)";
             $query_appointment = $dbh->prepare($sql_appointment);
             $query_appointment->execute([':pnum' => $patient_id, ':fname' => $firstname, ':sname' => $surname, ':app_date' => $app_date, ':start_time' => $start_time, ':end_time' => $end_time, ':status' => $app_status]);
 
             // Insert notification for admin
-            $admin_id = 1; // Assuming admin ID is 1
+            $admin_id = 1; 
             $notif_message = "A new walk-in appointment was created for " . htmlentities($firstname . ' ' . $surname) . ".";
             $notif_url = "mac.php?filter=today";
             $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
@@ -266,7 +265,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         }
     }
 
-    // Code for deletion
+    // for deletion
     if (isset($_GET['delid'])) {
         $rid = intval($_GET['delid']);
         $sql = "DELETE FROM tblappointment WHERE id = :rid";
@@ -278,11 +277,10 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         exit();
     }
 
-    // Initialize search and filter variables
+    
     $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
     $search = isset($_GET['search_query']) ? trim($_GET['search_query']) : '';
 
-    // --- APPOINTMENT COUNTS ---
     $sql_all = "SELECT COUNT(*) FROM tblappointment";
     $query_all = $dbh->prepare($sql_all);
     $query_all->execute();
@@ -309,13 +307,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     $query_completed->execute();
     $count_completed = $query_completed->fetchColumn();
 
-    // Count for 'Cancelled' appointments
+    // for 'Cancelled' appointments
     $sql_cancelled = "SELECT COUNT(*) FROM tblappointment WHERE status = 'Cancelled'";
     $query_cancelled = $dbh->prepare($sql_cancelled);
     $query_cancelled->execute();
     $count_cancelled = $query_cancelled->fetchColumn();
 
-    // --- APPOINTMENT LIST ---
     $sql_appointments = "SELECT * FROM tblappointment";
     $where_clauses = [];
     $params = [];
@@ -356,7 +353,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     }
     $appointments = $query_appointments->fetchAll(PDO::FETCH_OBJ);
 
-    // Helper to format time
     function format_time_12hr($time_24hr)
     {
         if (empty($time_24hr))
@@ -700,7 +696,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         </div>
     </div>
 
-    <!-- Cancel Appointment Admin Modal -->
+    <!-- Cancel Appointment Modal -->
     <div id="cancelAppointmentAdminModal" class="modal-container" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -747,7 +743,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <script src="vendors/js/vendor.bundle.base.js"></script>
     <script src="js/toast.js"></script>
     <script>
-        // Helper function to format time for display, now in a scope accessible to all listeners
         function formatTime12hr(time24hr) {
             if (!time24hr) return 'N/A';
             const [hours, minutes] = time24hr.split(':');
@@ -780,27 +775,24 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 cancelBtn.addEventListener('click', closeModal);
             }
 
-            // Close modal if clicking outside of the modal content
             window.addEventListener('click', function (event) {
                 if (event.target === modal) {
                     closeModal();
                 }
             });
 
-            // Form validation
             const form = document.getElementById('appointmentForm');
             if (form) {
                 form.addEventListener('submit', function (e) {
                     if (!form.checkValidity()) {
                         e.preventDefault();
-                        // Modern browsers will show their own validation messages.
-                        // For older ones, you might add custom logic here.
+                        
                         alert('Please fill out all required fields.');
                     }
                 });
             }
 
-            // Auto-capitalize first letter for new appointment fields
+            
             function capitalizeFirstLetter(inputId) {
                 const input = document.getElementById(inputId);
                 if (input) {
@@ -815,7 +807,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             capitalizeFirstLetter('surname');
             capitalizeFirstLetter('occupation');
 
-            // --- Cancel Appointment Admin Modal ---
             const cancelAdminModal = document.getElementById('cancelAppointmentAdminModal');
             const cancelAdminCloseBtn = cancelAdminModal.querySelector('.close-button');
             const cancelAdminCancelBtn = cancelAdminModal.querySelector('.btn-cancel');
@@ -845,7 +836,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 });
             });
 
-            // --- View Cancellation Reason Modal ---
             const viewReasonModal = document.getElementById('viewReasonModal');
             if (viewReasonModal) {
                 const viewReasonCloseBtn = viewReasonModal.querySelector('.close-button');
@@ -919,14 +909,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     filterButtons.classList.toggle('show');
                 });
 
-                // Close the dropdown if the user clicks outside of it
                 window.addEventListener('click', function (event) {
                     if (!dropdownToggle.contains(event.target) && !filterButtons.contains(event.target)) {
                         filterButtons.classList.remove('show');
                     }
                 });
 
-                // Close on escape key
                 document.addEventListener('keydown', function (event) {
                     if (event.key === 'Escape') {
                         filterButtons.classList.remove('show');

@@ -89,7 +89,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             $recent_reviews = $query_reviews->fetchAll(PDO::FETCH_OBJ);
 
                             // --- Chart Data Logic ---
-                            $period = isset($_GET['period']) ? $_GET['period'] : 'monthly'; // Default to monthly
+                            $period = isset($_GET['period']) ? $_GET['period'] : 'monthly'; 
 
                             $months = [];
                             $appointments_data = [];
@@ -99,7 +99,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             $date_format_sql = '';
                             $group_by_sql = '';
                             $interval_sql = '';
-                            $patient_group_by_sql = ''; // This will be for the date column
+                            $patient_group_by_sql = ''; 
                             $php_date_format = '';
                             $php_interval_unit = '';
                             $interval_count = 0;
@@ -119,12 +119,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     $group_by_sql = "YEARWEEK(a.date, 1)";
                                     $patient_group_by_sql = "YEARWEEK(p.created_at, 1)";
                                     $interval_sql = 'INTERVAL 7 WEEK';
-                                    // The label will be custom-generated below
                                     $php_interval_unit = 'week';
                                     $interval_count = 6;
                                     break;
                                 case 'yearly':
-                                    $date_format_sql = '%Y'; // Not used in final query, but kept for consistency
+                                    $date_format_sql = '%Y'; 
                                     $group_by_sql = "YEAR(a.date)";
                                     $patient_group_by_sql = "YEAR(p.created_at)";
                                     $interval_sql = 'INTERVAL 5 YEAR';
@@ -134,7 +133,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     break;
                                 case 'monthly':
                                 default:
-                                    $date_format_sql = '%Y-%m'; // Not used in final query, but kept for consistency
+                                    $date_format_sql = '%Y-%m'; 
                                     $group_by_sql = "DATE_FORMAT(a.date, '%Y-%m')";
                                     $patient_group_by_sql = "DATE_FORMAT(p.created_at, '%Y-%m')";
                                     $interval_sql = 'INTERVAL 7 MONTH';
@@ -148,7 +147,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 $current_date = strtotime("-$i $php_interval_unit");
                                 
                                 if ($period === 'weekly') {
-                                    $date_key = date('oW', $current_date); // ISO-8601 year and week
+                                    $date_key = date('oW', $current_date); 
                                     $week_start_ts = strtotime("-$i week Monday this week");
                                     $week_end_ts = strtotime("-$i week Sunday this week");
                                     $label = date('M d', $week_start_ts) . '-' . date('d', $week_end_ts);
@@ -175,9 +174,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 }
                             }
 
-                            // Fetch new patients count
-                            // Use COALESCE to treat NULL created_at as a very old date so it's grouped but likely outside our display range.
-                            // This ensures all patients are considered in the cumulative count.
                             $sql_chart_pat = "SELECT COUNT(p.number) as count, $patient_group_by_sql as period_key FROM tblpatient p GROUP BY period_key";
                             $query_chart_pat = $dbh->prepare($sql_chart_pat);
                             $query_chart_pat->execute();
@@ -189,8 +185,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 }
                             }
 
-                            // Calculate cumulative total patients
-                            // For each period, count all patients created up to the end of that period.
                             foreach ($months as $label => $date_key) {
                                 $end_date_for_period = date('Y-m-d', strtotime("last day of " . $label));
                                 if ($period === 'daily') {
@@ -209,7 +203,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             }
 
                             ?>
-                            <!-- Stats Grid -->
+                            
                             <div class="stats-grid">
                                 <div class="stat-card">
                                     <div class="stat-content">
@@ -250,7 +244,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 </div>
                             </div>
 
-                            <!-- Chart Section -->
                             <div class="chart-section">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                                     <div style="display: flex; align-items: center; gap: 280px;">
@@ -282,9 +275,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 </div>
                             </div>
 
-                            <!-- Content Grid -->
+                            
                             <div class="content-grid">
-                                <!-- Latest Appointments -->
                                 <div class="card">
                                     <div class="card-header">
                                         <h2 class="card-title">Latest Appointments</h2>
@@ -293,7 +285,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 
                                     <?php foreach ($latest_appointments as $appointment): ?>
                                         <?php
-                                        $avatar_image = 'avatar.png'; // Default fallback
+                                        $avatar_image = 'avatar.png'; 
                                         if (!empty($appointment->Image)) {
                                             $avatar_image = $appointment->Image;
                                         } elseif ($appointment->sex === 'Male') {
@@ -327,7 +319,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <?php endif; ?>
                                 </div>
 
-                                <!-- Popular Services -->
+                                
                                 <div class="card">
                                     <div class="card-header">
                                         <h2 class="card-title">Popular Services</h2>
@@ -359,7 +351,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 </div>
                             </div>
 
-                            <!-- Recent Reviews -->
                             <div class="card-tall">
                                 <div class="card-header">
                                     <h2 class="card-title">Recent Reviews</h2>
@@ -368,7 +359,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 <?php if (!empty($recent_reviews)): ?>
                                     <?php foreach ($recent_reviews as $review): ?>
                                         <?php
-                                        $review_avatar = 'avatar.png'; // Default fallback
+                                        $review_avatar = 'avatar.png'; 
                                         if (!empty($review->Image)) {
                                             $review_avatar = $review->Image;
                                         } elseif ($review->sex === 'Male') {
@@ -429,7 +420,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             fill: true,
                             tension: 0.4,
                             pointRadius: 5,
-                            pointBackgroundColor: '#14b8a6', // Teal
+                            pointBackgroundColor: '#14b8a6', 
                             pointBorderWidth: 2,
                             pointBorderColor: '#fff'
                         },
@@ -442,7 +433,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             fill: true,
                             tension: 0.4,
                             pointRadius: 5,
-                            pointBackgroundColor: '#3b82f6', // Blue
+                            pointBackgroundColor: '#3b82f6', 
                             pointBorderWidth: 2,
                             pointBorderColor: '#fff'
                         },
@@ -455,7 +446,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             fill: true,
                             tension: 0.4,
                             pointRadius: 5,
-                            pointBackgroundColor: '#10b981', // Green
+                            pointBackgroundColor: '#10b981', 
                             pointBorderWidth: 2,
                             pointBorderColor: '#fff'
                         }

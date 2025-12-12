@@ -1,13 +1,12 @@
-/* CSS for the Header */
 :root {
-    --primary-color: #1abc9c; /* A shade of green for the logo/icon */
+    --primary-color: #1abc9c; 
     --text-dark: #333;
     --text-light: #6c757d;
     --border-color: #e8ecf1;
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
-/* Main Header Container */
+
 .admin-header {
     display: flex;
     align-items: center;
@@ -20,14 +19,14 @@
     width: 100%;
 }
 
-/* Left Section: Logo and Navigation */
+
 .header-left {
     display: flex;
     align-items: center;
     flex-grow: 1;
 }
 
-/* Logo/Branding */
+
 .logo-container {
     display: flex;
     align-items: center;
@@ -56,11 +55,11 @@
     color: var(--text-light);
 }
 
-/* Dashboard Title */
+
 .dashboard-info {
     display: flex;
     flex-direction: column;
-    justify-content: center; /* This was margin-left: 20px; */
+    justify-content: center; 
     margin-left: 20px;
     flex-grow: 1;
 }
@@ -81,14 +80,14 @@
     padding: 0;
 }
 
-/* Right Section: Icons and User Profile */
+
 .header-right {
     display: flex;
     align-items: center;
     gap: 2px;
 }
 
-/* Notification and Message Icons */
+
 .icon-button {
     position: relative;
     background: none;
@@ -112,7 +111,7 @@
     border: 2px solid white;
 }
 
-/* User Profile */
+
 .user-profile {
     display: flex;
     align-items: center;
@@ -147,7 +146,7 @@
     white-space: nowrap;
 }
 
-/* Custom styles for the user profile dropdown toggle */
+
 .user-profile .dropdown-toggle {
     display: flex;
     align-items: center;
@@ -161,7 +160,7 @@
 }
 
 
-/* For dropdown compatibility */
+
 .user-profile .dropdown-toggle::after {
     display: none;
 }

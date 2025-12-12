@@ -6,10 +6,10 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid'] == 0)) {
   header('location:logout.php');
 } else {
-  // Code for deletion: prevent deleting a calendar entry that already has an appointment
+  // Code for deletion 
   if (isset($_GET['delid'])) {
     $rid = intval($_GET['delid']);
-    // Fetch the calendar entry's date and start_time
+    // Fetch the calendar entries for date and start_time
     $sqlFetch = "SELECT `date`, `start_time` FROM tblcalendar WHERE id = :rid";
     $queryFetch = $dbh->prepare($sqlFetch);
     $queryFetch->bindParam(':rid', $rid, PDO::PARAM_INT);
@@ -41,11 +41,11 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     header('Location: calendar.php');
   }
 
-  // Handle admin declining an appointment: mark matching appointments as Declined
+  // Handle admin declining an appointment
   if (isset($_GET['decline_date']) && isset($_GET['decline_time'])) {
     $dd = $_GET['decline_date'];
     $tt = $_GET['decline_time'];
-    // Update appointment(s) that match the date and start_time
+    // Update appointments that match the date and start_time
     $sqld = "UPDATE tblappointment SET status = 'Declined' WHERE `date` = :dt AND `start_time` = :tm";
     $queryd = $dbh->prepare($sqld);
     $queryd->bindParam(':dt', $dd, PDO::PARAM_STR);
@@ -59,14 +59,14 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     exit();
   }
 
-  // Handle calendar edit/update from modal
+  // calendar edit/update from modal
   if (isset($_POST['update_calendar'])) {
     $eid = isset($_POST['event_id']) ? intval($_POST['event_id']) : 0;
     $udate = isset($_POST['date']) ? $_POST['date'] : null;
     $ustart = isset($_POST['start_time']) ? $_POST['start_time'] : null;
     $uend = isset($_POST['end_time']) ? $_POST['end_time'] : null;
     if ($eid > 0) {
-      // Check if this calendar entry already has an appointment (booked)
+      // Check if schedule entry already has an appointment (booked)
       $sqlFetch = "SELECT `date`, `start_time` FROM tblcalendar WHERE id = :eid";
       $queryFetch = $dbh->prepare($sqlFetch);
       $queryFetch->bindParam(':eid', $eid, PDO::PARAM_INT);
@@ -104,7 +104,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     }
   }
 
-  // Handle new schedule creation from modal
+  // add new schedule creation from modal
   if (isset($_POST['add_schedule'])) {
     $date = $_POST['date'];
     $start_time = $_POST['start_time'];
@@ -125,7 +125,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
         exit();
     }
   }
-  // Month navigation
+  
   $currentMonth = isset($_GET['month']) ? $_GET['month'] : date('m');
   $currentYear = isset($_GET['year']) ? $_GET['year'] : date('Y');
 
@@ -134,12 +134,10 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
   $startDay = date('w', $firstDayOfMonth);
   $months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-  // Get names of the days of the week
+  
   $weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-  // Fetch events
-  // Fetch calendar events and mark as booked when a matching appointment exists (join on date and time)
-  // Only consider appointments that are not Declined when calculating booked flag
+  
   $sql = "SELECT c.*, CASE WHEN a.id IS NULL THEN 0 ELSE 1 END AS booked_flag FROM tblcalendar c LEFT JOIN tblappointment a ON a.date = c.date AND a.start_time = c.start_time AND (a.status IS NULL OR a.status NOT IN ('Declined', 'Cancelled')) WHERE MONTH(c.date) = :month AND YEAR(c.date) = :year";
   $query = $dbh->prepare($sql);
   $query->bindParam(':month', $currentMonth, PDO::PARAM_INT);
@@ -147,11 +145,10 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
   $query->execute();
   $events = $query->fetchAll(PDO::FETCH_OBJ);
 
-  // Create an array to hold events by date and flag booked events based strictly on tblappointment
+  
   $eventDays = [];
   foreach ($events as $event) {
     $dayIndex = date('j', strtotime($event->date));
-    // booked_flag comes from SQL join; coerce to boolean
     $event->booked = !empty($event->booked_flag);
     $eventDays[$dayIndex][] = $event;
   }
@@ -243,12 +240,11 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                                     echo '<div class="event ' . $eventClass . '" title="Click to edit">';
                                     echo '<div>' . htmlentities($time_display) . '</div>';
                                     
-                                    // Action buttons
                                     echo '<div class="event-actions" style="margin-top: 5px;">';
                                     if (!empty($event->booked)) {
                                         echo '<button class="btn btn-secondary btn-xs" disabled title="This schedule has an appointment and cannot be edited or deleted.">Booked</button>';
                                     } else {
-                                        // Use emojis for edit and delete actions
+                                        
                                         echo '<button class="btn btn-primary btn-xs edit-event-btn"
                                                 data-id="' . htmlentities($event->id) . '" 
                                                 data-date="' . htmlentities($event->date) . '" 
@@ -267,7 +263,6 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                             echo '</div>';
                         }
 
-                        // Next month's days
                         $totalCells = $startDay + $daysInMonth;
                         $remainingCells = (7 - ($totalCells % 7)) % 7;
                         for ($i = 1; $i <= $remainingCells; $i++) {
@@ -337,19 +332,12 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
             </form>
         </div>
     </div>
-    <!-- plugins:js -->
     <script src="vendors/js/vendor.bundle.base.js"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
     <script src="vendors/moment/moment.min.js"></script>
     <script src="vendors/daterangepicker/daterangepicker.js"></script>
-    <!-- End plugin js for this page -->
     <script src="js/toast.js"></script>
-    <!-- inject:js -->
     <script src="js/off-canvas.js"></script>
     <script src="js/misc.js"></script>
-    <!-- endinject -->
-    <!-- Custom js for this page --> 
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         // --- Add Schedule Modal ---
@@ -397,7 +385,6 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
         });
     });
     </script> 
-    <!-- End custom js for this page --> 
   </body>
   </html>
 <?php } ?>

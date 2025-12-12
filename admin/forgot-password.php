@@ -6,7 +6,6 @@ include('includes/dbconnection.php');
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// Make sure this path is correct for your project structure
 require '../vendor/autoload.php';
 
 $toast_message = null;
@@ -22,9 +21,9 @@ if(isset($_POST['submit'])) {
   $query->bindParam(':email', $email, PDO::PARAM_STR);
   $query->execute();
   if($query->rowCount() > 0) {
-    // Generate a 6-digit OTP
+    
     $otp = rand(100000, 999999);
-    // Store OTP, email, and timestamp in session
+    
     $_SESSION['otp'] = $otp;
     $_SESSION['otp_email'] = $email;
     $_SESSION['otp_timestamp'] = time();
@@ -33,12 +32,11 @@ if(isset($_POST['submit'])) {
     $mail = new PHPMailer(true);
     try {
         //Server settings - Update with your SMTP details
-        // $mail->SMTPDebug = 2; // Enable for verbose debug output
         $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com'; // Set the SMTP server to send through
+        $mail->Host       = 'smtp.gmail.com'; 
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'jezrahconde@gmail.com'; // SMTP username
-        $mail->Password   = 'gzht tvxy vxzx awrt'; // SMTP password or App Password
+        $mail->Username   = 'canoniokevin@gmail.com'; 
+        $mail->Password   = 'qfkr wesz vhkm tydc'; 
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
         $mail->SMTPOptions = array(
@@ -49,11 +47,9 @@ if(isset($_POST['submit'])) {
             )
         );
 
-        //Recipients
         $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
         $mail->addAddress($email);
 
-        //Content
         $mail->isHTML(true);
         $mail->Subject = 'Your OTP for Admin Password Reset';
         $mail->Body    = '
@@ -80,9 +76,9 @@ if(isset($_POST['submit'])) {
 
         $mail->send();
         header('location:verify-otp.php');
-        exit(); // Stop script execution after redirect
+        exit(); 
     } catch (Exception $e) {
-        // For debugging: error_log("Mailer Error: {$mail->ErrorInfo}");
+        
         setToast('The OTP email could not be sent. Please try again later.', 'danger');
     }
   } else {
@@ -97,11 +93,11 @@ if(isset($_POST['submit'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password</title>
-    <link rel="stylesheet" href="css/forgot-password-v2.css">
+    <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/toast.css">
 </head>
 <body>
-    <div class="container">
+    <div class="forgot-password-container">
         <div class="left-panel">
             <div class="floating-shape shape1"></div>
             <div class="floating-shape shape2"></div>

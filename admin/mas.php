@@ -424,37 +424,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                         <input type="text" name="search_query" placeholder="Search by patient or service name..." value="<?php echo htmlentities($search); ?>" aria-label="Search appointments">
                                     </div>
                                 </form>
-<<<<<<< HEAD
                                 <div class="filter-dropdown">
                                     <button class="filter-dropdown-toggle" id="filterDropdownToggle">
                                         <i class="fas fa-sort-amount-down-alt"></i>
                                         <span>Sort</span>
                                     </button>
                                     <div class="filter-buttons" id="filterButtons">
-                                        <a href="mas.php?filter=all&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'all') echo 'active'; ?>" data-filter="all">
-                                            All Appointments <span class="filter-count"><?php echo $count_all; ?></span>
-                                        </a>
-                                        <a href="mas.php?filter=today&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'today') echo 'active'; ?>" data-filter="today">
-                                            Today <span class="filter-count"><?php echo $count_today; ?></span>
-                                        </a>
-                                        <a href="mas.php?filter=upcoming&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'upcoming') echo 'active'; ?>" data-filter="upcoming">
-                                            Upcoming <span class="filter-count"><?php echo $count_upcoming; ?></span>
-                                        </a>
-                                        <a href="mas.php?filter=pending&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'pending') echo 'active'; ?>" data-filter="pending">
-                                            Ongoing <span class="filter-count"><?php echo $count_pending; ?></span>
-                                        </a>
-                                        <a href="mas.php?filter=completed&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'completed') echo 'active'; ?>" data-filter="completed">
-                                            Completed <span class="filter-count"><?php echo $count_completed; ?></span>
-                                        </a>
-                                        <a href="mas.php?filter=cancelled&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'cancelled') echo 'active'; ?>" data-filter="cancelled">
-                                            Cancelled <span class="filter-count"><?php echo $count_cancelled; ?></span>
-                                        </a>
-                                        <a href="mas.php?filter=for_cancellation&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'for_cancellation') echo 'active'; ?>" data-filter="for_cancellation">
-                                            Request Cancellation <span class="filter-count"><?php echo $count_for_cancellation; ?></span>
-                                        </a>
-                                    </div>
-=======
-                                <div class="filter-buttons">
                                     <a href="mas.php?filter=all&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'all') echo 'active'; ?>" data-filter="all">
                                         All Appointments <span class="filter-count"><?php echo $count_all; ?></span>
                                     </a>
@@ -473,8 +448,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <a href="mas.php?filter=for_cancellation&search_query=<?php echo urlencode($search); ?>" class="filter-btn <?php if ($filter === 'for_cancellation') echo 'active'; ?>" data-filter="for_cancellation">
                                         Request Cancellation <span class="filter-count"><?php echo $count_for_cancellation; ?></span>
                                     </a>
->>>>>>> dfe76b599e23962fb31a45d9584cd07c0fdb612f
                                 </div>
+                            </div>
                             </div>
                         </div>
                         
@@ -503,15 +478,15 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <?php if (count($schedules) > 0) : ?>
                                         <?php foreach ($schedules as $schedule) : ?>
                                             <tr>
-                                                <td><?php echo htmlentities($schedule->id); ?></td>
-                                                <td><?php echo htmlentities($schedule->firstname); ?></td>
-                                                <td><?php echo htmlentities($schedule->surname); ?></td>
-                                                <td style="width: 150px;"><?php echo htmlentities($schedule->category_name ?: 'N/A'); ?></td>
-                                                <td style="width: 315px;"><?php echo htmlentities($schedule->service_name ?: 'N/A'); ?></td>
-                                                <td><?php echo htmlentities($schedule->date); ?></td>
-                                                <td><?php echo format_time_12hr($schedule->time); ?></td>
-                                                <td><?php echo htmlentities($schedule->duration ? $schedule->duration . ' mins' : 'N/A'); ?></td>
-                                                <td class="cancel-reason-cell" style="width: 50px;">
+                                                <td data-label="No"><?php echo htmlentities($schedule->id); ?></td>
+                                                <td data-label="First Name"><?php echo htmlentities($schedule->firstname); ?></td>
+                                                <td data-label="Surname"><?php echo htmlentities($schedule->surname); ?></td>
+                                                <td data-label="Category" style="width: 150px;"><?php echo htmlentities($schedule->category_name ?: 'N/A'); ?></td>
+                                                <td data-label="Service" style="width: 315px;"><?php echo htmlentities($schedule->service_name ?: 'N/A'); ?></td>
+                                                <td data-label="Date"><?php echo htmlentities($schedule->date); ?></td>
+                                                <td data-label="Time"><?php echo format_time_12hr($schedule->time); ?></td>
+                                                <td data-label="Duration"><?php echo htmlentities($schedule->duration ? $schedule->duration . ' mins' : 'N/A'); ?></td>
+                                                <td data-label="Reason" class="cancel-reason-cell" style="width: 50px;">
                                                     <?php if (!empty($schedule->cancel_reason)): ?>
                                                     <button class="view-reason-btn" title="View Reason"
                                                         data-reason="<?php echo htmlentities($schedule->cancel_reason); ?>"
@@ -522,8 +497,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                     <span style="color: #ccc;">-</span>
                                                     <?php endif; ?>
                                                 </td>
-                                                <td><span class="status-badge status-<?php echo strtolower(htmlentities($schedule->status)); ?>"><?php echo htmlentities($schedule->status); ?></span></td>
-                                                <td class="actions-icons">
+                                                <td data-label="Status"><span class="status-badge status-<?php echo strtolower(htmlentities($schedule->status)); ?>"><?php echo htmlentities($schedule->status); ?></span></td>
+                                                <td data-label="Action" class="actions-icons">
                                                     <button class="edit-schedule-btn" title="Edit"
                                                         data-id="<?php echo htmlentities($schedule->id); ?>"
                                                         data-firstname="<?php echo htmlentities($schedule->firstname); ?>"

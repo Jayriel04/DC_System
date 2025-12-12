@@ -18,7 +18,7 @@ if(isset($_POST['submit']))
     $query->execute();
     $result = $query->fetch(PDO::FETCH_OBJ);
 
-    // Verify current password (checking both new hash and old md5 for backward compatibility)
+    // Verify current password and update to new password
     if ($result && (password_verify($current_password_input, $result->Password) || md5($current_password_input) === $result->Password)) {
         $new_hashed_password = password_hash($new_password_input, PASSWORD_DEFAULT);
         
@@ -41,7 +41,7 @@ if(isset($_POST['submit']))
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta charset="utf-8">
-    <title>Student  Management System|| Change Password</title>
+    <title>Change Password</title>
     <link rel="stylesheet" href="vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
@@ -125,28 +125,16 @@ if(isset($_POST['submit']))
                 </div>
             </div>
           </div>
-          <!-- content-wrapper ends -->
-          <!-- partial:partials/_footer.html -->
+
          <?php include_once('includes/footer.php');?>
-          <!-- partial -->
         </div>
-        <!-- main-panel ends -->
       </div>
-      <!-- page-body-wrapper ends -->
     </div>
-    <!-- container-scroller -->
-    <!-- plugins:js -->
     <script src="vendors/js/vendor.bundle.base.js"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
     <script src="vendors/select2/select2.min.js"></script>
     <script src="vendors/typeahead.js/typeahead.bundle.min.js"></script>
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
     <script src="js/off-canvas.js"></script>
     <script src="js/misc.js"></script>
-    <!-- endinject -->
-    <!-- Custom js for this page -->
     <script src="js/typeahead.js"></script>
     <script src="js/select2.js"></script>
     <script>
@@ -217,6 +205,5 @@ if(isset($_POST['submit']))
             document.getElementById('applyBtn').disabled = !(currentPassword && password && confirm && password === confirm && metCount === 3);
         }
     </script>
-    <!-- End custom js for this page -->
   </body>
 </html><?php }  ?>
