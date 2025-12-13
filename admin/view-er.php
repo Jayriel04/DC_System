@@ -3,7 +3,6 @@ session_start();
 error_reporting(0);
 include('includes/dbconnection.php');
 
-// Get patient ID from URL
 $stdid = '';
 if (isset($_GET['stid'])) {
     $stdid = intval($_GET['stid']);
@@ -16,7 +15,7 @@ if (empty($stdid)) {
     exit();
 }
 
-// Fetch patient info
+
 $sql = "SELECT * FROM tblpatient WHERE number = :num";
 $query = $dbh->prepare($sql);
 $query->bindParam(':num', $stdid, PDO::PARAM_INT);
@@ -28,7 +27,6 @@ if (!$row) {
     exit();
 }
 
-// Build a safe display name for the patient with fallbacks
 $patient_fullname = trim((isset($row->firstname) ? $row->firstname : '') . ' ' . (isset($row->surname) ? $row->surname : ''));
 if (empty($patient_fullname)) {
     if (!empty($row->username)) {
@@ -40,7 +38,6 @@ if (empty($patient_fullname)) {
     }
 }
 
-// Fetch health conditions for this patient
 $health_arr = [];
 if (!empty($row->health_conditions) && $row->health_conditions !== 'null' && $row->health_conditions !== '[]') {
     $decoded = json_decode($row->health_conditions, true);
@@ -49,7 +46,6 @@ if (!empty($row->health_conditions) && $row->health_conditions !== 'null' && $ro
     }
 }
 
-// helper to mark checkbox checked and to get text values
 function hc_checked($cat, $val)
 {
     global $health_arr;
@@ -65,10 +61,9 @@ function hc_text($key)
     return '';
 }
 
-// Handle admin POST from modal: save health conditions and optionally book appointment
+// save health conditions 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
     $post_health = isset($_POST['health_conditions']) ? $_POST['health_conditions'] : [];
-    // normalize any string fields (like liver_specify) into the array shape
     $hc_json = json_encode($post_health);
 
     $sqlUpd = "UPDATE tblpatient SET health_conditions = :hc WHERE number = :num";
@@ -77,7 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
     $qryUpd->bindParam(':num', $stdid, PDO::PARAM_INT);
     if ($qryUpd->execute()) {
         $_SESSION['modal_success'] = 'Health info saved.';
-        // Refresh to show updated values
         header('Location: view-er.php?stid=' . intval($stdid));
         exit();
     } else {
@@ -112,7 +106,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
                 <div class="content-wrapper">
                     <div class="header">
                         <div class="header-text">
-                            <h2 class="patient-name-header">Examination Records</h2>
+                            <h2>Examination Records</h2>
+                            <p>Manage your medical records</p>
                         </div>
                         <a href="manage-patient.php" class="btn-add btn-back-small" style="text-decoration: none;"><i
                                 class="fas fa-reply"></i> Back</a>
@@ -177,16 +172,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
                 <div id="medicalHistoryModal" class="modal">
                     <div class="modal-content health-questionnaire-modal">
                         <div class="modal-header">
-                            <h2 class="modal-title">Edit Examination Records
-                                <?php echo htmlspecialchars(trim($row->firstname . ' ' . $row->surname)); ?>
-                            </h2>
+                            <h2 class="modal-title">Edit Examination Records</h2>
                             <span class="close" data-dismiss="modal">&times;</span>
                         </div>
                         <div class="modal-body">
                             <form method="post" action="view-er.php?stid=<?php echo $stdid; ?>" id="medicalHistoryForm">
                                 <p class="instruction">Please check all conditions that apply to the patient.</p>
                                 <div class="form-container">
-                                    <!-- Left Column -->
+                                    
                                     <div>
                                         <div class="section general">
                                             <div class="section-title">General</div>
@@ -274,7 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
                                                 value="<?php echo hc_text('stroke_when'); ?>">
                                         </div>
                                     </div>
-                                    <!-- Right Column -->
+                                    
                                     <div>
                                         <div class="section urinary">
                                             <div class="section-title">Urinary</div>
@@ -370,7 +363,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Other Sections -->
+                                
                                 <div class="section hospitalization">
                                     <div class="section-title">Hospitalization</div>
                                     <div class="checkbox-item"><label for="hc-hosp-1">Have you been
@@ -454,7 +447,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_health'])) {
             <script src="vendors/js/vendor.bundle.base.js"></script>
             <script src="js/off-canvas.js"></script>
             <script src="js/misc.js"></script>
-            <script src="js/view-er-modal.js"></script>
+            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                    const modal = document.getElementById('medicalHistoryModal');
+                    if (!modal) return;
+
+                    const openBtn = document.getElementById('btnEditHealth');
+                    const closeBtn = modal.querySelector('.close');
+
+                    function openModal() {
+                        modal.style.display = 'flex';
+                    }
+
+                    function closeModal() {
+                        modal.style.display = 'none';
+                    }
+
+                    if (openBtn) {
+                        openBtn.addEventListener('click', openModal);
+                    }
+                    if (closeBtn) {
+                        closeBtn.addEventListener('click', closeModal);
+                    }
+                    window.addEventListener('click', function (event) {
+                        if (event.target === modal) closeModal();
+                    });
+                    });
+            </script>
 </body>
 
 </html>

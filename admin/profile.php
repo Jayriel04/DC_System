@@ -12,18 +12,18 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     $mobno=$_POST['mobilenumber'];
     $email=$_POST['email'];
 
-    // Handle file upload
-    $image = $_POST['current_image']; // Keep current image by default
+    
+    $image = $_POST['current_image']; 
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $target_dir = "images/";
-        // Create a unique filename
+        
         $image_name = time() . '_' . basename($_FILES["image"]["name"]);
         $target_file = $target_dir . $image_name;
         
-        // Move the uploaded file
+       
         if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-            $image = $image_name; // Set new image name for DB update
-            // Optionally, delete the old image if it's not the default
+            $image = $image_name; 
+
             if ($_POST['current_image'] != 'doctor.png' && file_exists($target_dir . $_POST['current_image'])) {
                 unlink($target_dir . $_POST['current_image']);
             }
@@ -88,7 +88,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                         $initials = strtoupper(substr($row->AdminName, 0, 2));
                     }
                   ?>
-                <!-- Tabs -->
+                
                 <div class="tabs">
                     <div class="tab active">
                         <i class="fas fa-user"></i>
@@ -96,7 +96,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                     </div>
                 </div>
 
-                <!-- Profile Header -->
+                
                 <div class="profile-header">
                     <div class="profile-info">
                         <div class="avatar">
@@ -122,7 +122,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                     </button>
                 </div>
 
-                <!-- Profile Form -->
+                
                 <div class="form-grid">
                     <div class="form-group">
                         <h3>Admin Name</h3>
@@ -171,7 +171,7 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                                 <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(event)">
                             </div>
                         </div>
-                        <!-- Hidden field to keep track of the current image -->
+                        
                         <input type="hidden" name="current_image" value="<?php echo htmlentities($row->image); ?>">
                     </div>
 

@@ -264,10 +264,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     <?php
                         
                         $pageno = isset($_GET['pageno']) ? intval($_GET['pageno']) : 1;
-                        $no_of_records_per_page = 10;
+                        $no_of_records_per_page = 5;
                         $offset = ($pageno - 1) * $no_of_records_per_page;
 
-                        // Build the query based on search
                         $countSql = "SELECT COUNT(*) FROM tblpatient WHERE 1=1";
                         if ($search) {
                             $countSql .= " AND (firstname LIKE :search OR surname LIKE :search)";
@@ -325,7 +324,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <td>
                                         <div class="patient-cell">
                                             <?php
-                                            $avatar_image = 'avatar.png'; // Default fallback
+                                            $avatar_image = 'avatar.png'; 
                                             if (!empty($row->Image)) {
                                                 $avatar_image = $row->Image;
                                             } elseif ($row->sex === 'Male') {
@@ -382,6 +381,30 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 <?php } ?>
                             </tbody>
                         </table>
+                        <div align="left" class="mt-4">
+                            <?php
+                            $query_params = [];
+                            if ($search) {
+                                $query_params['search_query'] = $search;
+                            }
+                            ?>
+                            <ul class="pagination">
+                                <li><a
+                                        href="?pageno=1<?php echo !empty($query_params) ? '&' . http_build_query($query_params) : ''; ?>"><strong>First</strong></a>
+                                </li>
+                                <li class="<?php if ($pageno <= 1) { echo 'disabled'; } ?>">
+                                    <a
+                                        href="<?php if ($pageno <= 1) { echo '#'; } else { echo "?pageno=" . ($pageno - 1) . (!empty($query_params) ? '&' . http_build_query($query_params) : ''); } ?>"><strong>Prev</strong></a>
+                                </li>
+                                <li class="<?php if ($pageno >= $total_pages) { echo 'disabled'; } ?>">
+                                    <a
+                                        href="<?php if ($pageno >= $total_pages) { echo '#'; } else { echo "?pageno=" . ($pageno + 1) . (!empty($query_params) ? '&' . http_build_query($query_params) : ''); } ?>"><strong>Next</strong></a>
+                                </li>
+                                <li><a
+                                        href="?pageno=<?php echo $total_pages; ?><?php echo !empty($query_params) ? '&' . http_build_query($query_params) : ''; ?>"><strong>Last</strong></a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <?php include_once('includes/footer.php');?>
@@ -469,7 +492,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         </div>
     </div>
 
-    <!-- Edit Patient Modal -->
+    <!-- Edit Patient Modal with service appointment schedule-->
     <div id="editPatientModal" class="modal-container" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -550,6 +573,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 </div>
             </form>
         </div>
+        <?php include_once('includes/footer.php'); ?>
     </div>
 
     <script src="vendors/js/vendor.bundle.base.js"></script>
@@ -604,7 +628,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 document.getElementById('edit_address').value = dataset.address;
                 document.getElementById('edit_email').value = dataset.email;
 
-                // Clear appointment fields
                 document.getElementById('edit_service_id').value = '';
                 document.getElementById('edit_appointment_date').value = '';
                 document.getElementById('edit_start_time').value = '';
@@ -617,7 +640,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             });
         });
 
-        // Auto-capitalize first letter for new patient fields
+        
         function capitalizeFirstLetter(inputId) {
             const input = document.getElementById(inputId);
             if (input) {
@@ -633,7 +656,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         capitalizeFirstLetter('occupation');
         capitalizeFirstLetter('address');
 
-        // --- Dependent Dropdown for Edit Modal ---
+        
         const categorySelect = document.getElementById('edit_service_category');
         const serviceSelect = document.getElementById('edit_service_id');
 
@@ -647,7 +670,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 return;
             }
 
-            // Fetch services for the selected category via AJAX
+            
             fetch(`manage-patient.php?get_services_by_category=1&category_id=${encodeURIComponent(category)}`) // Changed parameter name
                 .then(response => {
                     if (!response.ok) {

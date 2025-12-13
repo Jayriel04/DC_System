@@ -136,7 +136,6 @@ if(isset($_POST['submit']))
     <script src="js/off-canvas.js"></script>
     <script src="js/misc.js"></script>
     <script src="js/typeahead.js"></script>
-    <script src="js/select2.js"></script>
     <script>
         function togglePassword(fieldId) {
             const field = document.getElementById(fieldId);
@@ -204,6 +203,16 @@ if(isset($_POST['submit']))
             const currentPassword = document.getElementById('currentpassword').value;
             document.getElementById('applyBtn').disabled = !(currentPassword && password && confirm && password === confirm && metCount === 3);
         }
+        (function($) {
+            'use strict';
+
+            if ($(".js-example-basic-single").length) {
+                $(".js-example-basic-single").select2();
+            }
+            if ($(".js-example-basic-multiple").length) {
+                $(".js-example-basic-multiple").select2();
+            }
+            })(jQuery);
     </script>
   </body>
 </html><?php }  ?>

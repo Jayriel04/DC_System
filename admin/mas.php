@@ -8,16 +8,6 @@ use PHPMailer\PHPMailer\Exception;
 
 require '../vendor/autoload.php';
 
-/**
- * Renders a professional HTML email template for service appointment status updates.
- *
- * @param string $patientName The name of the patient.
- * @param string $appointmentDate The formatted date of the appointment.
- * @param string $serviceName The name of the service.
- * @param string $status The new status (e.g., 'Done', 'Cancelled').
- * @param string|null $reason The reason for cancellation, if any.
- * @return string The full HTML body of the email.
- */
 function getServiceAppointmentEmailBody(string $patientName, string $appointmentDate, string $serviceName, string $status, ?string $reason = null): string
 {
     ob_start();
@@ -44,13 +34,13 @@ function getServiceAppointmentEmailBody(string $patientName, string $appointment
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
-    // Handle schedule update from edit modal
+    // schedule update from edit modal
     if (isset($_POST['update_schedule'])) {
         $schedule_id = $_POST['schedule_id'];
         $status = $_POST['status'];
         $cancel_reason = ($status === 'Cancelled') ? $_POST['cancel_reason'] : NULL;
         
-        // Fetch schedule details before updating for notification purposes
+        // Fetch schedule details for notification
         $sql_fetch_schedule = "SELECT s.patient_number, s.date, svc.name as service_name, p.email, p.firstname, p.surname 
                                FROM tblschedule s 
                                LEFT JOIN tblservice svc ON s.service_id = svc.number 
@@ -69,7 +59,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             $query_update->bindParam(':id', $schedule_id, PDO::PARAM_INT);
 
             if ($query_update->execute()) {
-                // If status is Done or Cancelled, send a notification to the patient
+                // If status is Done or Cancelled
                 if ($status == 'Done' || $status == 'Cancelled') {
                     $patient_id = $schedule_data['patient_number'];
                     $service_name = $schedule_data['service_name'] ?: 'your service';
@@ -81,16 +71,16 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     $query_notif = $dbh->prepare($sql_notif);
                     $query_notif->execute([':recipient_id' => $patient_id, ':message' => $message, ':url' => $url]);
 
-                    // Send email notification
+                    
                     if (!empty($schedule_data['email'])) {
                         $mail = new PHPMailer(true);
                         try {
-                            //Server settings
+                            
                             $mail->isSMTP();
                             $mail->Host       = 'smtp.gmail.com';
                             $mail->SMTPAuth   = true;
-                            $mail->Username   = 'jezrahconde@gmail.com'; // Your Gmail address
-                            $mail->Password   = 'gzht tvxy vxzx awrt'; // Your Gmail App Password
+                            $mail->Username   = 'canoniokevin@gmail.com'; 
+                            $mail->Password   = 'qfkr wesz vhkm tydc'; 
                             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                             $mail->Port       = 587;
                             $mail->SMTPOptions = array(
@@ -101,11 +91,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                 )
                             );
 
-                            //Recipients
+                            
                             $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
                             $mail->addAddress($schedule_data['email'], $schedule_data['firstname'] . ' ' . $schedule_data['surname']);
 
-                            //Content
+                            
                             $mail->isHTML(true);
                             $mail->Subject = 'Update on your Service Appointment';
                             
@@ -118,7 +108,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             $mail->AltBody = $altBody;
                             $mail->send();
                         } catch (Exception $e) {
-                            // Optional: Log mail error
+                            
                         }
                     }
                 }
@@ -133,13 +123,13 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         exit();
     }
 
-    // Handle service schedule cancellation from admin modal
+    // service schedule cancellation 
     if (isset($_POST['confirm_cancel_service'])) {
         $schedule_id = $_POST['schedule_id'];
         $cancel_reason = $_POST['cancel_reason'];
-        $status = 'Cancelled'; // Set status to Cancelled
+        $status = 'Cancelled'; 
 
-        // Fetch schedule details for notification
+        
         $sql_fetch_schedule = "SELECT s.patient_number, s.date, svc.name as service_name, p.email, p.firstname, p.surname FROM tblschedule s LEFT JOIN tblservice svc ON s.service_id = svc.number LEFT JOIN tblpatient p ON s.patient_number = p.number WHERE s.id = :id";
         $query_fetch_schedule = $dbh->prepare($sql_fetch_schedule);
         $query_fetch_schedule->bindParam(':id', $schedule_id, PDO::PARAM_INT);
@@ -153,16 +143,16 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $query_cancel->bindParam(':id', $schedule_id, PDO::PARAM_INT);
 
         if ($query_cancel->execute()) {
-            // Send email notification to patient
+            
             if ($schedule_data && !empty($schedule_data['email'])) {
                 $mail = new PHPMailer(true);
                 try {
-                    //Server settings
+                    
                     $mail->isSMTP();
                     $mail->Host       = 'smtp.gmail.com';
                     $mail->SMTPAuth   = true;
-                    $mail->Username   = 'jezrahconde@gmail.com'; // Your Gmail address
-                    $mail->Password   = 'gzht tvxy vxzx awrt'; // Your Gmail App Password
+                    $mail->Username   = 'canoniokevin@gmail.com'; 
+                    $mail->Password   = 'qfkr wesz vhkm tydc'; // Your Gmail App Password
                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                     $mail->Port       = 587;
                     $mail->SMTPOptions = array(
@@ -173,11 +163,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         )
                     );
 
-                    //Recipients
+            
                     $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
                     $mail->addAddress($schedule_data['email'], $schedule_data['firstname'] . ' ' . $schedule_data['surname']);
 
-                    //Content
+        
                     $mail->isHTML(true);
                     $mail->Subject = 'Your Service Appointment has been Cancelled';
                     
@@ -191,11 +181,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     $altBody .= "\n\nThank you,\nJF Dental Care";
                     $mail->AltBody = $altBody;
                     $mail->send();
-                } catch (Exception $e) { /* Optional: Log mail error */ }
+                } catch (Exception $e) {  }
             }
-            // Insert notification for admin
-            $admin_id = 1; // Assuming admin ID is 1
-            $patient_name = $_POST['patient_name_for_notif']; // Hidden input needed in the form
+            
+            $admin_id = 1; 
+            $patient_name = $_POST['patient_name_for_notif']; 
             $notif_message = "A service for " . htmlentities($patient_name) . " was cancelled by an admin.";
             $notif_url = "mas.php?filter=cancelled";
             $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
@@ -208,11 +198,11 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         header('Location: mas.php');
         exit();
     }
-    // Handle new service appointment and patient creation from modal
+    
     if (isset($_POST['schedule_service_appointment'])) {
         $dbh->beginTransaction();
         try {
-            // 1. Create new patient
+            
             $firstname = $_POST['firstname'];
             $surname = $_POST['surname'];
             $dob = $_POST['date_of_birth'];
@@ -222,9 +212,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             $contact_number = $_POST['contact_number'];
             $address = $_POST['address'];
             $email = $_POST['email'];
-            $password = md5('password'); // Default password
+            $password = md5('password'); 
 
-            // Auto-generate a unique username
+            
             $base_username = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $firstname . $surname));
             $username = $base_username;
             $counter = 1;
@@ -244,12 +234,12 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             $query_patient->execute([':fname' => $firstname, ':sname' => $surname, ':dob' => $dob, ':sex' => $sex, ':status' => $civil_status, ':occupation' => $occupation, ':age' => $age, ':contact' => $contact_number, ':address' => $address, ':email' => $email, ':uname' => $username, ':password' => $password]);
             $patient_id = $dbh->lastInsertId();
 
-            // 2. Create new service schedule
+            // Create new service schedule
             $service_id = $_POST['service_id'];
             $app_date = $_POST['date'];
             $start_time = $_POST['start_time'];
             $duration = $_POST['duration'];
-            $app_status = 'Ongoing'; // Set default status to Ongoing for services
+            $app_status = 'Ongoing'; 
 
             $sql_schedule = "INSERT INTO tblschedule (patient_number, firstname, surname, service_id, date, time, duration, status) VALUES (:pnum, :fname, :sname, :service_id, :app_date, :start_time, :duration, :status)";
             $query_schedule = $dbh->prepare($sql_schedule);
@@ -265,7 +255,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         }
     }
 
-    // Code for deletion
+    
     if (isset($_GET['delid'])) {
         $rid = intval($_GET['delid']);
         $sql = "DELETE FROM tblschedule WHERE id = :rid";
@@ -279,7 +269,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 
     $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
     $search = isset($_GET['search_query']) ? trim($_GET['search_query']) : '';
-    // --- SERVICE APPOINTMENT COUNTS ---
+    
     $sql_all = "SELECT COUNT(*) FROM tblschedule";
     $query_all = $dbh->prepare($sql_all);
     $query_all->execute();
@@ -315,7 +305,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     $query_for_cancellation->execute();
     $count_for_cancellation = $query_for_cancellation->fetchColumn();
 
-    // --- SERVICE APPOINTMENT LIST ---
+    
     $sql_schedules = "SELECT s.*, svc.name as service_name, cat.name as category_name FROM tblschedule s LEFT JOIN tblservice svc ON s.service_id = svc.number LEFT JOIN tblcategory cat ON svc.category_id = cat.id";
     $where_clauses = [];
     $params = [];
@@ -359,7 +349,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     }
     $schedules = $query_schedules->fetchAll(PDO::FETCH_OBJ);
 
-    // Helper to format time
+    
     function format_time_12hr($time_24hr)
     {
         if (empty($time_24hr))
@@ -544,79 +534,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         </div>
     </div>
 
-    <!-- New Service Appointment Modal -->
-    <div id="newAppointmentModal" class="modal-container" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>New Service Appointment</h2>
-                <button class="close-button">&times;</button>
-            </div>
-            <form id="appointmentForm" method="POST">
-                <div class="modal-body">
-                    <h3 class="form-section-title">Patient Details</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label for="firstname">First Name</label><input type="text" id="firstname" name="firstname" required></div>
-                        <div class="form-group"><label for="surname">Surname</label><input type="text" id="surname" name="surname" required></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label for="date_of_birth">Date of Birth</label><input type="date" id="date_of_birth" name="date_of_birth" required></div>
-                        <div class="form-group">
-                            <label for="sex">Sex</label>
-                            <select id="sex" name="sex" required>
-                                <option value="">Select Sex</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label for="civil_status">Civil Status</label><input type="text" id="civil_status" name="civil_status"></div>
-                        <div class="form-group"><label for="occupation">Occupation</label><input type="text" id="occupation" name="occupation"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label for="contact_number">Phone Number</label><input type="tel" id="contact_number" name="contact_number" required></div>
-                        <div class="form-group"><label for="email">Email Address</label><input type="email" id="email" name="email"></div>
-                    </div>
-                    <div class="form-group"><label for="address">Address</label><textarea id="address" name="address" rows="2"></textarea></div>
-
-                    <hr class="form-divider">
-
-                    <h3 class="form-section-title">Service Appointment Details</h3>
-                    <div class="form-group">
-                        <label for="service_id">Service</label>
-                        <select id="service_id" name="service_id" required>
-                            <option value="">Select Service</option>
-                            <?php
-                            $svcs = $dbh->query("SELECT number, name FROM tblservice ORDER BY name")->fetchAll(PDO::FETCH_OBJ);
-                            foreach ($svcs as $s) {
-                                echo "<option value='{$s->number}'>" . htmlentities($s->name) . "</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="date">Date</label>
-                            <input type="date" id="date" name="date" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="start_time">Time</label>
-                            <input type="time" id="start_time" name="start_time" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="duration">Duration (minutes)</label>
-                        <input type="number" id="duration" name="duration" min="1" placeholder="e.g., 30" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-cancel">Cancel</button>
-                    <button type="submit" name="schedule_service_appointment" class="btn btn-schedule">Schedule Appointment</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Edit Service Schedule Modal -->
     <div id="editScheduleModal" class="modal-container" style="display: none;">
         <div class="modal-content">
@@ -764,7 +681,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 });
             }
 
-            // Show/hide cancellation reason field in edit modal
+            
             const editStatusSelect = document.getElementById('edit_status');
             const cancelReasonGroup = document.getElementById('cancel_reason_group');
 
@@ -778,7 +695,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 });
             }
 
-            // --- Cancel Service Schedule Admin Modal ---
+            
             const cancelAdminModal = document.getElementById('cancelScheduleAdminModal');
             if (cancelAdminModal) {
                 const cancelAdminCloseBtn = cancelAdminModal.querySelector('.close-button');
@@ -811,7 +728,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 });
             }
 
-            // --- View Cancellation Reason Modal ---
+            
             const viewReasonModal = document.getElementById('viewReasonModal');
             if (viewReasonModal) {
                 const viewReasonCloseBtn = viewReasonModal.querySelector('.close-button');
@@ -852,14 +769,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     filterButtons.classList.toggle('show');
                 });
 
-                // Close the dropdown if the user clicks outside of it
+                
                 window.addEventListener('click', function (event) {
                     if (!dropdownToggle.contains(event.target) && !filterButtons.contains(event.target)) {
                         filterButtons.classList.remove('show');
                     }
                 });
 
-                // Close on escape key
+                
                 document.addEventListener('keydown', function (event) {
                     if (event.key === 'Escape') {
                         filterButtons.classList.remove('show');

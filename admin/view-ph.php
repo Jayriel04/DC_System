@@ -4,10 +4,9 @@ error_reporting(0);
 include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid']) == 0) {
   header('location:logout.php');
-  exit(); // It's good practice to exit after a header redirect
+  exit();
 }
 
-// Determine patient id (accept either stid or number from manage-patient.php)
 $stdid = null;
 if (isset($_GET['stid'])) {
   $stdid = intval($_GET['stid']);
@@ -15,20 +14,18 @@ if (isset($_GET['stid'])) {
   $stdid = intval($_GET['number']);
 }
 
-// If no patient id supplied, stop early
 if (empty($stdid)) {
   echo "<p style='color:red'>No patient selected.</p>";
   exit();
 }
 
-// Lookup patient from tblpatient (include number)
+
 $sql = "SELECT number, firstname, surname FROM tblpatient WHERE number = :stdid";
 $query = $dbh->prepare($sql);
 $query->bindParam(':stdid', $stdid, PDO::PARAM_INT);
 $query->execute();
 $patient = $query->fetch(PDO::FETCH_OBJ);
 
-// Fetch consultation appointments for this patient
 $appointments = [];
 try {
   $sqlApp = "SELECT id, firstname, surname, `date`, start_time AS `time`, created_at, status FROM tblappointment WHERE patient_number = :pnum ORDER BY `date` DESC, `time` DESC";
@@ -36,11 +33,8 @@ try {
   $qryApp->bindParam(':pnum', $stdid, PDO::PARAM_INT);
   $qryApp->execute();
   $appointments = $qryApp->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-  // You might want to log this error in a real application
-}
+} catch (Exception $e) {}
 
-// Fetch service schedules for this patient
 $serviceSchedules = [];
 try {
   $sqlSch = "SELECT s.id AS schedule_id, s.appointment_id, s.date, s.time, s.duration, s.created_at, s.firstname, s.surname, s.status AS sched_status, svc.name AS service_name FROM tblschedule s LEFT JOIN tblservice svc ON svc.number = s.service_id LEFT JOIN tblappointment a ON a.id = s.appointment_id WHERE s.patient_number = :pnum ORDER BY s.date DESC, s.time DESC";
@@ -48,11 +42,9 @@ try {
   $qrySch->bindParam(':pnum', $stdid, PDO::PARAM_INT);
   $qrySch->execute();
   $serviceSchedules = $qrySch->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-  // You might want to log this error in a real application
-}
+} catch (Exception $e) {}
 
-// Helper to convert 24-hour time to 12-hour am/pm
+
 function time12_viewph($t)
 {
   if (empty($t))
@@ -81,7 +73,6 @@ function time12_viewph($t)
   <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
   <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/view-ph.css" />
   <link rel="stylesheet" href="css/sidebar.css" />
   <link rel="stylesheet" href="css/dashboard.css" />
   <link rel="stylesheet" href="css/stylev2.css">
@@ -99,7 +90,8 @@ function time12_viewph($t)
           <?php if ($patient): ?>
             <div class="header">
               <div class="header-text">
-                <h2 class="patient-name-header">Patient History</h2>
+                <h2>Patient History</h2>
+                <p>View consultation and service history</p>
               </div>
               <a href="manage-patient.php" class="btn-add btn-back-small" style="text-decoration: none;"><i class="fas fa-reply"></i> Back</a>
             </div>
@@ -110,7 +102,7 @@ function time12_viewph($t)
             <h2 class="patient-name-header">Patient History</h2>
             <div class="alert alert-danger">Patient not found.</div>
             <?php endif; ?>
-              <!-- Consultation Card -->
+
               <div class="history-card consultation">
                 <div class="history-header">
                   <div class="history-icon consultation-icon" style="font-size: 24px;">
@@ -153,7 +145,6 @@ function time12_viewph($t)
                 </div>
               </div>
 
-              <!-- Service Card -->
               <div class="history-card service">
                 <div class="history-header">
                   <div class="history-icon service-icon" style="font-size: 24px;">
@@ -201,20 +192,17 @@ function time12_viewph($t)
             <?php endif; ?>
 
         </div>
-        <!-- content-wrapper ends -->
         <?php include_once('includes/footer.php'); ?>
       </div>
-      <!-- main-panel ends -->
     </div>
-    <!-- page-body-wrapper ends -->
+
   </div>
-  <!-- container-scroller -->
   <script src="vendors/js/vendor.bundle.base.js"></script>
   <script src="vendors/select2/select2.min.js"></script>
   <script src="vendors/typeahead.js/typeahead.bundle.min.js"></script>
   <script src="js/off-canvas.js"></script>
   <script src="js/misc.js"></script>
-  <script src="js/view-ph.js"></script>
+  
 </body>
 
 </html>

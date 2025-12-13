@@ -6,7 +6,7 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
-    // Fetch all reviews from tblpatient
+    
     $sql_reviews = "SELECT firstname, surname, Image, sex, rating, feedback, created_at FROM tblpatient WHERE feedback IS NOT NULL AND feedback != '' ORDER BY created_at DESC";
     $query_reviews = $dbh->prepare($sql_reviews);
     $query_reviews->execute();
@@ -41,7 +41,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         <?php if (!empty($all_reviews)): ?>
                             <?php foreach ($all_reviews as $review): ?>
                                 <?php
-                                $review_avatar = 'avatar.png'; // Default fallback
+                                $review_avatar = 'avatar.png'; 
                                 if (!empty($review->Image)) {
                                     $review_avatar = $review->Image;
                                 } elseif ($review->sex === 'Male') {

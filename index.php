@@ -749,7 +749,6 @@ if (isset($_POST['submit_feedback'])) {
 
   <?php include_once('includes/footer.php'); ?>
   <script src="js/responsiveslides.min.js"></script>
-  <script src="js/health-modal.js"></script>
   <script src="js/health-questionnaire.js"></script>
   <script src="js/interactive-calendar.js"></script>
   <script src="js/script.js"></script>

@@ -5,11 +5,11 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
 } else {
-    // Handle new service creation from modal
+    
     if (isset($_POST['add_service'])) {
         $sname = ucfirst(trim($_POST['sname']));
         $sdesc = trim($_POST['sdesc']);
-        $category_id = $_POST['category_id']; // Changed from 'category'
+        $category_id = $_POST['category_id']; 
         $image_path = '';
 
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
@@ -41,8 +41,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $sid = $_POST['id'];
         $sname = ucfirst(trim($_POST['sname']));
         $sdesc = trim($_POST['sdesc']);
-        $category_id = $_POST['category_id']; // Changed from 'category'
-        $image_path = $_POST['existing_image']; // Keep existing image by default
+        $category_id = $_POST['category_id']; 
+        $image_path = $_POST['existing_image'];
 
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0 && !empty($_FILES['image']['name'])) {
             $image = $_FILES['image']['name'];
@@ -64,7 +64,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         header('Location: manage-service.php');
         exit();
     }
-    // Code for deletion
+    
     if (isset($_GET['delid'])) {
         $rid = intval($_GET['delid']);
         $sql = "DELETE FROM tblservice WHERE number = :rid";
@@ -76,7 +76,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         exit();
     }
 
-    // Initialize search and category variables
+    
     $search = '';
     $category_id_filter = '';
 
@@ -87,7 +87,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $category_id_filter = trim($_GET['category_id']);
     }
 
-    // Fetch all categories for dropdowns
+    
     $sql_cats = "SELECT id, name FROM tblcategory ORDER BY id ASC";
     $query_cats = $dbh->prepare($sql_cats);
     $query_cats->execute();
@@ -109,9 +109,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         <link rel="stylesheet" href="css/sidebar.css">
         <link rel="stylesheet" href="css/stylev2.css">
         <link rel="stylesheet" href="css/toast.css">
-        <link rel="stylesheet" href="css/mas-modal.css"> 
-
-
+        <link rel="stylesheet" href="css/mas-modal.css">
     </head>
 
     <body>
@@ -199,7 +197,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             $query->bindParam(':offset', $offset, PDO::PARAM_INT);
                             $query->bindParam(':limit', $no_of_records_per_page, PDO::PARAM_INT);
                             if ($search) {
-                                // bindValue so the wildcard string is bound correctly
+                                
                                 $query->bindValue(':search', $params[':search'], PDO::PARAM_STR);
                             }
                             if ($category_id_filter) {
@@ -246,7 +244,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
 
                         <div align="left" class="mt-4">
                             <?php
-                            // Build the query string for pagination links
                             $query_params = [];
                             if ($search)
                                 $query_params['search_query'] = $search;
@@ -382,10 +379,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 let debounceTimeout;
 
                 searchInput.addEventListener('input', function () {
-                    // Clear the previous timeout
                     clearTimeout(debounceTimeout);
 
-                    // Set a new timeout
                     debounceTimeout = setTimeout(() => {
                         const form = document.getElementById('searchForm');
 
@@ -434,14 +429,14 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             imagePreview.style.display = 'none';
                         }
 
-                        // Clear the file input
+                       
                         document.getElementById('edit_service_image').value = '';
 
-                        editModal.style.display = 'flex'; // Changed from 'block' to 'flex'
+                        editModal.style.display = 'flex'; 
                     });
                 });
 
-                // Auto-capitalize first letter for new service fields
+                
                 function capitalizeFirstLetter(inputId) {
                     const input = document.getElementById(inputId);
                     if (input) {
@@ -457,7 +452,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 capitalizeFirstLetter('edit_service_name');
                 capitalizeFirstLetter('edit_service_description');
 
-                // Add event listener for category dropdown to auto-submit form
                 document.getElementById('categoryDropdown').addEventListener('change', function () {
                     document.getElementById('searchForm').submit();
                 });

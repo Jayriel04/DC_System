@@ -15,18 +15,18 @@ function setToast($message, $type) {
     $toast_message = ['message' => $message, 'type' => $type];
 }
 
-// Redirect if email is not in session
+
 if (empty($_SESSION['otp_email'])) {
     header('location:forgot-password.php');
     exit();
 }
 
-// Handle OTP resend request
+
 if (isset($_GET['resend']) && $_GET['resend'] == 1) {
     $email = $_SESSION['otp_email'];
     $otp = rand(100000, 999999);
     $_SESSION['otp'] = $otp;
-    $_SESSION['otp_timestamp'] = time(); // Reset the timestamp
+    $_SESSION['otp_timestamp'] = time(); 
 
     $mail = new PHPMailer(true);
     try {
@@ -34,8 +34,8 @@ if (isset($_GET['resend']) && $_GET['resend'] == 1) {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'jezrahconde@gmail.com'; // SMTP username
-        $mail->Password   = 'gzht tvxy vxzx awrt'; // SMTP password or App Password
+        $mail->Username   = 'canoniokevin@gmail.com'; 
+        $mail->Password   = 'qfkr wesz vhkm tydc'; 
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
         $mail->SMTPOptions = array(
@@ -46,11 +46,11 @@ if (isset($_GET['resend']) && $_GET['resend'] == 1) {
             )
         );
 
-        //Recipients
+        
         $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
         $mail->addAddress($email);
 
-        //Content
+        
         $mail->isHTML(true);
         $mail->Subject = 'Your New OTP for Admin Password Reset';
         $mail->Body    = '
@@ -78,39 +78,39 @@ if (isset($_GET['resend']) && $_GET['resend'] == 1) {
         $mail->send();
         setToast('A new OTP has been sent to your email.', 'success');
     } catch (Exception $e) {
-        // For debugging: error_log("Mailer Error: {$mail->ErrorInfo}");
+       
         setToast('The OTP email could not be sent. Please try again later.', 'danger');
     }
-    // Redirect to the same page without the resend parameter to prevent re-sending on refresh
+    
     header('Location: verify-otp.php');
     exit();
 }
 
-// Step 1: Handle OTP verification
+// 1: Handle OTP verification
 if (isset($_POST['verify_otp'])) {
     $otp = trim($_POST['otp']);
 
-    // Check if OTP has expired (e.g., 5 minutes)
+    
     if (time() - $_SESSION['otp_timestamp'] > 300) {
         setToast('OTP has expired. Please request a new one.', 'danger');
         unset($_SESSION['otp']);
         unset($_SESSION['otp_email']);
         unset($_SESSION['otp_timestamp']);
-        // Redirect to start over
+        
         header('location:forgot-password.php');
         exit();
     } elseif ($_SESSION['otp'] != $otp) {
         setToast('Invalid OTP entered.', 'danger');
     } else {
-        // OTP is correct, set session flag to show password form
+        
         $_SESSION['admin_otp_verified'] = true;
         setToast('OTP verified successfully. Please set your new password.', 'success');
     }
 }
 
-// Step 2: Handle password reset
+// 2: Handle password reset
 if (isset($_POST['reset_password'])) {
-    // Double-check that OTP was actually verified
+    
     if (!isset($_SESSION['admin_otp_verified']) || !$_SESSION['admin_otp_verified']) {
         setToast('Please verify your OTP first.', 'danger');
         header('Location: verify-otp.php');
@@ -125,7 +125,7 @@ if (isset($_POST['reset_password'])) {
     } elseif (strlen($new_password) < 8 || !preg_match("#[0-9]+#", $new_password) || !preg_match("#[a-zA-Z]+#", $new_password)) {
         setToast('Password must be at least 8 characters and include letters and numbers.', 'danger');
     } else {
-        // Use modern, secure password hashing
+        
         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
         $email = $_SESSION['otp_email'];
 
@@ -137,7 +137,7 @@ if (isset($_POST['reset_password'])) {
         try {
             if ($update_query->execute() && $update_query->rowCount() > 0) {
                 setToast('Password has been reset successfully. You can now login.', 'success');
-                // Clear session variables
+                
                 unset($_SESSION['otp']);
                 unset($_SESSION['otp_email']);
                 unset($_SESSION['otp_timestamp']);
@@ -192,7 +192,7 @@ if (isset($_POST['reset_password'])) {
                 <script src="js/toast.js"></script>
                 <?php
                     if ($toast_message) {
-                        // If a password reset was successful, show a success message and redirect.
+                        
                         if ($toast_message['type'] === 'success' && isset($_POST['reset_password'])) {
                             echo "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$toast_message['message']}', '{$toast_message['type']}'); setTimeout(function() { window.location.href = 'login.php'; }, 3000); });</script>";
                         } else {
@@ -200,7 +200,7 @@ if (isset($_POST['reset_password'])) {
                         }
                     }
 
-                    // Determine which part of the form to show
+                    
                     $show_password_form = isset($_SESSION['admin_otp_verified']) && $_SESSION['admin_otp_verified'];
                 ?>
 
