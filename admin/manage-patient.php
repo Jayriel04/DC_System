@@ -356,7 +356,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <td><a href="view-er.php?stid=<?php echo $row->number; ?>" class="action-icon" title="View Examination Record"><i class="fas fa-file-medical"></i></a></td>
                                     <td>
                                         <div class="actions-cell">
-                                            <button class="action-icon edit-patient-btn" title="Edit"
+                                            <button class="action-icon edit-patient-btn" title="Add service appointment"
                                                 data-id="<?php echo htmlentities($row->number); ?>"
                                                 data-firstname="<?php echo htmlentities($row->firstname); ?>"
                                                 data-surname="<?php echo htmlentities($row->surname); ?>"
@@ -368,7 +368,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                                 data-address="<?php echo htmlentities($row->address); ?>"
                                                 data-email="<?php echo htmlentities($row->email); ?>"
                                                 style="background:none; border:none; cursor:pointer; padding:0; font-size: 1rem;"
-                                            ><i class="fas fa-edit" style="color:#007bffe3 ;"></i></button>
+                                            ><i class="fas fa-calendar-plus" style="color:#007bffe3 ;"></i></button>
                                             <a href="manage-patient.php?delid=<?php echo ($row->number); ?>" onclick="return confirm('Do you really want to Delete?');" class="action-icon" title="Delete"><i class="fas fa-trash-alt" style="color:red;"></i></a>
                                         </div>
                                     </td>
@@ -496,40 +496,13 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <div id="editPatientModal" class="modal-container" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Edit Patient Details</h2>
+                <h2>Add New Service Schedule</h2>
                 <button class="close-button">&times;</button>
             </div>
             <form id="editPatientForm" method="POST">
                 <input type="hidden" name="patient_id" id="edit_patient_id">
                 <div class="modal-body">
-                    <h3 class="form-section-title">Patient Details</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label for="edit_firstname">First Name</label><input type="text" id="edit_firstname" name="firstname" readonly></div>
-                        <div class="form-group"><label for="edit_surname">Surname</label><input type="text" id="edit_surname" name="surname" readonly></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label for="edit_date_of_birth">Date of Birth</label><input type="date" id="edit_date_of_birth" name="date_of_birth" readonly></div>
-                        <div class="form-group">
-                            <label for="edit_sex">Sex</label>
-                            <select id="edit_sex" name="sex">
-                                <option value="">Select Sex</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label for="edit_civil_status">Civil Status</label><input type="text" id="edit_civil_status" name="civil_status"></div>
-                        <div class="form-group"><label for="edit_occupation">Occupation</label><input type="text" id="edit_occupation" name="occupation"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label for="edit_contact_number">Phone Number</label><input type="tel" id="edit_contact_number" name="contact_number"></div>
-                        <div class="form-group"><label for="edit_email">Email Address</label><input type="email" id="edit_email" name="email"></div>
-                    </div>
-                    <div class="form-group"><label for="edit_address">Address</label><textarea id="edit_address" name="address" rows="2" readonly></textarea></div>
-
-                    <hr class="form-divider" style="margin: 20px 0; border-top: 1px solid #ccc;">
-                    <h3 class="form-section-title">Add New Service Schedule (Optional)</h3>
+                    <h3 class="form-section-title">Patient: <span id="patient_name_for_service"></span></h3>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="edit_service_category">Service Category</label>
@@ -569,7 +542,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel">Cancel</button>
-                    <button type="submit" name="update_patient" class="btn btn-schedule" style=" background-color: #008779 !important; color: white;">Save Changes</button>
+                    <button type="submit" name="update_patient" class="btn btn-schedule" style=" background-color: #008779 !important; color: white;">Schedule Service</button>
                 </div>
             </form>
         </div>
@@ -619,14 +592,8 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 const dataset = this.dataset;
                 document.getElementById('edit_patient_id').value = dataset.id;
                 document.getElementById('edit_firstname').value = dataset.firstname;
-                document.getElementById('edit_surname').value = dataset.surname;
-                document.getElementById('edit_date_of_birth').value = dataset.dob;
-                document.getElementById('edit_sex').value = dataset.sex;
-                document.getElementById('edit_civil_status').value = dataset.status;
-                document.getElementById('edit_occupation').value = dataset.occupation;
-                document.getElementById('edit_contact_number').value = dataset.contact;
-                document.getElementById('edit_address').value = dataset.address;
-                document.getElementById('edit_email').value = dataset.email;
+                document.getElementById('edit_surname').value = dataset.surname; // Keep for form submission
+                document.getElementById('patient_name_for_service').textContent = dataset.firstname + ' ' + dataset.surname;
 
                 document.getElementById('edit_service_id').value = '';
                 document.getElementById('edit_appointment_date').value = '';
@@ -639,6 +606,19 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 editModal.style.display = 'flex';
             });
         });
+
+        // Add hidden inputs for firstname and surname to the edit form
+        const editForm = document.getElementById('editPatientForm');
+        const hiddenFname = document.createElement('input');
+        hiddenFname.type = 'hidden';
+        hiddenFname.name = 'firstname';
+        hiddenFname.id = 'edit_firstname';
+        const hiddenSname = document.createElement('input');
+        hiddenSname.type = 'hidden';
+        hiddenSname.name = 'surname';
+        hiddenSname.id = 'edit_surname';
+        editForm.prepend(hiddenSname);
+        editForm.prepend(hiddenFname);
 
         
         function capitalizeFirstLetter(inputId) {

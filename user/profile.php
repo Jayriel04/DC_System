@@ -8,15 +8,6 @@ use PHPMailer\PHPMailer\Exception;
 
 require '../vendor/autoload.php';
 
-/**
- * Renders a professional HTML email template for admin notifications.
- *
- * @param string $title The title of the notification (e.g., "New Consultation Request").
- * @param string $message The main message content of the notification.
- * @param string|null $ctaUrl An optional URL for a call-to-action button.
- * @param string $ctaText The text for the call-to-action button.
- * @return string The full HTML body of the email.
- */
 function getAdminNotificationEmailBody(string $title, string $message, ?string $ctaUrl = null, string $ctaText = 'View in Admin Panel'): string
 {
     ob_start();
@@ -28,7 +19,7 @@ function getAdminNotificationEmailBody(string $title, string $message, ?string $
         <div style="padding: 20px 0; text-align: left;">
             <p>Dear Admin,</p>
             <h3 style="color: #333; margin-top: 0;"><?php echo htmlspecialchars($title); ?></h3>
-            <p><?php echo $message; // Message is expected to be pre-formatted with HTML if needed ?></p>
+            <p><?php echo $message;  ?></p>
             <?php if ($ctaUrl): ?><p style="text-align: center; margin-top: 30px;"><a href="<?php echo htmlspecialchars($ctaUrl); ?>" style="background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-size: 16px;"><?php echo htmlspecialchars($ctaText); ?></a></p><?php endif; ?>
         </div>
     </div>
@@ -42,11 +33,11 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 } else {
     $patient_number = $_SESSION['sturecmsnumber'];
 
-    // Handle form submission for updating medical history
+    
     if (isset($_POST['update_medical_history'])) {
         $health_conditions_data = isset($_POST['health_conditions']) && is_array($_POST['health_conditions']) ? $_POST['health_conditions'] : [];
 
-        // Ensure all categories are present, even if empty, to overwrite old data
+        
         $all_categories = ['general', 'liver', 'diabetes', 'thyroid', 'urinary', 'nervous', 'blood', 'respiratory', 'liver_specify'];
         foreach ($all_categories as $cat) {
             if (!isset($health_conditions_data[$cat])) {
@@ -66,7 +57,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         exit();
     }
 
-    // Handle form submission for updating profile from modal
+    
     if (isset($_POST['update_profile'])) {
         $firstname = ucfirst(trim($_POST['firstname']));
         $surname = ucfirst(trim($_POST['surname']));
@@ -129,7 +120,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         exit();
     }
 
-    // AJAX endpoint: return calendar times for a given date
+    
     if (isset($_GET['get_calendar_times']) && !empty($_GET['date'])) {
         $reqDate = $_GET['date'];
         try {
@@ -161,13 +152,13 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $year = $_GET['year'];
 
         try {
-            // Subquery to get all slots in the month from tblcalendar
+            
             $all_slots_sql = "SELECT `date`, `start_time` FROM `tblcalendar` WHERE YEAR(`date`) = :year1 AND MONTH(`date`) = :month1";
 
-            // Subquery to get all booked slots in the month from tblappointment
+            
             $booked_slots_sql = "SELECT `date`, `start_time` FROM `tblappointment` WHERE YEAR(`date`) = :year2 AND MONTH(`date`) = :month2 AND `status` != 'Declined' AND `status` != 'Cancelled'";
 
-            // Main query to find dates with at least one available slot
+            
             $sql = "SELECT DISTINCT T1.`date`
                     FROM ($all_slots_sql) AS T1
                     LEFT JOIN ($booked_slots_sql) AS T2 
@@ -187,12 +178,12 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         exit();
     }
 
-    // Handle form submission for booking an appointment from the modal
+    
     if (isset($_POST['book_appointment'])) {
         $appointment_date = trim($_POST['appointment_date']);
         $appointment_time = trim($_POST['appointment_time']);
 
-        // Check for duplicate appointment
+        
         $sqlChk = "SELECT COUNT(*) FROM tblappointment WHERE patient_number = :pn AND `date` = :dt AND `start_time` = :tm";
         $qryChk = $dbh->prepare($sqlChk);
         $qryChk->execute([':pn' => $patient_number, ':dt' => $appointment_date, ':tm' => $appointment_time]);
@@ -222,17 +213,17 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 ':st' => $status_default
             ]);
 
-            // Insert notification for admin
-            $admin_id = 1; // Assuming admin ID is 1
+            
+            $admin_id = 1;
             $notif_message = "New consultation request from " . htmlentities($firstname . ' ' . $surname) . ".";
             $notif_url = "mac.php?filter=pending";
             $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
             $query_notif = $dbh->prepare($sql_notif);
             $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message, ':url' => $notif_url]);
 
-            // Send email to admin
+            
             try {
-                // Fetch admin email
+                
                 $sql_admin_email = "SELECT Email FROM tbladmin WHERE ID = :admin_id";
                 $query_admin_email = $dbh->prepare($sql_admin_email);
                 $query_admin_email->execute([':admin_id' => $admin_id]);
@@ -244,8 +235,8 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                     $mail->isSMTP();
                     $mail->Host       = 'smtp.gmail.com';
                     $mail->SMTPAuth   = true;
-                    $mail->Username   = 'jezrahconde@gmail.com'; // Your Gmail address
-                    $mail->Password   = 'gzht tvxy vxzx awrt'; // Your Gmail App Password
+                    $mail->Username   = 'canoniokevin@gmail.com';
+                    $mail->Password   = 'qfkr wesz vhkm tydc'; 
                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                     $mail->Port       = 587;
                     $mail->SMTPOptions = array(
@@ -256,11 +247,11 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                         )
                     );
 
-                    //Recipients
+                    
                     $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
                     $mail->addAddress($admin_email);
 
-                    //Content
+                    
                     $mail->isHTML(true);
                     $mail->Subject = 'New Consultation Request';
                     $emailTitle = 'New Consultation Request';
@@ -272,7 +263,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
                     $mail->send(); 
                 }
-            } catch (Exception $e) { /* Optional: Log mail error */ }
+            } catch (Exception $e) {  }
 
             $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Appointment booked successfully.'];
             header('Location: profile.php?tab=appointments');
@@ -281,12 +272,12 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         exit();
     }
 
-    // Handle appointment cancellation
+    
     if (isset($_POST['cancel_appointment'])) {
         $appointment_id_to_cancel = $_POST['cancel_appointment_id'];
         $cancel_reason = trim($_POST['cancel_reason']);
         
-        // Verify the appointment belongs to the current patient before cancelling
+        
         $sql_cancel = "UPDATE tblappointment SET status = 'Cancelled', cancel_reason = :cancel_reason, cancelled_at = NOW() WHERE id = :appointment_id AND patient_number = :patient_number";
         $query_cancel = $dbh->prepare($sql_cancel);
         $query_cancel->bindParam(':appointment_id', $appointment_id_to_cancel, PDO::PARAM_INT);
@@ -294,15 +285,15 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $query_cancel->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
         $query_cancel->execute();
 
-        // Insert notification for admin
-        $admin_id = 1; // Assuming admin ID is 1
+       
+        $admin_id = 1; 
         $notif_message = htmlentities($_SESSION['sturecmsfirstname'] . ' ' . $_SESSION['sturecmssurname']) . " cancelled a consultation.";
         $notif_url = "mac.php?filter=cancelled";
         $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
         $query_notif = $dbh->prepare($sql_notif);
         $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message, ':url' => $notif_url]);
 
-        // Send email to admin
+        
         try {
             // Fetch admin email
             $sql_admin_email = "SELECT Email FROM tbladmin WHERE ID = :admin_id";
@@ -316,8 +307,8 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 $mail->isSMTP();
                 $mail->Host       = 'smtp.gmail.com';
                 $mail->SMTPAuth   = true;
-                $mail->Username   = 'jezrahconde@gmail.com'; // Your Gmail address
-                $mail->Password   = 'gzht tvxy vxzx awrt'; // Your Gmail App Password
+                $mail->Username   = 'canoniokevin@gmail.com'; 
+                $mail->Password   = 'qfkr wesz vhkm tydc'; 
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port       = 587;
                 $mail->SMTPOptions = array(
@@ -328,11 +319,11 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                     )
                 );
 
-                //Recipients
+                
                 $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
                 $mail->addAddress($admin_email);
 
-                //Content
+                
                 $mail->isHTML(true);
                 $mail->Subject = 'Consultation Cancellation';
                 $emailTitle = 'Consultation Cancellation';
@@ -344,19 +335,17 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
                 $mail->send(); 
             }
-        } catch (Exception $e) { /* Optional: Log mail error */ }
+        } catch (Exception $e) {  }
         
         $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Your appointment has been successfully cancelled.'];
         header('Location: profile.php?tab=appointments');
         exit();
     }
 
-    // Handle service schedule cancellation
     if (isset($_POST['request_service_cancellation'])) {
         $schedule_id_to_cancel = $_POST['schedule_id_to_cancel'];
         $cancel_reason = trim($_POST['cancel_reason']);
 
-        // Verify the schedule belongs to the current patient before cancelling
         $sql_cancel_service = "UPDATE tblschedule SET status = 'For Cancellation', cancel_reason = :cancel_reason, cancelled_at = NOW() WHERE id = :schedule_id AND patient_number = :patient_number";
         $query_cancel_service = $dbh->prepare($sql_cancel_service);
         $query_cancel_service->bindParam(':schedule_id', $schedule_id_to_cancel, PDO::PARAM_INT);
@@ -364,8 +353,8 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         $query_cancel_service->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
         $query_cancel_service->execute();
 
-        // Insert notification for admin
-        $admin_id = 1; // Assuming admin ID is 1
+       
+        $admin_id = 1; 
         $notif_message = htmlentities($_SESSION['sturecmsfirstname'] . ' ' . $_SESSION['sturecmssurname']) . " requested to cancel a service.";
         $notif_url = "mas.php?filter=for_cancellation";
         $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
@@ -386,8 +375,8 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 $mail->isSMTP();
                 $mail->Host       = 'smtp.gmail.com';
                 $mail->SMTPAuth   = true;
-                $mail->Username   = 'jezrahconde@gmail.com'; // Your Gmail address
-                $mail->Password   = 'gzht tvxy vxzx awrt'; // Your Gmail App Password
+                $mail->Username   = 'canoniokevin@gmail.com'; 
+                $mail->Password   = 'qfkr wesz vhkm tydc'; 
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port       = 587;
                 $mail->SMTPOptions = array(
@@ -414,7 +403,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
                 $mail->send(); 
             }
-        } catch (Exception $e) { /* Optional: Log mail error */ }
+        } catch (Exception $e) { }
 
         $_SESSION['toast_message'] = ['type' => 'info', 'message' => 'Your cancellation request has been submitted for review.'];
         header('Location: profile.php?tab=appointments');
@@ -423,14 +412,13 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
     $patient_number = $_SESSION['sturecmsnumber'];
 
-    // Fetch patient data
+    
     $sql_patient = "SELECT * FROM tblpatient WHERE number = :patient_number";
     $query_patient = $dbh->prepare($sql_patient);
     $query_patient->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
     $query_patient->execute();
     $patient = $query_patient->fetch(PDO::FETCH_OBJ);
 
-    // Fetch health conditions
     $health_arr = [];
     if ($patient && !empty($patient->health_conditions) && $patient->health_conditions !== 'null') {
         $decoded = json_decode($patient->health_conditions, true);
@@ -439,7 +427,6 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
         }
     }
 
-    // Helper functions to pre-fill the form
     function hc_checked($category, $value, $health_data)
     {
         if (isset($health_data[$category]) && is_array($health_data[$category]) && in_array($value, $health_data[$category])) {
@@ -454,14 +441,12 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     }
 
 
-    // Fetch consultation appointments
     $sql_appts = "SELECT id, `date`, start_time, status FROM tblappointment WHERE patient_number = :patient_number ORDER BY `date` DESC, start_time DESC";
     $query_appts = $dbh->prepare($sql_appts);
     $query_appts->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
     $query_appts->execute();
     $appointments = $query_appts->fetchAll(PDO::FETCH_ASSOC);
 
-    // Fetch service schedules
     $sql_schedules = "SELECT s.id, s.date, s.time, s.duration, s.status AS sched_status, svc.name AS service_name 
                       FROM tblschedule s 
                       LEFT JOIN tblservice svc ON svc.number = s.service_id 
@@ -510,7 +495,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <div id="toast-container" class="toast-container top-center"></div>
     <div class="container">
         <?php if ($patient): ?>
-            <!-- Patient Header -->
+            
             <?php
             if (isset($_SESSION['toast_message'])) {
                 echo "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$_SESSION['toast_message']['message']}', '{$_SESSION['toast_message']['type']}'); });</script>";
@@ -521,7 +506,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 <div class="patient-info">
                     <div class="patient-avatar">
                         <?php
-                        $profile_avatar = 'avatar.png'; // Default fallback
+                        $profile_avatar = 'avatar.png'; 
                         if (!empty($patient->Image)) {
                             $profile_avatar = $patient->Image;
                         } elseif ($patient->sex === 'Male') {
@@ -569,7 +554,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 </div>
             </div>
 
-            <!-- Tabs -->
+            
             <div class="tabs" id="profileTabs">
                 <div class="tab active" data-tab-target="#aboutContent">
                     👤
@@ -585,7 +570,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                 </div>
             </div>
 
-            <!-- Tab Content Panels -->
+            
             <div class="tab-content-container">
 
                 <div id="aboutContent" class="tab-pane active">
@@ -678,7 +663,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
 
                 <div id="appointmentsContent" class="tab-pane">
                     <div class="content-grid">
-                        <!-- Left Card: Consultation Appointments -->
+                        
                         <div class="card">
                             <div class="card-header">
                                 <h2 class="card-title">Consultations</h2>
@@ -715,7 +700,7 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                             </div>
                         </div>
 
-                        <!-- Right Card: Service Appointments -->
+                    
                         <div class="card">
                             <div class="card-header">
                                 <h2 class="card-title">Services</h2>
@@ -795,14 +780,14 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
                     <h4 class="modal-title">Book New Appointment</h4>
                     <span class="close" data-dismiss="modal">&times;</span>
                 </div>
-                <div class="modal-body" style="padding: 15px;">
+                <div class="modal-body" style="padding: 15px; overflow-y: auto; max-height: 80vh;">
                     <form method="post" action="profile.php">
                         <div class="form-group">
                             <label for="appointment_date">Preferred Date</label>
-                            <!-- This input is now the trigger and will be populated by the calendar -->
+                            
                             <input type="text" class="form-control" name="appointment_date" id="appointment_date"
                                 placeholder="Select a date" required readonly>
-                            <!-- Interactive Calendar HTML -->
+                            
                             <div class="calendar-wrapper" id="calendarWrapper">
                                 <div class="calendar-header">
                                     <button type="button" class="nav-btn" id="prevBtn">‹</button>
@@ -1184,7 +1169,6 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     <script src="../js/toast.js"></script>
     <script src="vendors/js/vendor.bundle.base.js"></script>
     <script src="../js/bootstrap.js"></script>
-    <!-- Load calendar CSS -->
     <link rel="stylesheet" href="../css/interactive-calendar.css">
     <style>
         .form-check {
@@ -1265,7 +1249,6 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
     </style>
 
     <script>
-        // Tab switching functionality
         document.addEventListener('DOMContentLoaded', function () {
             const urlParams = new URLSearchParams(window.location.search);
             const tabToOpen = urlParams.get('tab');
@@ -1302,18 +1285,14 @@ if (strlen($_SESSION['sturecmsnumber']) == 0) {
             }
         });
     </script>
-    <!-- Calendar and Appointment Scripts -->
     <script src="../js/interactive-calendar.js"></script>
     <script src="js/calendar-availability.js"></script>
     <script src="js/profile-booking-modal.js"></script>
-
-    <!-- Other Profile Scripts -->
     <script src="js/profile-medical-modal.js"></script>
     <script src="js/profile-edit-modal.js"></script>
     <script src="../js/health-questionnaire.js"></script>
 
     <script>
-        // Debug initialization
         document.addEventListener('DOMContentLoaded', function () {
             console.log('Page loaded, checking elements:');
             console.log('Book Appointment Button:', !!document.getElementById('bookAppointmentBtn'));
