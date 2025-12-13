@@ -398,7 +398,14 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                     <div class="form-group"><label for="add_name">Material Name</label><input type="text" id="add_name" name="name" required></div>
                     <div class="form-row">
                         <div class="form-group"><label for="add_brand">Brand</label><input type="text" id="add_brand" name="brand"></div>
-                        <div class="form-group"><label for="add_category">Category</label><input type="text" id="add_category" name="category"></div>
+                        <div class="form-group">
+                            <label for="add_category">Category</label>
+                            <select id="add_category" name="category">
+                                <option value="">Select Category</option>
+                                <option value="Supply">Supply</option>
+                                <option value="Medicine">Medicine</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group"><label for="add_quantity">Quantity</label><input type="number" id="add_quantity" name="quantity" min="0"></div>
@@ -426,7 +433,13 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                     <div class="form-group"><label for="edit_name">Material Name</label><input type="text" id="edit_name" name="name" required></div>
                     <div class="form-row">
                         <div class="form-group"><label for="edit_brand">Brand</label><input type="text" id="edit_brand" name="brand"></div>
-                        <div class="form-group"><label for="edit_category">Category</label><input type="text" id="edit_category" name="category"></div>
+                        <div class="form-group">
+                            <label for="edit_category">Category</label>
+                            <select id="edit_category" name="category">
+                                <option value="Supply">Supply</option>
+                                <option value="Medicine">Medicine</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group"><label for="edit_quantity">Quantity</label><input type="number" id="edit_quantity" name="quantity" min="0"></div>
@@ -520,11 +533,9 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
             }
         }
         capitalizeFirstLetter('add_name');
-        capitalizeFirstLetter('add_brand');
-        capitalizeFirstLetter('add_category');
+        capitalizeFirstLetter('add_brand');;
         capitalizeFirstLetter('edit_name');
-        capitalizeFirstLetter('edit_brand');
-        capitalizeFirstLetter('edit_category');
+        capitalizeFirstLetter('edit_brand');;
     });
     </script>
 </body>

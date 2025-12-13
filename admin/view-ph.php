@@ -37,7 +37,7 @@ try {
 
 $serviceSchedules = [];
 try {
-  $sqlSch = "SELECT s.id AS schedule_id, s.appointment_id, s.date, s.time, s.duration, s.created_at, s.firstname, s.surname, s.status AS sched_status, svc.name AS service_name FROM tblschedule s LEFT JOIN tblservice svc ON svc.number = s.service_id LEFT JOIN tblappointment a ON a.id = s.appointment_id WHERE s.patient_number = :pnum ORDER BY s.date DESC, s.time DESC";
+  $sqlSch = "SELECT s.id AS schedule_id, s.date, s.time, s.duration, s.created_at, s.firstname, s.surname, s.status AS sched_status, svc.name AS service_name FROM tblschedule s LEFT JOIN tblservice svc ON svc.number = s.service_id WHERE s.patient_number = :pnum ORDER BY s.date DESC, s.time DESC";
   $qrySch = $dbh->prepare($sqlSch);
   $qrySch->bindParam(':pnum', $stdid, PDO::PARAM_INT);
   $qrySch->execute();

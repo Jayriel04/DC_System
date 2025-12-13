@@ -204,9 +204,9 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                 <div class="calendar-container">
                     <div class="calendar-header">
                       <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
-                        <a href="?month=<?php echo ($currentMonth == 1) ? 12 : $currentMonth - 1; ?>&year=<?php echo ($currentMonth == 1) ? $currentYear - 1 : $currentYear; ?>" class="nav-button" title="Previous Month">&lt;</a>
+                        <button onclick="window.location.href='?month=<?php echo ($currentMonth == 1) ? 12 : $currentMonth - 1; ?>&year=<?php echo ($currentMonth == 1) ? $currentYear - 1 : $currentYear; ?>'" class="nav-button" title="Previous Month" style="width: 4vh;padding: 2px;background-color: white;border-radius: 5px;">&lt;</button>
                         <h2 class="month-year"><?php echo $months[$currentMonth - 1] . " " . $currentYear; ?></h2>
-                        <a href="?month=<?php echo ($currentMonth == 12) ? 1 : $currentMonth + 1; ?>&year=<?php echo ($currentMonth == 12) ? $currentYear + 1 : $currentYear; ?>" class="nav-button" title="Next Month">&gt;</a>
+                        <button onclick="window.location.href='?month=<?php echo ($currentMonth == 12) ? 1 : $currentMonth + 1; ?>&year=<?php echo ($currentMonth == 12) ? $currentYear + 1 : $currentYear; ?>'" class="nav-button" title="Next Month" style="width: 4vh;padding: 2px;background-color: white;border-radius: 5px;">&gt;</button>
                         </div>
                     </div>
 

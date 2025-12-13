@@ -184,14 +184,19 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 } catch (Exception $e) {  }
             }
             
-            $admin_id = 1; 
-            $patient_name = $_POST['patient_name_for_notif']; 
-            $notif_message = "A service for " . htmlentities($patient_name) . " was cancelled by an admin.";
-            $notif_url = "mas.php?filter=cancelled";
-            $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
-            $query_notif = $dbh->prepare($sql_notif);
-            $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message, ':url' => $notif_url]);
+            // Insert notification for the patient
+            if ($schedule_data) {
+                $patient_id = $schedule_data['patient_number'];
+                $service_name = $schedule_data['service_name'] ?: 'your service';
+                $schedule_date = date('F j, Y', strtotime($schedule_data['date']));
+                $message = "Your service appointment for " . htmlentities($service_name) . " on " . $schedule_date . " has been cancelled by the admin.";
+                if (!empty($cancel_reason)) { $message .= " Reason: " . htmlentities($cancel_reason); }
+                $url = "profile.php?tab=appointments";
+                $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:recipient_id, 'patient', :message, :url)";
+                $dbh->prepare($sql_notif)->execute([':recipient_id' => $patient_id, ':message' => $message, ':url' => $url]);
+            }
             $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Service schedule cancelled successfully.'];
+
         } else {
             $_SESSION['toast_message'] = ['type' => 'danger', 'message' => 'An error occurred while cancelling the service schedule.'];
         }
@@ -641,47 +646,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
     <script src="vendors/js/vendor.bundle.base.js"></script>
     <script src="js/toast.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('newAppointmentModal');
-            const openBtn = document.getElementById('newAppointmentBtn');
-            const closeBtn = modal.querySelector('.close-button');
-            const cancelBtn = modal.querySelector('.btn-cancel');
-
-            function openModal() {
-                modal.style.display = 'flex';
-            }
-
-            function closeModal() {
-                modal.style.display = 'none';
-            }
-
-            if (openBtn) {
-                openBtn.addEventListener('click', openModal);
-            }
-            if (closeBtn) {
-                closeBtn.addEventListener('click', closeModal);
-            }
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', closeModal);
-            }
-
-            window.addEventListener('click', function(event) {
-                if (event.target === modal) {
-                    closeModal();
-                }
-            });
-
-            const form = document.getElementById('appointmentForm');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    if (!form.checkValidity()) {
-                        e.preventDefault();
-                        alert('Please fill out all required fields.');
-                    }
-                });
-            }
-
-            
+        document.addEventListener('DOMContentLoaded', function() {            
             const editStatusSelect = document.getElementById('edit_status');
             const cancelReasonGroup = document.getElementById('cancel_reason_group');
 
@@ -758,6 +723,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         });
     </script>
     <script>
+        // This script was separate, it's better to have all DOMContentLoaded logic together.
         document.addEventListener('DOMContentLoaded', function () {
             const dropdownToggle = document.getElementById('filterDropdownToggle');
             const filterButtons = document.getElementById('filterButtons');

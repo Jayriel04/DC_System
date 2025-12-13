@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 13, 2025 at 02:57 PM
+-- Generation Time: Dec 13, 2025 at 04:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -64,6 +64,13 @@ CREATE TABLE `tblappointment` (
   `cancel_reason` text DEFAULT NULL,
   `cancelled_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblappointment`
+--
+
+INSERT INTO `tblappointment` (`id`, `firstname`, `surname`, `date`, `start_time`, `end_time`, `patient_number`, `created_at`, `status`, `cancel_reason`, `cancelled_at`) VALUES
+(1, 'Jezrah Faith', 'Canonio', '2025-12-14', '10:00:00', '10:30:00', 1, '2025-12-13 14:42:37', 'Pending', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -151,15 +158,6 @@ CREATE TABLE `tblinventory` (
   `status` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `tblinventory`
---
-
-INSERT INTO `tblinventory` (`number`, `name`, `brand`, `expiration_date`, `quantity`, `category`, `status`) VALUES
-(1, 'Etchant', 'FGM', '2025-09-19', 1, 'Medicine', 'Available'),
-(2, 'Fsd', 'Dsd', '2026-01-24', 1, 'Supply', 'Available'),
-(3, 'Isoprophyl Alcohol', 'Doctor J', '2028-06-25', 3, 'Supply', 'Available');
-
 -- --------------------------------------------------------
 
 --
@@ -241,7 +239,8 @@ INSERT INTO `tblnotif` (`id`, `recipient_id`, `recipient_type`, `message`, `url`
 (58, 15, 'patient', 'Your appointment for Etchant on December 11, 2025 has been marked as done.', 'profile.php?tab=appointments', 1, '2025-12-13 01:39:49'),
 (59, 15, 'patient', 'Your consultation on December 6, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-13 13:11:16'),
 (60, 15, 'patient', 'Your appointment for your service on December 11, 2025 has been marked as cancelled.', 'profile.php?tab=appointments', 0, '2025-12-13 13:36:07'),
-(61, 1, 'admin', 'Pio Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 1, '2025-12-13 13:43:40');
+(61, 1, 'admin', 'Pio Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 1, '2025-12-13 13:43:40'),
+(62, 1, 'admin', 'New consultation request from Jezrah Faith Canonio.', 'mac.php?filter=pending', 0, '2025-12-13 14:42:37');
 
 -- --------------------------------------------------------
 
@@ -270,6 +269,13 @@ CREATE TABLE `tblpatient` (
   `feedback` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tblpatient`
+--
+
+INSERT INTO `tblpatient` (`number`, `firstname`, `surname`, `date_of_birth`, `sex`, `status`, `occupation`, `age`, `contact_number`, `address`, `email`, `Image`, `health_conditions`, `created_at`, `username`, `password`, `rating`, `feedback`) VALUES
+(1, 'Jezrah Faith', 'Canonio', '2004-05-13', 'Female', 'Single', 'Student', 21, '09564780461', 'Purok Kabulihan, Yati, Liloan, Cebu City', 'canonio.jezrahfaith.mcc@gmail.com', NULL, '{\"general\":[\"Marked weight change\"],\"ear\":[\"Loss of hearing, ringing of ears\"],\"nervous\":[\"Headache\",\"Numbness\\/Tingling\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Persistent cough\"],\"heart\":[\"Chest pain\\/discomfort\"],\"rheumatic_age\":\"\",\"stroke_when\":\"\",\"urinary\":[\"Burning sensation on urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Increase intake of food or water\"],\"thyroid\":[\"Apprehension\",\"Goiter\"],\"arthritis\":[\"Joint pain\"],\"radiograph\":[\"Undergo radiation therapy\"],\"pregnancy_months\":\"\",\"women\":[\"Breast feed\"],\"hospitalization_date\":\"\",\"hospitalization_specify\":\"\",\"allergy_specify\":\"\",\"extraction_date\":\"\",\"extraction_specify\":\"\",\"extraction_reaction_specify\":\"\"}', '2025-12-13 14:41:47', 'jezrah', '$2y$10$3uOZydQhNyPYDSXZC/tOEOlfNXSxnWCg21M418GlOYYWPmJm6w7fG', NULL, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -278,7 +284,6 @@ CREATE TABLE `tblpatient` (
 
 CREATE TABLE `tblschedule` (
   `id` int(11) NOT NULL,
-  `appointment_id` int(11) DEFAULT NULL,
   `patient_number` int(11) DEFAULT NULL,
   `firstname` varchar(255) DEFAULT NULL,
   `surname` varchar(255) DEFAULT NULL,
@@ -291,6 +296,13 @@ CREATE TABLE `tblschedule` (
   `cancel_reason` text DEFAULT NULL,
   `cancelled_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `tblschedule`
+--
+
+INSERT INTO `tblschedule` (`id`, `patient_number`, `firstname`, `surname`, `date`, `time`, `service_id`, `created_at`, `duration`, `status`, `cancel_reason`, `cancelled_at`) VALUES
+(1, 1, 'Jezrah Faith', 'Canonio', '2025-12-19', '10:00:00', 1, '2025-12-13 15:15:30', 120, 'Ongoing', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -311,11 +323,11 @@ CREATE TABLE `tblservice` (
 --
 
 INSERT INTO `tblservice` (`number`, `name`, `description`, `category_id`, `image`) VALUES
-(12, 'Child Oral Prophylaxis', 'A professional cleaning procedure for children that removes plaque and minor stains to maintain good oral hygiene.', 1, 'images/child-oral.jpg'),
-(13, 'Adult Oral Prophylaxis (Mild Calcular Deposits)', 'A routine dental cleaning for adults that removes soft plaque and small amounts of hardened tartar around the teeth.', 1, 'images/adult-oral.jpg'),
-(14, 'Composite Filling', 'A tooth-colored material used to fill cavities or repair minor tooth damage, designed to blend naturally with the surrounding teeth.', 2, 'images/composite.jpg'),
-(15, 'Porcelain Veneers (per tooth)', 'Thin porcelain shells bonded to the front surface of a tooth to enhance its color, shape, or alignment.', 3, 'images/pocelain.jpg'),
-(16, 'PFM (semi-precious metal)', 'A PFM crown that uses a metal base made from semi-precious alloys, offering good durability and fit.', 4, 'images/PFM semi.avif');
+(1, 'Child Oral Prophylaxis', 'A professional cleaning procedure for children that removes plaque and minor stains to maintain good oral hygiene.', 1, 'images/child-oral.jpg'),
+(2, 'Pit and Fissure Sealants (per tooth)', 'A thin protective coating applied to the chewing surfaces of a tooth to prevent cavities.', 1, 'images/pit-fissure.jpg'),
+(3, 'Composite Filling', 'A tooth-colored material used to fill cavities or repair minor tooth damage, designed to blend naturally with the surrounding teeth.', 2, 'images/composite.jpg'),
+(4, 'Porcelain Veneers (per tooth)', 'Thin porcelain shells bonded to the front surface of a tooth to enhance its color, shape, or alignment.', 3, 'images/pocelain.jpg'),
+(5, 'Full Metal Crown (non-precious metal)', 'A crown made from non-precious metal alloys (such as nickel or chromium), offering strength at a lower cost.', 5, 'images/full metal non.png');
 
 --
 -- Indexes for dumped tables
@@ -392,7 +404,7 @@ ALTER TABLE `tbladmin`
 -- AUTO_INCREMENT for table `tblappointment`
 --
 ALTER TABLE `tblappointment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblcalendar`
@@ -410,31 +422,31 @@ ALTER TABLE `tblcategory`
 -- AUTO_INCREMENT for table `tblinventory`
 --
 ALTER TABLE `tblinventory`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tblnotif`
 --
 ALTER TABLE `tblnotif`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT for table `tblpatient`
 --
 ALTER TABLE `tblpatient`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblschedule`
 --
 ALTER TABLE `tblschedule`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1880;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblservice`
 --
 ALTER TABLE `tblservice`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables

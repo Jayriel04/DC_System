@@ -43,41 +43,22 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         exit();
     }
 
-    // patient update from edit modal
-    if (isset($_POST['update_patient'])) {
+    // Schedule a new service for an existing patient
+    if (isset($_POST['schedule_service_for_patient'])) {
         $patient_id = $_POST['patient_id'];
         $firstname = $_POST['firstname'];
         $surname = $_POST['surname'];
-        $dob = $_POST['date_of_birth'];
-        $sex = $_POST['sex'];
-        $civil_status = $_POST['civil_status'];
-        $occupation = $_POST['occupation'];
-        $contact_number = $_POST['contact_number'];
-        $address = $_POST['address'];
-        $email = $_POST['email'];
+
         $dbh->beginTransaction();
 
-        $age = '';
-        if (!empty($dob)) {
-            $birthDate = new DateTime($dob);
-            $today = new DateTime();
-            $age = $today->diff($birthDate)->y;
-        }
-
         try {
-            $sql_update = "UPDATE tblpatient SET firstname=:fname, surname=:sname, date_of_birth=:dob, sex=:sex, status=:status, occupation=:occupation, age=:age, contact_number=:contact, address=:address, email=:email WHERE number=:pid";
-            $query_update = $dbh->prepare($sql_update);
-            $query_update->execute([
-                ':fname' => $firstname, ':sname' => $surname, ':dob' => $dob, ':sex' => $sex, ':status' => $civil_status, 
-                ':occupation' => $occupation, ':age' => $age, ':contact' => $contact_number, ':address' => $address, 
-                ':email' => $email, ':pid' => $patient_id
-            ]);
-
-            
             $service_id = $_POST['service_id'];
             $app_date = $_POST['app_date'];
             $start_time = $_POST['start_time'];
             $duration = $_POST['duration'];
+
+            $alert_message = 'No service details provided.';
+            $alert_type = 'warning';
 
             if (!empty($service_id) && !empty($app_date) && !empty($start_time)) {
                 $app_status = 'Ongoing'; 
@@ -85,9 +66,9 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 $sql_schedule = "INSERT INTO tblschedule (patient_number, firstname, surname, service_id, date, time, duration, status) VALUES (:pnum, :fname, :sname, :service_id, :app_date, :start_time, :duration, :status)";
                 $query_schedule = $dbh->prepare($sql_schedule);
                 $query_schedule->execute([
-                    ':pnum' => $patient_id, 
-                    ':fname' => $firstname, 
-                    ':sname' => $surname, 
+                    ':pnum' => $patient_id,
+                    ':fname' => $firstname,
+                    ':sname' => $surname,
                     ':service_id' => $service_id,
                     ':app_date' => $app_date, 
                     ':start_time' => $start_time, 
@@ -95,11 +76,10 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                     ':status' => $app_status
                 ]);
                 $alert_message = 'Patient details updated and new service appointment scheduled successfully.';
-            } else {
-                $alert_message = 'Patient details updated successfully.';
+                $alert_type = 'success';
             }
             $dbh->commit();
-            $_SESSION['toast_message'] = ['type' => 'success', 'message' => $alert_message];
+            $_SESSION['toast_message'] = ['type' => $alert_type, 'message' => $alert_message];
             header('Location: manage-patient.php');
         } catch (Exception $e) {
             $dbh->rollBack();
@@ -542,7 +522,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel">Cancel</button>
-                    <button type="submit" name="update_patient" class="btn btn-schedule" style=" background-color: #008779 !important; color: white;">Schedule Service</button>
+                    <button type="submit" name="schedule_service_for_patient" class="btn btn-schedule" style=" background-color: #008779 !important; color: white;">Schedule Service</button>
                 </div>
             </form>
         </div>

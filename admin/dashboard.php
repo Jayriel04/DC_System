@@ -56,13 +56,18 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             $avg_rating = $query_rating->fetchColumn() ?: 0;
 
                             // Fetch latest appointments
-                            $sql_latest_app = "SELECT a.date, a.start_time, a.status, p.firstname, p.surname, p.Image, p.sex, s.name as service_name 
-                                               FROM tblappointment a 
-                                               JOIN tblpatient p ON a.patient_number = p.number 
-                                               LEFT JOIN tblschedule sch ON sch.appointment_id = a.id
-                                               LEFT JOIN tblservice s ON sch.service_id = s.number
-                                               ORDER BY a.date DESC, a.start_time DESC 
-                                               LIMIT 5";
+                            $sql_latest_app = "(SELECT a.id, a.date, a.start_time, a.status COLLATE utf8mb4_general_ci as status, p.firstname, p.surname, p.Image, p.sex, 'Consultation' as service_name
+                                FROM tblappointment a
+                                JOIN tblpatient p ON a.patient_number = p.number)
+                                UNION ALL
+                               (SELECT s.id, s.date, s.time as start_time, s.status COLLATE utf8mb4_general_ci as status, p.firstname, p.surname, p.Image, p.sex, svc.name as service_name
+                                FROM tblschedule s
+                                JOIN tblpatient p ON s.patient_number = p.number
+                                LEFT JOIN tblservice svc ON s.service_id = svc.number)
+                               ORDER BY date DESC, start_time DESC
+                               LIMIT 5";
+
+
                             $query_latest_app = $dbh->prepare($sql_latest_app);
                             $query_latest_app->execute();
                             $latest_appointments = $query_latest_app->fetchAll(PDO::FETCH_OBJ);
