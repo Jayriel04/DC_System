@@ -757,7 +757,6 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             }
         });
     </script>
-    <script src="js/mas-modal.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const dropdownToggle = document.getElementById('filterDropdownToggle');
@@ -784,6 +783,45 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 });
             }
         });
+
+        // --- Edit Schedule Modal ---
+        const editModal = document.getElementById('editScheduleModal');
+        if (editModal) {
+            const editCloseBtn = editModal.querySelector('.close-button');
+            const editCancelBtn = editModal.querySelector('.btn-cancel');
+
+            function closeEditModal() {
+                editModal.style.display = 'none';
+            }
+
+            editCloseBtn.addEventListener('click', closeEditModal);
+            editCancelBtn.addEventListener('click', closeEditModal);
+
+            window.addEventListener('click', function (event) {
+                if (event.target === editModal) {
+                    closeEditModal();
+                }
+            });
+
+            document.querySelectorAll('.edit-schedule-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const dataset = this.dataset;
+                    document.getElementById('edit_schedule_id').value = dataset.id;
+                    document.getElementById('edit_firstname').value = dataset.firstname;
+                    document.getElementById('edit_surname').value = dataset.surname;
+                    document.getElementById('edit_service').value = dataset.service;
+                    document.getElementById('edit_date').value = dataset.date;
+                    document.getElementById('edit_time').value = dataset.time;
+                    document.getElementById('edit_duration').value = dataset.duration;
+                    document.getElementById('edit_status').value = dataset.status;
+                    document.getElementById('edit_cancel_reason').value = dataset.cancelReason;
+                    
+                    // Trigger change event to show/hide reason field
+                    document.getElementById('edit_status').dispatchEvent(new Event('change'));
+                    editModal.style.display = 'flex';
+                });
+            });
+        }
     </script>
 </body>
 

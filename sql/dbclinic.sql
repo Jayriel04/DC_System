@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 08, 2025 at 08:05 AM
+-- Generation Time: Dec 13, 2025 at 02:57 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,7 +43,7 @@ CREATE TABLE `tbladmin` (
 --
 
 INSERT INTO `tbladmin` (`ID`, `AdminName`, `UserName`, `MobileNumber`, `Email`, `Password`, `image`, `AdminRegdate`) VALUES
-(1, 'Admin', 'admin', 9564780461, 'canoniokevin@gmail.com', '$2y$10$fdyJgvrdq3O0y9YM0OhDV.FGnhh7iZYCvCESl0YUEOZ/wzkIMpz3O', 'doctor.png', '2025-06-01 04:36:52');
+(1, 'Admin', 'admin', 9564780461, 'canoniokevin@gmail.com', '$2y$10$5kjYgb7R.pBKBAV9V1djd.YgcE57ro9MiSptIMrWRAx1QUxit4OCy', '1765551681_doctor.png', '2025-06-01 04:36:52');
 
 -- --------------------------------------------------------
 
@@ -64,26 +64,6 @@ CREATE TABLE `tblappointment` (
   `cancel_reason` text DEFAULT NULL,
   `cancelled_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tblappointment`
---
-
-INSERT INTO `tblappointment` (`id`, `firstname`, `surname`, `date`, `start_time`, `end_time`, `patient_number`, `created_at`, `status`, `cancel_reason`, `cancelled_at`) VALUES
-(1, 'John Mar', 'Ypil', '2025-09-26', '17:47:00', NULL, 4, '2025-09-26 09:54:12', 'Declined', NULL, NULL),
-(2, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:36:00', NULL, 5, '2025-09-27 06:36:43', 'Cancelled', 'ahhahaha', '2025-11-29 17:53:10'),
-(3, 'Rodelyn', 'Estrera', '2025-09-27', '16:42:00', NULL, 8, '2025-09-27 08:42:44', 'Approved', NULL, NULL),
-(4, 'John Mar', 'Ypil', '2025-09-27', '18:14:00', '19:00:00', 4, '2025-09-27 10:33:00', 'Approved', NULL, NULL),
-(5, 'John Mar', 'Ypil', '2025-10-05', '13:47:00', '14:48:00', 4, '2025-10-05 05:49:13', 'Approved', NULL, NULL),
-(6, 'John Mar', 'Ypil', '2025-10-05', '15:14:00', '16:14:00', 4, '2025-10-05 06:15:00', 'Approved', NULL, NULL),
-(7, 'Nimfa', 'Conde', '2025-10-05', '17:39:00', '18:40:00', 10, '2025-10-05 09:40:49', 'walk-in', NULL, NULL),
-(8, 'Sig', 'Canonio', '2025-10-05', '17:29:00', NULL, 13, '2025-10-20 10:36:59', 'Cancelled', 'sample cancel!', NULL),
-(9, 'Jaynard', 'Senilla', '2025-11-29', '12:08:00', NULL, 14, '2025-11-29 04:41:14', 'Approved', NULL, NULL),
-(17, 'Jezrah Faith', 'Canonio', '2025-11-29', '15:11:00', '16:11:00', 5, '2025-11-29 10:07:41', 'Cancelled', 'emergency', '2025-12-06 11:48:09'),
-(18, 'Jezrah Faith', 'Canonio', '2025-11-29', '18:38:00', '19:39:00', 5, '2025-11-29 10:39:21', 'Cancelled', 'emergecny', '2025-12-06 11:59:01'),
-(19, 'Pio', 'Canonio', '2025-12-06', '13:00:00', '13:30:00', 15, '2025-12-06 03:16:54', 'Cancelled', 'emergency', '2025-12-06 18:15:38'),
-(20, 'Jezrah Faith', 'Canonio', '2025-12-07', '10:00:00', '10:30:00', 5, '2025-12-06 04:00:24', 'Cancelled', 'emergwncy', '2025-12-06 12:01:27'),
-(21, 'Pio', 'Canonio', '2025-12-08', '10:00:00', '10:30:00', 15, '2025-12-06 10:19:47', 'Cancelled', 'emergency', '2025-12-06 18:20:55');
 
 -- --------------------------------------------------------
 
@@ -117,11 +97,9 @@ INSERT INTO `tblcalendar` (`id`, `date`, `start_time`, `end_time`) VALUES
 (12, '2025-11-29', '12:08:00', '13:08:00'),
 (13, '2025-11-29', '15:11:00', '16:11:00'),
 (14, '2025-11-29', '18:38:00', '19:39:00'),
-(15, '2025-12-06', '13:00:00', '13:30:00'),
-(16, '2025-12-07', '10:00:00', '10:30:00'),
-(17, '2025-12-08', '10:00:00', '10:30:00'),
-(18, '2025-12-08', '14:23:00', '15:23:00'),
-(19, '2025-12-11', '10:00:00', '10:30:00');
+(20, '2025-12-14', '10:00:00', '10:30:00'),
+(21, '2025-12-14', '11:00:00', '11:30:00'),
+(22, '2025-12-15', '13:00:00', '13:30:00');
 
 -- --------------------------------------------------------
 
@@ -257,7 +235,13 @@ INSERT INTO `tblnotif` (`id`, `recipient_id`, `recipient_type`, `message`, `url`
 (52, 1, 'admin', 'Item \'Etchant\' is running low on stock (1).', 'manage-inventory.php', 1, '2025-12-07 03:57:51'),
 (53, 1, 'admin', 'Item \'fsd\' is out of stock.', 'manage-inventory.php', 1, '2025-12-07 03:57:51'),
 (54, 1, 'admin', 'Item \'Etchant\' is running low on stock (1).', 'manage-inventory.php', 0, '2025-12-07 03:59:48'),
-(55, 1, 'admin', 'Item \'Fsd\' is running low on stock (1).', 'manage-inventory.php', 0, '2025-12-07 03:59:48');
+(55, 1, 'admin', 'Item \'Fsd\' is running low on stock (1).', 'manage-inventory.php', 0, '2025-12-07 03:59:48'),
+(56, 15, 'patient', 'Your consultation on December 8, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-08 08:33:55'),
+(57, 5, 'patient', 'Your consultation on December 7, 2025 has been approved.', 'profile.php?tab=appointments', 0, '2025-12-12 17:13:00'),
+(58, 15, 'patient', 'Your appointment for Etchant on December 11, 2025 has been marked as done.', 'profile.php?tab=appointments', 1, '2025-12-13 01:39:49'),
+(59, 15, 'patient', 'Your consultation on December 6, 2025 has been approved.', 'profile.php?tab=appointments', 1, '2025-12-13 13:11:16'),
+(60, 15, 'patient', 'Your appointment for your service on December 11, 2025 has been marked as cancelled.', 'profile.php?tab=appointments', 0, '2025-12-13 13:36:07'),
+(61, 1, 'admin', 'Pio Canonio cancelled a consultation.', 'mac.php?filter=cancelled', 1, '2025-12-13 13:43:40');
 
 -- --------------------------------------------------------
 
@@ -286,22 +270,6 @@ CREATE TABLE `tblpatient` (
   `feedback` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `tblpatient`
---
-
-INSERT INTO `tblpatient` (`number`, `firstname`, `surname`, `date_of_birth`, `sex`, `status`, `occupation`, `age`, `contact_number`, `address`, `email`, `Image`, `health_conditions`, `created_at`, `username`, `password`, `rating`, `feedback`) VALUES
-(4, 'John Mar', 'Ypil', '2002-12-21', 'Male', 'Married', 'Student', 22, '09374939832', 'idk', 'ypil.johnmar.mcc@gmail.com', 'anonymous-girl.png', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Increase intake of food or water\"],\"thyroid\":[\"Apprehension\"],\"nervous\":[\"Headache\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Persistent cough\"],\"urinary\":[]}', '2025-09-27 11:02:35', 'jm', '763c3f1b6fe4707b8c39df149788c70b', 5, 'lami kayu'),
-(5, 'Jezrah Faith', 'Canonio', '2004-05-13', 'Female', 'Single', 'Princess', 21, '09876543211', 'Yati liloan', 'canonio.jezrahfaith.mcc@gmail.com', '1.jpg', '{\"general\":[\"Increase frequency of urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Family history of diabetes\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Numbness\\/Tingling\"],\"blood\":[\"Anemia\"],\"respiratory\":[\"Persistent cough\"]}', '2025-09-27 11:03:26', 'jezrah', '3b02af71589ec5ea4138a1ece1866008', 4, 'nice service my nigga'),
-(8, 'Rodelyn', 'Estrera', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'estrera.rodelyn.mcc@gmail.com', NULL, '{\"general\":[\"Marked weight change\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Delayed healing of wounds\"],\"thyroid\":[\"Perspire easily\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Headache\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Difficulty in breathing\"]}', '2025-09-27 11:04:04', 'rodelyn', 'bc65be184bd685684a786ac70c6d2ef7', NULL, NULL),
-(9, 'Justine', 'Aguinaldo', '0000-00-00', '', '', '', 0, '', '', 'aguinaldo.justinelouise.mcc@gmail.com', NULL, NULL, '2025-09-27 11:04:46', 'justine', 'f6f3e757ac491a3511a5198a39c5ce29', NULL, NULL),
-(10, 'Nimfa', 'Conde', '1956-03-09', 'Female', 'Single', 'Mother', 69, '09876543211', 'idk', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(11, 'Seg', 'Canonio', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'seg@gmail.com', NULL, NULL, NULL, 'seg', '54151f5b2b56a1345561afde6059ac63', NULL, NULL),
-(12, 'Crazy', 'Rapidboots', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'crazy@test.com', NULL, NULL, NULL, 'crazy', 'fa2ee41779ef60891cbfdfcd0dccaa7c', NULL, NULL),
-(13, 'Sig', 'Canonio', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'sig@test.com', NULL, '{\"general\":[\"Increase frequency of urination\",\"Burning sensation on urination\"],\"liver\":[\"History of liver ailment\"],\"diabetes\":[\"Delayed healing of wounds\"],\"thyroid\":[\"Apprehension\"],\"urinary\":[\"Increase frequency of urination\"],\"nervous\":[\"Headache\",\"Dizziness\\/Fainting\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Persistent cough\"]}', NULL, 'Sig', '252e0253e865dec297431b97709794d5', NULL, NULL),
-(14, 'Jaynard', 'Senilla', '0000-00-00', 'Male', '', '', 0, '', '', 'saging@gmail.com', NULL, NULL, '2025-11-29 04:07:01', 'jaynard', 'fa2c395447a8ad82849d3a7129830102', NULL, NULL),
-(15, 'Pio', 'Canonio', '0000-00-00', '', '', '', 0, '', '', 'canoniopio@gmail.com', NULL, NULL, '2025-12-06 03:09:32', 'pio', '$2y$10$6R9t1Nyj1aN6IimOTh5jfudMGS985UGAOg9tjrMAolKjstVhemBXu', 4, 'amazing!');
-
 -- --------------------------------------------------------
 
 --
@@ -324,20 +292,6 @@ CREATE TABLE `tblschedule` (
   `cancelled_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `tblschedule`
---
-
-INSERT INTO `tblschedule` (`id`, `appointment_id`, `patient_number`, `firstname`, `surname`, `date`, `time`, `service_id`, `created_at`, `duration`, `status`, `cancel_reason`, `cancelled_at`) VALUES
-(1, 1, 4, 'John Mar', 'Ypil', '2025-09-26', '21:32:00', 3, '2025-09-26 05:32:21', 30, 'Ongoing', 'idk', '2025-10-05 19:05:16'),
-(2, 2, 5, 'Jezrah Faith', 'Canonio', '2025-09-27', '14:39:00', 1, '2025-09-26 22:39:38', 45, 'Cancelled', 'emergency', '2025-12-06 12:02:33'),
-(3, 3, 8, 'Rodelyn', 'Estrera', '2025-09-27', '18:44:00', 4, '2025-09-27 02:44:52', 67, 'Ongoing', NULL, NULL),
-(4, 4, 4, 'John Mar', 'Ypil', '2025-10-05', '16:29:00', 5, '2025-10-05 08:29:34', 50, 'Ongoing', NULL, NULL),
-(5, 5, 4, 'John Mar', 'Ypil', '2025-10-05', '16:39:00', 6, '2025-10-05 08:39:17', 34, 'Ongoing', NULL, NULL),
-(6, 6, 4, 'John Mar', 'Ypil', '2025-10-05', '16:39:00', 2, '2025-10-05 08:39:42', 56, 'Cancelled', 'cancel', NULL),
-(7, NULL, 14, 'Jaynard', 'Senilla', '2025-11-29', '17:46:00', 2, '2025-11-29 08:46:54', 45, 'Ongoing', NULL, NULL),
-(8, NULL, 15, 'Pio', 'Canonio', '2025-12-11', '07:30:00', 1, '2025-12-06 09:49:40', 160, 'Cancelled', 'emergency', '2025-12-06 18:03:25');
-
 -- --------------------------------------------------------
 
 --
@@ -357,14 +311,11 @@ CREATE TABLE `tblservice` (
 --
 
 INSERT INTO `tblservice` (`number`, `name`, `description`, `category_id`, `image`) VALUES
-(1, 'Etchant', 'Agoyyyyyyyyyyyyyyyyyyyyyyyyyyyyy', 1, 'images/588880344_1162759702712818_3890524668527245534_n.jpg'),
-(2, 'Ibot ngipon', 'Pa ibot ka ngipon gaw', 2, 'images/services/sstudy laod.jpg'),
-(3, 'Sample 3', 'Idk aahahahhansklwkldnqkw', 3, 'images/services/image.png'),
-(4, 'Sample 4', 'Sample for number 5', 4, 'images/services/logo.png'),
-(5, 'Sample 5', 'Sample number 5', 5, 'images/services/mcc_logo2.jpg'),
-(6, 'Sample 6', 'Sample for number 6', 6, 'images/services/mcc.jpg'),
-(7, 'Sample 7', 'This is for sample service', 7, 'images/services/Mandaue City College Student Profiling.png'),
-(8, 'Sample service', 'Sample category for a service', 8, 'images/mcc new logo.jpg');
+(12, 'Child Oral Prophylaxis', 'A professional cleaning procedure for children that removes plaque and minor stains to maintain good oral hygiene.', 1, 'images/child-oral.jpg'),
+(13, 'Adult Oral Prophylaxis (Mild Calcular Deposits)', 'A routine dental cleaning for adults that removes soft plaque and small amounts of hardened tartar around the teeth.', 1, 'images/adult-oral.jpg'),
+(14, 'Composite Filling', 'A tooth-colored material used to fill cavities or repair minor tooth damage, designed to blend naturally with the surrounding teeth.', 2, 'images/composite.jpg'),
+(15, 'Porcelain Veneers (per tooth)', 'Thin porcelain shells bonded to the front surface of a tooth to enhance its color, shape, or alignment.', 3, 'images/pocelain.jpg'),
+(16, 'PFM (semi-precious metal)', 'A PFM crown that uses a metal base made from semi-precious alloys, offering good durability and fit.', 4, 'images/PFM semi.avif');
 
 --
 -- Indexes for dumped tables
@@ -441,13 +392,13 @@ ALTER TABLE `tbladmin`
 -- AUTO_INCREMENT for table `tblappointment`
 --
 ALTER TABLE `tblappointment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `tblcalendar`
 --
 ALTER TABLE `tblcalendar`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `tblcategory`
@@ -465,25 +416,25 @@ ALTER TABLE `tblinventory`
 -- AUTO_INCREMENT for table `tblnotif`
 --
 ALTER TABLE `tblnotif`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `tblpatient`
 --
 ALTER TABLE `tblpatient`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `tblschedule`
 --
 ALTER TABLE `tblschedule`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1879;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1880;
 
 --
 -- AUTO_INCREMENT for table `tblservice`
 --
 ALTER TABLE `tblservice`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- Constraints for dumped tables
