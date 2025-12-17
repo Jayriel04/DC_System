@@ -1,12 +1,11 @@
 <?php
 session_start();
-// DEBUG: show all errors while debugging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include('includes/dbconnection.php');
 
-// Check if a logged-in user already has health conditions on file
+
 $user_has_health_conditions = false;
 if (isset($_SESSION['sturecmsnumber'])) {
   $patient_number_check = $_SESSION['sturecmsnumber'];
@@ -16,17 +15,15 @@ if (isset($_SESSION['sturecmsnumber'])) {
   $query_health_check->execute();
   $health_data = $query_health_check->fetch(PDO::FETCH_OBJ);
 
-  // Check if health conditions are not empty, null, or an empty JSON array/object
   if ($health_data && !empty($health_data->health_conditions) && $health_data->health_conditions !== 'null' && $health_data->health_conditions !== '[]') {
     $user_has_health_conditions = true;
   }
 }
 
-// AJAX endpoint: return calendar times for a given date
 if (isset($_GET['get_calendar_times']) && !empty($_GET['date'])) {
   $reqDate = $_GET['date'];
   try {
-    // Only return calendar slots for the date that are not already booked
+    // calendar slots for the date that are not already booked
     $stmt = $dbh->prepare("SELECT c.id, c.start_time, c.end_time FROM tblcalendar c LEFT JOIN tblappointment a ON a.date = c.date AND a.start_time = c.start_time WHERE c.date = :date AND a.id IS NULL ORDER BY c.start_time");
     $stmt->bindParam(':date', $reqDate, PDO::PARAM_STR);
     $stmt->execute();

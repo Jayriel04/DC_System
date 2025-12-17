@@ -2,11 +2,11 @@
 session_start();
 error_reporting(0);
 include('includes/dbconnection.php');
-
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require '../vendor/autoload.php';
+
 
 function getServiceAppointmentEmailBody(string $patientName, string $appointmentDate, string $serviceName, string $status, ?string $reason = null): string
 {

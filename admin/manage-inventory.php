@@ -397,7 +397,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                 <div class="modal-body">
                     <div class="form-group"><label for="add_name">Material Name</label><input type="text" id="add_name" name="name" required></div>
                     <div class="form-row">
-                        <div class="form-group"><label for="add_brand">Brand</label><input type="text" id="add_brand" name="brand"></div>
+                        <div class="form-group"><label for="add_brand">Brand</label><input type="text" id="add_brand" name="brand" required></div>
                         <div class="form-group">
                             <label for="add_category">Category</label>
                             <select id="add_category" name="category">
@@ -408,8 +408,8 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group"><label for="add_quantity">Quantity</label><input type="number" id="add_quantity" name="quantity" min="0"></div>
-                        <div class="form-group"><label for="add_expiration_date">Expiration Date</label><input type="date" id="add_expiration_date" name="expiration_date" ></div>
+                        <div class="form-group"><label for="add_quantity">Quantity</label><input type="number" id="add_quantity" name="quantity" min="0" required></div>
+                        <div class="form-group"><label for="add_expiration_date">Expiration Date</label><input type="date" id="add_expiration_date" name="expiration_date" required></div>
                     </div>
                 </div>
                 <div class="modal-footer">

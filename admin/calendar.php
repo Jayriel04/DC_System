@@ -173,6 +173,29 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
     <link rel="stylesheet" href="css/stylev2.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/mas-modal.css"> 
+    <style>
+      .calendar-legend {
+        display: flex;
+        gap: 15px;
+        font-size: 14px;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .legend-bullet {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+      .bullet-green {
+        background-color: #5996d7;
+      }
+      .bullet-red {
+        background-color: #b91c1c;
+      }
+    </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   </head>
 
@@ -202,11 +225,19 @@ if (strlen($_SESSION['sturecmsaid'] == 0)) {
                 </div>
 
                 <div class="calendar-container">
-                    <div class="calendar-header">
+                    <div class="calendar-header" style="display: flex; justify-content: space-between; align-items: center;">
                       <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
                         <button onclick="window.location.href='?month=<?php echo ($currentMonth == 1) ? 12 : $currentMonth - 1; ?>&year=<?php echo ($currentMonth == 1) ? $currentYear - 1 : $currentYear; ?>'" class="nav-button" title="Previous Month" style="width: 4vh;padding: 2px;background-color: white;border-radius: 5px;">&lt;</button>
                         <h2 class="month-year"><?php echo $months[$currentMonth - 1] . " " . $currentYear; ?></h2>
                         <button onclick="window.location.href='?month=<?php echo ($currentMonth == 12) ? 1 : $currentMonth + 1; ?>&year=<?php echo ($currentMonth == 12) ? $currentYear + 1 : $currentYear; ?>'" class="nav-button" title="Next Month" style="width: 4vh;padding: 2px;background-color: white;border-radius: 5px;">&gt;</button>
+                        </div>
+                        <div class="calendar-legend">
+                            <div class="legend-item">
+                                <span class="legend-bullet bullet-green"></span> Availability
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-bullet bullet-red"></span> Unavailability
+                            </div>
                         </div>
                     </div>
 

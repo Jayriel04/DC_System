@@ -610,13 +610,12 @@ if (!empty($_SESSION)) {
       if (notifIcon) notifIcon.setAttribute('aria-expanded', 'true');
       panelVisible = true;
       
-      // Set the 'All' tab as active and render all notifications by default
+      // tab as active and render all notifications by default
       document.querySelector('.notif-tab[data-tab="all"]').classList.add('active');
       document.querySelector('.notif-tab[data-tab="unread"]').classList.remove('active');
       renderNotifications(userNotifications, 'all');
 
-      // After showing, mark them as read on the server
-      // This still requires a call to a server file, but it's only for updating state.
+      
       var unreadIds = userNotifications.filter(n => n.is_read == 0).map(n => n.id);
       if (unreadIds.length > 0) {
         fetch('<?php echo $base; ?>/user/ajax_helpers.php?action=mark_as_read', {

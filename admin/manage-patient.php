@@ -1,6 +1,11 @@
 <?php
 session_start();
 error_reporting(0);
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../vendor/autoload.php';
 include('includes/dbconnection.php');
 if (strlen($_SESSION['sturecmsaid']) == 0) {
     header('location:logout.php');
@@ -77,6 +82,57 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                 ]);
                 $alert_message = 'Patient details updated and new service appointment scheduled successfully.';
                 $alert_type = 'success';
+
+                // --- Start Notification Logic ---
+                // 1. Get patient email and service name
+                $sql_details = "SELECT p.email, s.name as service_name 
+                                FROM tblpatient p, tblservice s 
+                                WHERE p.number = :pnum AND s.number = :snum";
+                $query_details = $dbh->prepare($sql_details);
+                $query_details->execute([':pnum' => $patient_id, ':snum' => $service_id]);
+                $details = $query_details->fetch(PDO::FETCH_ASSOC);
+
+                if ($details) {
+                    $patient_email = $details['email'];
+                    $service_name = $details['service_name'];
+                    $schedule_date_formatted = date('F j, Y', strtotime($app_date));
+                    $schedule_time_formatted = date('g:i A', strtotime($start_time));
+
+                    // 2. Insert in-app notification for the patient
+                    $notif_message = "A new service appointment for " . htmlentities($service_name) . " has been scheduled for you on " . $schedule_date_formatted . " at " . $schedule_time_formatted . ".";
+                    $notif_url = "profile.php?tab=appointments";
+                    $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'patient', :msg, :url)";
+                    $query_notif = $dbh->prepare($sql_notif);
+                    $query_notif->execute([':rid' => $patient_id, ':msg' => $notif_message, ':url' => $notif_url]);
+
+                    // 3. Send email notification
+                    if (!empty($patient_email)) {
+                        $mail = new PHPMailer(true);
+                        try {
+                            $mail->isSMTP();
+                            $mail->Host       = 'smtp.gmail.com';
+                            $mail->SMTPAuth   = true;
+                            $mail->Username   = 'canoniokevin@gmail.com'; 
+                            $mail->Password   = 'qfkr wesz vhkm tydc'; 
+                            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                            $mail->Port       = 587;
+                            $mail->SMTPOptions = ['ssl' => ['verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true]];
+
+                            $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
+                            $mail->addAddress($patient_email, $firstname . ' ' . $surname);
+
+                            $mail->isHTML(true);
+                            $mail->Subject = 'New Service Appointment Scheduled';
+                            $mail->Body    = "Dear " . htmlentities($firstname) . ",<br><br>A new service appointment for <strong>" . htmlentities($service_name) . "</strong> has been scheduled for you on <strong>" . $schedule_date_formatted . " at " . $schedule_time_formatted . "</strong>.<br><br>Thank you,<br>JF Dental Care";
+                            $mail->AltBody = "Dear " . htmlentities($firstname) . ",\n\nA new service appointment for " . htmlentities($service_name) . " has been scheduled for you on " . $schedule_date_formatted . " at " . $schedule_time_formatted . ".\n\nThank you,\nJF Dental Care";
+
+                            $mail->send();
+                        } catch (Exception $e) {
+                            // Email sending failed, but we don't stop the process. Log it if needed.
+                        }
+                    }
+                }
+                // --- End Notification Logic ---
             }
             $dbh->commit();
             $_SESSION['toast_message'] = ['type' => $alert_type, 'message' => $alert_message];
@@ -147,6 +203,52 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
             } else {
                 $alert_message = 'New patient added successfully.';
             }
+
+            // --- Start Notification Logic (for new patient with appointment) ---
+            if (!empty($app_date) && !empty($start_time) && !empty($email)) {
+                // 1. Get service name
+                $sql_service = "SELECT name FROM tblservice WHERE number = :snum";
+                $query_service = $dbh->prepare($sql_service);
+                $query_service->execute([':snum' => $service_id ?? 0]); // Assuming service_id might be set if appointment is added
+                $service_info = $query_service->fetch(PDO::FETCH_ASSOC);
+                $service_name = $service_info ? $service_info['name'] : 'the scheduled service';
+
+                $schedule_date_formatted = date('F j, Y', strtotime($app_date));
+                $schedule_time_formatted = date('g:i A', strtotime($start_time));
+
+                // 2. Insert in-app notification for the patient
+                $notif_message = "A new service appointment for " . htmlentities($service_name) . " has been scheduled for you on " . $schedule_date_formatted . " at " . $schedule_time_formatted . ".";
+                $notif_url = "profile.php?tab=appointments";
+                $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'patient', :msg, :url)";
+                $query_notif = $dbh->prepare($sql_notif);
+                $query_notif->execute([':rid' => $patient_id, ':msg' => $notif_message, ':url' => $notif_url]);
+
+                // 3. Send email notification
+                $mail = new PHPMailer(true);
+                try {
+                    $mail->isSMTP();
+                    $mail->Host       = 'smtp.gmail.com';
+                    $mail->SMTPAuth   = true;
+                    $mail->Username   = 'canoniokevin@gmail.com'; 
+                    $mail->Password   = 'qfkr wesz vhkm tydc'; 
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port       = 587;
+                    $mail->SMTPOptions = ['ssl' => ['verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true]];
+
+                    $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
+                    $mail->addAddress($email, $firstname . ' ' . $surname);
+
+                    $mail->isHTML(true);
+                    $mail->Subject = 'New Service Appointment Scheduled';
+                    $mail->Body    = "Dear " . htmlentities($firstname) . ",<br><br>A new service appointment for <strong>" . htmlentities($service_name) . "</strong> has been scheduled for you on <strong>" . $schedule_date_formatted . " at " . $schedule_time_formatted . "</strong>.<br><br>Thank you,<br>JF Dental Care";
+                    $mail->AltBody = "Dear " . htmlentities($firstname) . ",\n\nA new service appointment for " . htmlentities($service_name) . " has been scheduled for you on " . $schedule_date_formatted . " at " . $schedule_time_formatted . ".\n\nThank you,\nJF Dental Care";
+
+                    $mail->send();
+                } catch (Exception $e) {
+                    // Email sending failed, but we don't stop the process. Log it if needed.
+                }
+            }
+            // --- End Notification Logic ---
             
             $dbh->commit();
             $_SESSION['toast_message'] = ['type' => 'success', 'message' => $alert_message];
