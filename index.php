@@ -5,6 +5,12 @@ ini_set('display_errors', 1);
 
 include('includes/dbconnection.php');
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'vendor/autoload.php';
+
+
 
 $user_has_health_conditions = false;
 if (isset($_SESSION['sturecmsnumber'])) {
@@ -117,7 +123,7 @@ if (isset($_POST['book_appointment'])) {
       $query_get_name->execute();
       $patient_details = $query_get_name->fetch(PDO::FETCH_ASSOC);
 
-      // 3. Create the appointment in tblappointment
+      // 3. Create the appointment in tblappointment and get end time
       $sql_insert_appt = "INSERT INTO tblappointment (firstname, surname, date, start_time, patient_number, status) 
                                 VALUES (:firstname, :surname, :appdate, :apptime, :patient_number, 'Pending')";
       $query_insert_appt = $dbh->prepare($sql_insert_appt);
@@ -127,6 +133,53 @@ if (isset($_POST['book_appointment'])) {
       $query_insert_appt->bindParam(':apptime', $appointment_time, PDO::PARAM_STR);
       $query_insert_appt->bindParam(':patient_number', $patient_number, PDO::PARAM_INT);
       $query_insert_appt->execute();
+
+      // --- Start Notification Logic ---
+      // 4. Insert in-app notification for the admin
+      $admin_id = 1; // Assuming admin ID is 1
+      $notif_message = "New consultation request from " . htmlentities($patient_details['firstname'] . ' ' . $patient_details['surname']) . ".";
+      $notif_url = "mac.php?filter=pending";
+      $sql_notif = "INSERT INTO tblnotif (recipient_id, recipient_type, message, url) VALUES (:rid, 'admin', :msg, :url)";
+      $query_notif = $dbh->prepare($sql_notif);
+      $query_notif->execute([':rid' => $admin_id, ':msg' => $notif_message, ':url' => $notif_url]);
+
+      // 5. Send email notification to admin
+      try {
+          // Fetch admin email
+          $sql_admin_email = "SELECT Email FROM tbladmin WHERE ID = :admin_id";
+          $query_admin_email = $dbh->prepare($sql_admin_email);
+          $query_admin_email->execute([':admin_id' => $admin_id]);
+          $admin_email = $query_admin_email->fetchColumn();
+
+          if ($admin_email) {
+              $mail = new PHPMailer(true);
+              //Server settings
+              $mail->isSMTP();
+              $mail->Host       = 'smtp.gmail.com';
+              $mail->SMTPAuth   = true;
+              $mail->Username   = 'canoniokevin@gmail.com'; // Your Gmail address
+              $mail->Password   = 'qfkr wesz vhkm tydc'; // Your Gmail App Password
+              $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+              $mail->Port       = 587;
+              $mail->SMTPOptions = ['ssl' => ['verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true]];
+
+              //Recipients
+              $mail->setFrom('JFDentalCare.mcc@gmail.com', 'JF Dental Care');
+              $mail->addAddress($admin_email);
+
+              //Content
+              $mail->isHTML(true);
+              $mail->Subject = 'New Consultation Request';
+              $emailMessage = "A new consultation has been booked by <strong>" . htmlentities($patient_details['firstname'] . ' ' . $patient_details['surname']) . "</strong> for <strong>" . date('F j, Y', strtotime($appointment_date)) . " at " . date('g:i A', strtotime($appointment_time)) . "</strong>.<br><br>Please review it in the admin panel.";
+              $mail->Body    = "Dear Admin,<br><br>" . $emailMessage;
+              $mail->AltBody = "Dear Admin,\n\n" . strip_tags(str_replace('<br>', "\n", $emailMessage));
+
+              $mail->send();
+          }
+      } catch (Exception $e) {
+          // Email sending failed, but we don't stop the process. Log it if needed.
+          error_log("Mailer Error from index.php: " . $mail->ErrorInfo);
+      }
 
       // Commit transaction and redirect with a success message
       $dbh->commit();      

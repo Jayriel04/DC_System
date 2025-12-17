@@ -235,6 +235,10 @@ if (isset($_POST['reset_password'])) {
                                     <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                 </button>
                             </div>
+                            <div class="password-strength-container" style="margin-top: 8px; font-size: 13px;">
+                                <div id="password-strength-text"></div>
+                                <p id="password-strength-msg" style="color: #777; margin-top: 5px; font-size: 12px;">Use 8+ characters with a mix of letters, numbers & symbols.</p>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="confirmpassword">Confirm New Password</label>
@@ -291,6 +295,55 @@ if (isset($_POST['reset_password'])) {
                 });
             });
         }
+    });
+    <?php endif; ?>
+
+    <?php if ($show_password_form): ?>
+    document.addEventListener('DOMContentLoaded', function () {
+        const passwordInput = document.getElementById('newpassword');
+        const confirmPasswordInput = document.getElementById('confirmpassword');
+        const strengthText = document.getElementById('password-strength-text');
+        const strengthMsg = document.getElementById('password-strength-msg');
+
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            let feedback = '';
+            let color = '';
+
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            switch (strength) {
+                case 0:
+                case 1:
+                case 2:
+                    feedback = 'Weak';
+                    color = '#e74c3c'; // Red
+                    break;
+                case 3:
+                case 4:
+                    feedback = 'Medium';
+                    color = '#f39c12'; // Orange
+                    break;
+                case 5:
+                    feedback = 'Strong';
+                    color = '#2ecc71'; // Green
+                    break;
+            }
+            
+            if (password.length > 0) {
+                strengthText.textContent = 'Strength: ' + feedback;
+                strengthText.style.color = color;
+                strengthMsg.style.display = 'none';
+            } else {
+                strengthText.textContent = '';
+                strengthMsg.style.display = 'block';
+            }
+        });
     });
     <?php endif; ?>
 
