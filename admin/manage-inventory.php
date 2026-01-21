@@ -259,7 +259,7 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                     $low_stock_items = [];
                                     $out_of_stock_items = [];
 
-                                    $no_of_records_per_page = 15;
+                                    $no_of_records_per_page = 5;
                                     $pageno = isset($_GET['pageno']) ? intval($_GET['pageno']) : 1;
                                     $offset = ($pageno - 1) * $no_of_records_per_page;
 
@@ -354,27 +354,30 @@ if (strlen($_SESSION['sturecmsaid'])==0) {
                                 $query_params['category_filter'] = $category_filter;
                             ?>
                             <ul class="pagination">
-                                <li><a
-                                        href="?pageno=1<?php echo http_build_query($query_params) ? '&' . http_build_query($query_params) : ''; ?>"><strong>First</strong></a>
-                                </li>
                                 <li class="<?php if ($pageno <= 1)
                                     echo 'disabled'; ?>">
                                     <a
                                         href="<?php if ($pageno <= 1)
                                             echo '#';
                                         else
-                                            echo "?pageno=" . ($pageno - 1) . (http_build_query($query_params) ? '&' . http_build_query($query_params) : ''); ?>"><strong>Prev</strong></a>
+                                            echo "?pageno=" . ($pageno - 1) . (http_build_query($query_params) ? '&' . http_build_query($query_params) : ''); ?>">Prev</a>
                                 </li>
+                                <?php
+                                for ($i = 1; $i <= $total_pages; $i++) {
+                                    if ($i == $pageno) {
+                                        echo '<li class="active"><a href="#">' . $i . '</a></li>';
+                                    } else {
+                                        echo '<li><a href="?pageno=' . $i . (http_build_query($query_params) ? '&' . http_build_query($query_params) : '') . '">' . $i . '</a></li>';
+                                    }
+                                }
+                                ?>
                                 <li class="<?php if ($pageno >= $total_pages)
                                     echo 'disabled'; ?>">
                                     <a
                                         href="<?php if ($pageno >= $total_pages)
                                             echo '#';
                                         else
-                                            echo "?pageno=" . ($pageno + 1) . (http_build_query($query_params) ? '&' . http_build_query($query_params) : ''); ?>"><strong>Next</strong></a>
-                                </li>
-                                <li><a
-                                        href="?pageno=<?php echo $total_pages; ?><?php echo http_build_query($query_params) ? '&' . http_build_query($query_params) : ''; ?>"><strong>Last</strong></a>
+                                            echo "?pageno=" . ($pageno + 1) . (http_build_query($query_params) ? '&' . http_build_query($query_params) : ''); ?>">Next</a>
                                 </li>
                             </ul>
                         </div>

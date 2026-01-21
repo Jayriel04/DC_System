@@ -471,19 +471,22 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                             }
                             ?>
                             <ul class="pagination">
-                                <li><a
-                                        href="?pageno=1<?php echo !empty($query_params) ? '&' . http_build_query($query_params) : ''; ?>"><strong>First</strong></a>
-                                </li>
                                 <li class="<?php if ($pageno <= 1) { echo 'disabled'; } ?>">
                                     <a
-                                        href="<?php if ($pageno <= 1) { echo '#'; } else { echo "?pageno=" . ($pageno - 1) . (!empty($query_params) ? '&' . http_build_query($query_params) : ''); } ?>"><strong>Prev</strong></a>
+                                        href="<?php if ($pageno <= 1) { echo '#'; } else { echo "?pageno=" . ($pageno - 1) . (!empty($query_params) ? '&' . http_build_query($query_params) : ''); } ?>">Prev</a>
                                 </li>
+                                <?php
+                                for ($i = 1; $i <= $total_pages; $i++) {
+                                    if ($i == $pageno) {
+                                        echo '<li class="active"><a href="#">' . $i . '</a></li>';
+                                    } else {
+                                        echo '<li><a href="?pageno=' . $i . (!empty($query_params) ? '&' . http_build_query($query_params) : '') . '">' . $i . '</a></li>';
+                                    }
+                                }
+                                ?>
                                 <li class="<?php if ($pageno >= $total_pages) { echo 'disabled'; } ?>">
                                     <a
-                                        href="<?php if ($pageno >= $total_pages) { echo '#'; } else { echo "?pageno=" . ($pageno + 1) . (!empty($query_params) ? '&' . http_build_query($query_params) : ''); } ?>"><strong>Next</strong></a>
-                                </li>
-                                <li><a
-                                        href="?pageno=<?php echo $total_pages; ?><?php echo !empty($query_params) ? '&' . http_build_query($query_params) : ''; ?>"><strong>Last</strong></a>
+                                        href="<?php if ($pageno >= $total_pages) { echo '#'; } else { echo "?pageno=" . ($pageno + 1) . (!empty($query_params) ? '&' . http_build_query($query_params) : ''); } ?>">Next</a>
                                 </li>
                             </ul>
                         </div>

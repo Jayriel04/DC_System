@@ -345,7 +345,25 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
         $sql_schedules .= " WHERE " . implode(' AND ', $where_clauses);
     }
 
-    $sql_schedules .= " ORDER BY s.date DESC, s.time DESC";
+    // Pagination logic
+    $pageno = isset($_GET['pageno']) ? intval($_GET['pageno']) : 1;
+    $no_of_records_per_page = 5;
+    $offset = ($pageno - 1) * $no_of_records_per_page;
+
+    $total_pages_sql = "SELECT COUNT(*) FROM tblschedule s LEFT JOIN tblservice svc ON s.service_id = svc.number LEFT JOIN tblcategory cat ON svc.category_id = cat.id";
+    if (!empty($where_clauses)) {
+        $total_pages_sql .= " WHERE " . implode(' AND ', $where_clauses);
+    }
+    $query_total = $dbh->prepare($total_pages_sql);
+    if (!empty($params)) {
+        $query_total->execute($params);
+    } else {
+        $query_total->execute();
+    }
+    $total_rows = $query_total->fetchColumn();
+    $total_pages = ceil($total_rows / $no_of_records_per_page);
+
+    $sql_schedules .= " ORDER BY s.date DESC, s.time DESC LIMIT $offset, $no_of_records_per_page";
     $query_schedules = $dbh->prepare($sql_schedules);
     if (!empty($params)) {
         $query_schedules->execute($params);
@@ -452,7 +470,7 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                         <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 0;">
 
                         <div class="patient-list-card" id="appointment-table-container">
-                            <h2 class="section-title">Service Appointments (<?php echo count($schedules); ?>)</h2>
+                            <h2 class="section-title">Service Appointments (<?php echo $total_rows; ?>)</h2>
                             <table class="patient-table" style="overflow-x: auto;">
                                 <thead>
                                     <tr>
@@ -530,6 +548,30 @@ if (strlen($_SESSION['sturecmsaid']) == 0) {
                                     <?php endif; ?>
                                 </tbody>
                             </table>
+                            <div align="left" class="mt-4">
+                                <?php
+                                $query_params = [];
+                                if ($filter != 'all') $query_params['filter'] = $filter;
+                                if ($search) $query_params['search_query'] = $search;
+                                ?>
+                                <ul class="pagination">
+                                    <li class="<?php if ($pageno <= 1) echo 'disabled'; ?>">
+                                        <a href="<?php if ($pageno <= 1) echo '#'; else echo "?pageno=" . ($pageno - 1) . (!empty($query_params) ? '&' . http_build_query($query_params) : ''); ?>">Prev</a>
+                                    </li>
+                                    <?php
+                                    for ($i = 1; $i <= $total_pages; $i++) {
+                                        if ($i == $pageno) {
+                                            echo '<li class="active"><a href="#">' . $i . '</a></li>';
+                                        } else {
+                                            echo '<li><a href="?pageno=' . $i . (!empty($query_params) ? '&' . http_build_query($query_params) : '') . '">' . $i . '</a></li>';
+                                        }
+                                    }
+                                    ?>
+                                    <li class="<?php if ($pageno >= $total_pages) echo 'disabled'; ?>">
+                                        <a href="<?php if ($pageno >= $total_pages) echo '#'; else echo "?pageno=" . ($pageno + 1) . (!empty($query_params) ? '&' . http_build_query($query_params) : ''); ?>">Next</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
 
                     </div>
