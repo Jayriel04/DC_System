@@ -7,16 +7,54 @@ namespace Composer\Autoload;
 class ComposerStaticInit2185d2f99bcd56787481d9357a5972d3
 {
     public static $prefixLengthsPsr4 = array (
-        'P' => 
+        'P' =>
         array (
+            'ParagonIE\\ConstantTime\\' => 23,
             'PHPMailer\\PHPMailer\\' => 20,
+        ),
+        'D' =>
+        array (
+            'Delight\\Otp\\' => 12,
+            'Delight\\Http\\' => 13,
+            'Delight\\Db\\' => 11,
+            'Delight\\Cookie\\' => 15,
+            'Delight\\Base64\\' => 15,
+            'Delight\\Auth\\' => 13,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'PHPMailer\\PHPMailer\\' => 
+        'ParagonIE\\ConstantTime\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
+        ),
+        'PHPMailer\\PHPMailer\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
+        'Delight\\Otp\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/delight-im/otp/src',
+        ),
+        'Delight\\Http\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/delight-im/http/src',
+        ),
+        'Delight\\Db\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/delight-im/db/src',
+        ),
+        'Delight\\Cookie\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/delight-im/cookie/src',
+        ),
+        'Delight\\Base64\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/delight-im/base64/src',
+        ),
+        'Delight\\Auth\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/delight-im/auth/src',
         ),
     );
 

@@ -1,6 +1,6 @@
 <?php
 session_start();
-error_reporting(0);
+require_once __DIR__ . '/../vendor/autoload.php';
 include('includes/dbconnection.php');
 
 $toast_message = null;
@@ -9,49 +9,60 @@ function setToast($message, $type) {
     $toast_message = ['message' => $message, 'type' => $type];
 }
 
+$auth = new \Delight\Auth\Auth($dbh);
+
 if (isset($_POST['login'])) {
-    $username = $_POST['username']; // Changed to username
-    $password_input = $_POST['password'];
+    try {
+        $identifier = $_POST['username'];
+        $password = $_POST['password'];
 
-    // Updated SQL query to use tblpatient
-    $sql = "SELECT number, firstname, surname, password FROM tblpatient WHERE (username = :username OR number = :username)";
-    $query = $dbh->prepare($sql);
-    $query->bindParam(':username', $username, PDO::PARAM_STR);
-    $query->execute();
-    $result = $query->fetch(PDO::FETCH_OBJ);
+        // The auth library needs an email to log in.
+        // We fetch the email corresponding to the user-provided identifier (username or patient number).
+        $sql = "SELECT email FROM tblpatient WHERE username = ?";
+        $query = $dbh->prepare($sql);
+        $query->execute([$identifier]);
+        $user_email = $query->fetchColumn();
 
-    // Verify password against the stored hash
-    if ($query->rowCount() > 0 && password_verify($password_input, $result->password)) {
-        // Check for legacy md5 passwords and update them to the new hash
-        if (password_needs_rehash($result->password, PASSWORD_DEFAULT)) {
-            $new_hash = password_hash($password_input, PASSWORD_DEFAULT);
-            $rehash_sql = "UPDATE tblpatient SET password = :new_hash WHERE number = :number";
-            $rehash_query = $dbh->prepare($rehash_sql);
-            $rehash_query->execute([':new_hash' => $new_hash, ':number' => $result->number]);
+        if (!$user_email) {
+            // If no email is found, we can treat it as an invalid user.
+            throw new \Delight\Auth\InvalidEmailException();
         }
 
-            $_SESSION['sturecmsnumber'] = $result->number;
-            $_SESSION['sturecmsfirstname'] = $result->firstname;
-            $_SESSION['sturecmssurname'] = $result->surname;
+        $rememberDuration = !empty($_POST["remember"]) ? (int) (60 * 60 * 24 * 365) : null;
+        $auth->login($user_email, $password, $rememberDuration);
 
-        if (!empty($_POST["remember"])) {
-            // COOKIES for username
-            setcookie("user_login", $_POST["username"], time() + (10 * 365 * 24 * 60 * 60));
-            // COOKIES for password
-            setcookie("userpassword", $_POST["password"], time() + (10 * 365 * 24 * 60 * 60));
-        } else {
-            if (isset($_COOKIE["user_login"])) {
-                setcookie("user_login", "");
-                if (isset($_COOKIE["userpassword"])) {
-                    setcookie("userpassword", "");
-                }
-            }
-        }
-            $_SESSION['login'] = $_POST['username'];
-            // Redirect user to the site index after successful login
+        // Login successful. Fetch patient data for the session.
+        $patient_query = $dbh->prepare("SELECT number, firstname, surname FROM tblpatient WHERE number = ?");
+        $patient_query->execute([$auth->getUserId()]);
+        $patient = $patient_query->fetch(PDO::FETCH_OBJ);
+
+        if ($patient) {
+            $_SESSION['sturecmsnumber'] = $patient->number;
+            $_SESSION['sturecmsfirstname'] = $patient->firstname;
+            $_SESSION['sturecmssurname'] = $patient->surname;
+
             header('Location: ../index.php');
             exit();
-    } else {
+        } else {
+            // Inconsistent state: user exists in `users` but not `tblpatient`.
+            $auth->logOut();
+            setToast('Associated patient record not found. Please contact support.', 'danger');
+        }
+    }
+    catch (\Delight\Auth\InvalidEmailException $e) {
+        setToast('Invalid username or password.', 'danger');
+    }
+    catch (\Delight\Auth\InvalidPasswordException $e) {
+        setToast('Invalid username or password.', 'danger');
+    }
+    catch (\Delight\Auth\EmailNotVerifiedException $e) {
+        setToast('Please verify your email address.', 'warning');
+    }
+    catch (\Delight\Auth\TooManyRequestsException $e) {
+        setToast('Too many login attempts. Please try again later.', 'danger');
+    }
+    catch (\Exception $e) {
+        error_log($e->getMessage()); // Log the real error for debugging
         setToast('Invalid username or password.', 'danger');
     }
 }
@@ -115,13 +126,13 @@ if (isset($_POST['login'])) {
                 <form id="login" method="post" name="login">
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" placeholder="Username or email" required="true" name="username" value="<?php if(isset($_COOKIE['user_login'])) { echo $_COOKIE['user_login']; } ?>">
+                        <input type="text" class="form-control" id="username" placeholder="Username or Patient Number" required="true" name="username" value="">
                     </div>
 
                     <div class="form-group">
                         <label for="password">Password</label>
                         <div class="input-wrapper">
-                            <input type="password" id="password" class="form-control" placeholder="Password" required name="password" value="<?php if(isset($_COOKIE['userpassword'])) { echo $_COOKIE['userpassword']; } ?>">
+                            <input type="password" id="password" class="form-control" placeholder="Password" required name="password" value="">
                             <i class="fas fa-eye toggle-password" id="togglePassword"></i>
                         </div>
                     </div>
@@ -129,14 +140,13 @@ if (isset($_POST['login'])) {
                     <div class="my-2 d-flex justify-content-between align-items-center" style="margin-top: 1rem; margin-bottom: 1rem;">
                         <div class="form-check">
                             <label class="form-check-label text-muted">
-                                <input type="checkbox" id="remember" class="form-check-input" name="remember" <?php if(isset($_COOKIE["user_login"])) { ?> checked <?php } ?> /> Keep me signed in </label>
+                                <input type="checkbox" id="remember" class="form-check-input" name="remember" value="1" /> Keep me signed in </label>
                         </div>
                         <a href="forgot-password.php" class="auth-link">Forgot password?</a>
                     </div>
 
                     <button type="submit" name="login" class="login-btn">Login</button>
                 </form>
-
                
                     </div>
                 </div>

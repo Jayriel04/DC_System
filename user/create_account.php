@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../vendor/autoload.php';
 include('includes/dbconnection.php');
 
 $toast_message = null;
@@ -8,6 +9,7 @@ function setToast($message, $type) {
     $toast_message = ['message' => $message, 'type' => $type];
 }
 
+$auth = new \Delight\Auth\Auth($dbh);
 
 // Only use columns that exist in tblpatient:
 // firstname, surname, date_of_birth, sex, status, occupation, age,
@@ -39,16 +41,7 @@ if (isset($_POST['register'])) {
     } elseif ($password_raw !== $confirm_password) {
         setToast('Passwords do not match.', 'danger');
     } else {
-        // Check if username or email already exist in tblpatient
-        $checkSql = "SELECT number FROM tblpatient WHERE username = :username OR email = :email";
-        $checkQuery = $dbh->prepare($checkSql);
-        $checkQuery->bindValue(':username', $username, PDO::PARAM_STR);
-        $checkQuery->bindValue(':email', $email, PDO::PARAM_STR);
-        $checkQuery->execute();
-
-        if ($checkQuery->rowCount() > 0) {
-            setToast('Username or email already exists. Please choose another one.', 'danger');
-        } else {
+        try {
             // compute age from date_of_birth if provided
             $age = null;
             if (!empty($date_of_birth)) {
@@ -62,14 +55,24 @@ if (isset($_POST['register'])) {
                 }
             }
 
-            // Use modern, secure password hashing
-            $password = password_hash($password_raw, PASSWORD_DEFAULT);
+            // 1. Register user in auth system (users table)
+            $userId = $auth->register($email, $password_raw, $username);
 
-            // Prepare INSERT using only tblpatient columns (email added)
-            $sql = "INSERT INTO tblpatient (firstname, surname, date_of_birth, sex, status, occupation, age, contact_number, address, email, username, password, Image, health_conditions, created_at) VALUES (:firstname, :surname, :date_of_birth, :sex, NULL, NULL, :age, :contact_number, :address, :email, :username, :password, NULL, NULL, NOW())";
+            // 2. Manually verify user to allow immediate login (replicating original behavior)
+            $stmt = $dbh->prepare("UPDATE users SET verified = 1 WHERE id = ?");
+            $stmt->execute([$userId]);
+
+            // 3. Fetch the generated hash to keep tblpatient in sync
+            $stmt = $dbh->prepare("SELECT password FROM users WHERE id = ?");
+            $stmt->execute([$userId]);
+            $password_hash = $stmt->fetchColumn();
+
+            // 4. Insert into tblpatient using the SAME ID
+            $sql = "INSERT INTO tblpatient (number, firstname, surname, date_of_birth, sex, status, occupation, age, contact_number, address, email, username, password, Image, health_conditions, created_at) VALUES (:number, :firstname, :surname, :date_of_birth, :sex, NULL, NULL, :age, :contact_number, :address, :email, :username, :password, NULL, NULL, NOW())";
             $query = $dbh->prepare($sql);
 
             // Bind values, use PARAM_NULL when appropriate to avoid type errors
+            $query->bindValue(':number', $userId, PDO::PARAM_INT);
             $query->bindValue(':firstname', $firstname, PDO::PARAM_STR);
             $query->bindValue(':surname', $surname, PDO::PARAM_STR);
 
@@ -111,24 +114,34 @@ if (isset($_POST['register'])) {
             }
 
             $query->bindValue(':username', $username, PDO::PARAM_STR);
-            $query->bindValue(':password', $password, PDO::PARAM_STR);
+            $query->bindValue(':password', $password_hash, PDO::PARAM_STR);
 
-            if ($query->execute()) {
-                // Auto-login the newly created patient: set same session vars as login.php and redirect to dashboard
-                $patientId = $dbh->lastInsertId();
-                // Ensure integer
-                $patientId = $patientId ? (int)$patientId : null;
-                $_SESSION['sturecmsnumber'] = $patientId;
-                $_SESSION['sturecmsfirstname'] = $firstname;
-                $_SESSION['sturecmssurname'] = $surname;
-                $_SESSION['login'] = $username;
+            $query->execute();
 
-                $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Account created successfully! Welcome.'];
-                header('Location: ../index.php');
-                exit();
-            } else {
-                setToast('Error creating account. Please try again.', 'danger');
-            }
+            // 5. Log the user in
+            $auth->login($email, $password_raw);
+
+            // 6. Set session variables
+            $_SESSION['sturecmsnumber'] = $userId;
+            $_SESSION['sturecmsfirstname'] = $firstname;
+            $_SESSION['sturecmssurname'] = $surname;
+            $_SESSION['login'] = $username;
+
+            $_SESSION['toast_message'] = ['type' => 'success', 'message' => 'Account created successfully! Welcome.'];
+            header('Location: ../index.php');
+            exit();
+
+        } catch (\Delight\Auth\InvalidEmailException $e) {
+            setToast('Invalid email address.', 'danger');
+        } catch (\Delight\Auth\InvalidPasswordException $e) {
+            setToast('Invalid password.', 'danger');
+        } catch (\Delight\Auth\UserAlreadyExistsException $e) {
+            setToast('Username or email already exists.', 'danger');
+        } catch (\Delight\Auth\TooManyRequestsException $e) {
+            setToast('Too many requests. Please try again later.', 'danger');
+        } catch (\Exception $e) {
+            // Log error for debugging: error_log($e->getMessage());
+            setToast('Error creating account. Please try again.', 'danger');
         }
     }
 }

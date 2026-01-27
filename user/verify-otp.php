@@ -138,6 +138,13 @@ if (isset($_POST['reset_password'])) {
 
         try {
             if ($update_query->execute() && $update_query->rowCount() > 0) {
+                // Also update the users table
+                $update_users = "UPDATE users SET password=:password WHERE email=:email";
+                $update_query_users = $dbh->prepare($update_users);
+                $update_query_users->bindParam(':password', $hashed_password, PDO::PARAM_STR);
+                $update_query_users->bindParam(':email', $email, PDO::PARAM_STR);
+                $update_query_users->execute();
+
                 setToast('Password has been reset successfully. You can now login.', 'success');
                 // Clear session variables
                 unset($_SESSION['otp']);

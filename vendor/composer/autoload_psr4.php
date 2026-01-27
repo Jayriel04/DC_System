@@ -6,5 +6,12 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'ParagonIE\\ConstantTime\\' => array($vendorDir . '/paragonie/constant_time_encoding/src'),
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
+    'Delight\\Otp\\' => array($vendorDir . '/delight-im/otp/src'),
+    'Delight\\Http\\' => array($vendorDir . '/delight-im/http/src'),
+    'Delight\\Db\\' => array($vendorDir . '/delight-im/db/src'),
+    'Delight\\Cookie\\' => array($vendorDir . '/delight-im/cookie/src'),
+    'Delight\\Base64\\' => array($vendorDir . '/delight-im/base64/src'),
+    'Delight\\Auth\\' => array($vendorDir . '/delight-im/auth/src'),
 );
