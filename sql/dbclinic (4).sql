@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 27, 2026 at 08:33 AM
+-- Generation Time: Jan 27, 2026 at 09:43 AM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -274,7 +274,8 @@ CREATE TABLE `tblpatient` (
 --
 
 INSERT INTO `tblpatient` (`number`, `firstname`, `surname`, `date_of_birth`, `sex`, `status`, `occupation`, `age`, `contact_number`, `address`, `email`, `Image`, `health_conditions`, `created_at`, `username`, `password`, `rating`, `feedback`) VALUES
-(1, 'Jezrah Faith', 'Canonio', '2004-05-13', 'Female', 'Single', 'Student', 21, '09564780461', 'Purok Kabulihan, Yati, Liloan, Cebu City', 'canonio.jezrahfaith.mcc@gmail.com', NULL, '{\"general\":[\"Marked weight change\"],\"ear\":[\"Loss of hearing, ringing of ears\"],\"nervous\":[\"Headache\",\"Numbness\\/Tingling\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Persistent cough\"],\"heart\":[\"Chest pain\\/discomfort\"],\"rheumatic_age\":\"\",\"stroke_when\":\"\",\"urinary\":[\"Burning sensation on urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Increase intake of food or water\"],\"thyroid\":[\"Apprehension\",\"Goiter\"],\"arthritis\":[\"Joint pain\"],\"radiograph\":[\"Undergo radiation therapy\"],\"pregnancy_months\":\"\",\"women\":[\"Breast feed\"],\"hospitalization_date\":\"\",\"hospitalization_specify\":\"\",\"allergy_specify\":\"\",\"extraction_date\":\"\",\"extraction_specify\":\"\",\"extraction_reaction_specify\":\"\"}', '2025-12-13 14:41:47', 'jezrah', '$2y$10$JrmcYE3B1/dFhyp65FuYledX6AamMx0HqoqAGCS6tcqRBpp1C2qY.', NULL, NULL);
+(1, 'Jezrah Faith', 'Canonio', '2004-05-13', 'Female', 'Single', 'Student', 21, '09564780461', 'Purok Kabulihan, Yati, Liloan, Cebu City', 'canonio.jezrahfaith.mcc@gmail.com', NULL, '{\"general\":[\"Marked weight change\"],\"ear\":[\"Loss of hearing, ringing of ears\"],\"nervous\":[\"Headache\",\"Numbness\\/Tingling\"],\"blood\":[\"Bruise easily\"],\"respiratory\":[\"Persistent cough\"],\"heart\":[\"Chest pain\\/discomfort\"],\"rheumatic_age\":\"\",\"stroke_when\":\"\",\"urinary\":[\"Burning sensation on urination\"],\"liver_specify\":\"\",\"liver\":[\"Jaundice\"],\"diabetes\":[\"Increase intake of food or water\"],\"thyroid\":[\"Apprehension\",\"Goiter\"],\"arthritis\":[\"Joint pain\"],\"radiograph\":[\"Undergo radiation therapy\"],\"pregnancy_months\":\"\",\"women\":[\"Breast feed\"],\"hospitalization_date\":\"\",\"hospitalization_specify\":\"\",\"allergy_specify\":\"\",\"extraction_date\":\"\",\"extraction_specify\":\"\",\"extraction_reaction_specify\":\"\"}', '2025-12-13 14:41:47', 'jezrah', '$2y$10$uqQExwI5KpPYcpYcP9TnkOd7/p6Yud32BPoso9o892YKdEPlhCDWu', NULL, NULL),
+(3, 'John Mar', 'Ypil', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ypil.johnmar.mcc@gmail.com', NULL, NULL, '2026-01-27 08:55:23', 'jm', '$pa01$2y$10$33mLfuaIcy0Dx40bc1kr0e/JhXtxTUP/X8b82ZqLiip9AB37NTfxK', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -354,8 +355,55 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `password`, `username`, `status`, `verified`, `resettable`, `roles_mask`, `registered`, `last_login`, `force_logout`) VALUES
-(1, 'canonio.jezrahfaith.mcc@gmail.com', '$2y$10$JrmcYE3B1/dFhyp65FuYledX6AamMx0HqoqAGCS6tcqRBpp1C2qY.', 'jezrah', 0, 1, 1, 0, 1765636907, NULL, 0),
-(2, 'ypil.johnmar.mcc@gmail.com', '$pa01$2y$10$PqvEvy6V6aRx.KNNbl2ADuMskg3NoJCz5Twhx0T0HVyavdNWfGMe6', 'jm', 0, 1, 1, 0, 1769502691, NULL, 0);
+(1, 'canonio.jezrahfaith.mcc@gmail.com', '$2y$10$uqQExwI5KpPYcpYcP9TnkOd7/p6Yud32BPoso9o892YKdEPlhCDWu', 'jezrah', 0, 1, 1, 0, 1765636907, 1769504036, 0),
+(3, 'ypil.johnmar.mcc@gmail.com', '$pa01$2y$10$33mLfuaIcy0Dx40bc1kr0e/JhXtxTUP/X8b82ZqLiip9AB37NTfxK', 'jm', 0, 1, 1, 0, 1769504123, 1769504146, 0),
+(4, 'canoniokevin@gmail.com', '$2y$10$5kjYgb7R.pBKBAV9V1djd.YgcE57ro9MiSptIMrWRAx1QUxit4OCy', 'admin', 0, 1, 1, 0, 1769504572, 1769504591, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users_2fa`
+--
+
+CREATE TABLE `users_2fa` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `mechanism` tinyint(3) UNSIGNED NOT NULL,
+  `seed` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` int(10) UNSIGNED NOT NULL,
+  `expires_at` int(10) UNSIGNED DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users_audit_log`
+--
+
+CREATE TABLE `users_audit_log` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED DEFAULT NULL,
+  `event_at` int(10) UNSIGNED NOT NULL,
+  `event_type` varchar(128) CHARACTER SET ascii NOT NULL,
+  `admin_id` int(10) UNSIGNED DEFAULT NULL,
+  `ip_address` varchar(49) CHARACTER SET ascii DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `details_json` text COLLATE utf8mb4_unicode_ci
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `users_audit_log`
+--
+
+INSERT INTO `users_audit_log` (`id`, `user_id`, `event_at`, `event_type`, `admin_id`, `ip_address`, `user_agent`, `details_json`) VALUES
+(1, 1, 1769503446, 'login', NULL, '::/48', 'YtGJhHIu0Fd4G85DQqAJJx/Qv0eZmBoEjKNI8JrwNYQ=', '{\"email\":\"c***c@g***l.com\",\"username\":null}'),
+(2, 1, 1769503531, 'login', NULL, '::/48', 'YtGJhHIu0Fd4G85DQqAJJx/Qv0eZmBoEjKNI8JrwNYQ=', '{\"email\":\"c***c@g***l.com\",\"username\":null}'),
+(3, 1, 1769504014, 'login', NULL, '::/48', 'YtGJhHIu0Fd4G85DQqAJJx/Qv0eZmBoEjKNI8JrwNYQ=', '{\"email\":\"c***c@g***l.com\",\"username\":null}'),
+(4, 1, 1769504036, 'login', NULL, '::/48', 'YtGJhHIu0Fd4G85DQqAJJx/Qv0eZmBoEjKNI8JrwNYQ=', '{\"email\":\"c***c@g***l.com\",\"username\":null}'),
+(5, 3, 1769504123, 'register', NULL, '::/48', 'YtGJhHIu0Fd4G85DQqAJJx/Qv0eZmBoEjKNI8JrwNYQ=', '{\"email\":\"y***c@g***l.com\",\"username\":\"jm\"}'),
+(6, 3, 1769504123, 'login', NULL, '::/48', 'YtGJhHIu0Fd4G85DQqAJJx/Qv0eZmBoEjKNI8JrwNYQ=', '{\"email\":\"y***c@g***l.com\",\"username\":null}'),
+(7, 3, 1769504146, 'login', NULL, '::/48', 'YtGJhHIu0Fd4G85DQqAJJx/Qv0eZmBoEjKNI8JrwNYQ=', '{\"email\":\"y***c@g***l.com\",\"username\":null}'),
+(8, 4, 1769504591, 'login', NULL, '::/48', 'YtGJhHIu0Fd4G85DQqAJJx/Qv0eZmBoEjKNI8JrwNYQ=', '{\"email\":\"c***n@g***l.com\",\"username\":null}');
 
 -- --------------------------------------------------------
 
@@ -418,7 +466,10 @@ CREATE TABLE `users_throttling` (
 --
 
 INSERT INTO `users_throttling` (`bucket`, `tokens`, `replenished_at`, `expires_at`) VALUES
-('ejWtPDKvxt-q7LZ3mFjzUoIWKJYzu47igC8Jd9mffFk', 74, 1769502690, 1770042690);
+('5JzmOXt9vZmM0Kc-lUvE5UjlLXOu5UtX1BmaBuH0ivc', 499, 1769503511, 1769676311),
+('CUeQSH1MUnRpuE3Wqv_fI3nADvMpK_cg6VpYK37vgIw', 4, 1769504123, 1769936123),
+('ejWtPDKvxt-q7LZ3mFjzUoIWKJYzu47igC8Jd9mffFk', 61.5282, 1769504591, 1770044591),
+('Jjl8HEbTSJpZBWoyXOajJXqciuUdngUbah061jwhliE', 19, 1769503511, 1769539511);
 
 --
 -- Indexes for dumped tables
@@ -487,6 +538,22 @@ ALTER TABLE `tblservice`
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `users_2fa`
+--
+ALTER TABLE `users_2fa`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_id_mechanism` (`user_id`,`mechanism`);
+
+--
+-- Indexes for table `users_audit_log`
+--
+ALTER TABLE `users_audit_log`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `event_at` (`event_at`),
+  ADD KEY `user_id_event_at` (`user_id`,`event_at`),
+  ADD KEY `user_id_event_type_event_at` (`user_id`,`event_type`,`event_at`);
 
 --
 -- Indexes for table `users_confirmations`
@@ -564,7 +631,7 @@ ALTER TABLE `tblnotif`
 -- AUTO_INCREMENT for table `tblpatient`
 --
 ALTER TABLE `tblpatient`
-  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tblschedule`
@@ -582,7 +649,19 @@ ALTER TABLE `tblservice`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `users_2fa`
+--
+ALTER TABLE `users_2fa`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users_audit_log`
+--
+ALTER TABLE `users_audit_log`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `users_confirmations`
