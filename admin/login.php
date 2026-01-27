@@ -1,6 +1,7 @@
 <?php
 session_start();
 error_reporting(0);
+require_once __DIR__ . '/../vendor/autoload.php';
 include('includes/dbconnection.php');
 
 $toast_message = null;
@@ -9,78 +10,84 @@ function setToast($message, $type) {
     $toast_message = ['message' => $message, 'type' => $type];
 }
 
+$auth = new \Delight\Auth\Auth($dbh);
+
 if (isset($_POST['login'])) {
   $username = $_POST['username'];
-  $password_input = $_POST['password'];
-  $sql = "SELECT ID, Password FROM tbladmin WHERE UserName=:username";
+  $password = $_POST['password'];
+
+  $sql = "SELECT Email FROM tbladmin WHERE UserName = ?";
   $query = $dbh->prepare($sql);
-  $query->bindParam(':username', $username, PDO::PARAM_STR);
-  $query->execute();
-  $result = $query->fetch(PDO::FETCH_OBJ);
+  $query->execute([$username]);
+  $user_email = $query->fetchColumn();
 
-  // Verify password
-  if ($query->rowCount() > 0) {
-    $is_password_correct = false;
-    
-    if (password_verify($password_input, $result->Password)) {
-        $is_password_correct = true;
-        // Rehash password if needed
-        if (password_needs_rehash($result->Password, PASSWORD_DEFAULT)) {
-            $new_hash = password_hash($password_input, PASSWORD_DEFAULT);
-            $rehash_sql = "UPDATE tbladmin SET Password = :new_hash WHERE ID = :id";
-            $rehash_query = $dbh->prepare($rehash_sql);
-            $rehash_query->execute([':new_hash' => $new_hash, ':id' => $result->ID]);
+  if (!$user_email) {
+    setToast('Invalid Details', 'danger');
+  } else {
+    try {
+      $auth->login($user_email, $password);
+
+      // Login successful
+      $admin_query = $dbh->prepare("SELECT ID FROM tbladmin WHERE UserName = ?");
+      $admin_query->execute([$username]);
+      $admin = $admin_query->fetch(PDO::FETCH_OBJ);
+
+      if ($admin) {
+        $_SESSION['sturecmsaid'] = $admin->ID;
+
+        if (!empty($_POST["remember"])) {
+          setcookie(
+            "user_login",
+            $_POST["username"],
+            [
+              'expires' => time() + (10 * 365 * 24 * 60 * 60),
+              'path' => '/',
+              'secure' => true,
+              'httponly' => true,
+              'samesite' => 'Strict'
+            ]
+          );
+          // DO NOT store password in a cookie for security reasons.
+          if (isset($_COOKIE["userpassword"])) {
+              setcookie("userpassword", "", time() - 3600, '/');
+          }
+        } else {
+          // Clear cookies if remember is not checked
+          if (isset($_COOKIE["user_login"])) {
+            setcookie("user_login", "", [
+              'expires' => time() - 3600,
+              'path' => '/',
+            ]);
+          }
+          if (isset($_COOKIE["userpassword"])) {
+            setcookie("userpassword", "", [
+              'expires' => time() - 3600,
+              'path' => '/',
+            ]);
+          }
         }
-    }
-    elseif (md5($password_input) === $result->Password) {
-        $is_password_correct = true;
-        $new_hash = password_hash($password_input, PASSWORD_DEFAULT);
-        $rehash_sql = "UPDATE tbladmin SET Password = :new_hash WHERE ID = :id";
-        $rehash_query = $dbh->prepare($rehash_sql);
-        $rehash_query->execute([':new_hash' => $new_hash, ':id' => $result->ID]);
-    }
-
-    if ($is_password_correct) {
-      $_SESSION['sturecmsaid'] = $result->ID;
-
-      if (!empty($_POST["remember"])) {
-        setcookie(
-          "user_login",
-          $_POST["username"],
-          [
-            'expires' => time() + (10 * 365 * 24 * 60 * 60),
-            'path' => '/',
-            'secure' => true,
-            'httponly' => true,
-            'samesite' => 'Strict'
-          ]
-        );
-        // DO NOT store password in a cookie for security reasons.
-        if (isset($_COOKIE["userpassword"])) {
-            setcookie("userpassword", "", time() - 3600, '/');
-        }
+        $_SESSION['login'] = $_POST['username'];
+        echo "<script type='text/javascript'> document.location ='dashboard.php'; </script>";
       } else {
-        // Clear cookies if remember is not checked
-        if (isset($_COOKIE["user_login"])) {
-          setcookie("user_login", "", [
-            'expires' => time() - 3600,
-            'path' => '/',
-          ]);
-        }
-        if (isset($_COOKIE["userpassword"])) {
-          setcookie("userpassword", "", [
-            'expires' => time() - 3600,
-            'path' => '/',
-          ]);
-        }
+        $auth->logOut();
+        setToast('Admin record not found.', 'danger');
       }
-      $_SESSION['login'] = $_POST['username'];
-      echo "<script type='text/javascript'> document.location ='dashboard.php'; </script>";
-    } else {
+    }
+    catch (\Delight\Auth\InvalidEmailException $e) {
       setToast('Invalid Details', 'danger');
     }
-  } else {
-    setToast('Invalid Details', 'danger');
+    catch (\Delight\Auth\InvalidPasswordException $e) {
+      setToast('Invalid Details', 'danger');
+    }
+    catch (\Delight\Auth\EmailNotVerifiedException $e) {
+      setToast('Please verify your email address.', 'warning');
+    }
+    catch (\Delight\Auth\TooManyRequestsException $e) {
+      setToast('Too many login attempts. Please try again later.', 'danger');
+    }
+    catch (\Exception $e) {
+      setToast('Invalid Details', 'danger');
+    }
   }
 }
 
